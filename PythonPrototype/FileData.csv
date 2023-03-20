@@ -1,0 +1,6 @@
+,File_ID,project,path,area,relative_path,filename,ext,lines,Initial Author,Latest Author,Most Frequent Author,Unique Authors,Initial Commit,Latest Commit,Total Commits,Total Inserts,Total Deletes
+0,0,PythonPrototype,,Root,PythonPrototype\GitStractor.ipynb,GitStractor.ipynb,.ipynb,260,Matt Eland,Matt Eland,Matt Eland,1,,,1,0,0
+1,1,PythonPrototype,,Scripts,PythonPrototype\Scripts\FileAnalyzer.py,FileAnalyzer.py,.py,188,Matt Eland,Matt Eland,Matt Eland,1,,,1,0,0
+2,2,PythonPrototype,,Scripts,PythonPrototype\Scripts\GitAnalyzer.py,GitAnalyzer.py,.py,136,Matt Eland,Matt Eland,Matt Eland,1,,,1,0,0
+3,3,PythonPrototype,,Scripts,PythonPrototype\Scripts\GitDataMerger.py,GitDataMerger.py,.py,108,Matt Eland,Matt Eland,Matt Eland,1,,,1,0,0
+4,4,,,Root,README.md,README.md,.md,42,Matt Eland,Matt Eland,Matt Eland,1,,,1,0,0

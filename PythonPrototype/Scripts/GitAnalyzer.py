@@ -101,14 +101,6 @@ def build_commits(repo, author_info):
 
     return (commits, file_commits)
 
-def correct_renames(file_commits_file_path):
-    df = pd.read_csv(file_commits_file_path)
-
-    df.sort_values()
-
-    df.to_csv(file_commits_file_path)
-
-
 def analyze_repository(path, commits_file_path = 'Commits.csv', 
                        file_commits_file_path = 'FileCommits.csv', 
                        num_threads=1,
@@ -137,10 +129,6 @@ def analyze_repository(path, commits_file_path = 'Commits.csv',
         df_file_commits = pd.DataFrame(file_commits)
         df_file_commits.to_csv(file_commits_file_path)
         print('Saved to ' + file_commits_file_path)
-
-        print('Correcting renames')
-        correct_renames(file_commits_file_path)
-        print('Renames compensated')
 
         print('Repository Data Pulled Successfully')
     except NoSuchPathError:

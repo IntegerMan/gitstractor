@@ -1,0 +1,6 @@
+,fullpath,root,project,path,area,relative_path,filename,ext,lines
+0,C:\Dev\GitStractorPythonPrototype/./GitStractor.ipynb,C:\Dev\GitStractor,PythonPrototype,.,Root,PythonPrototype\GitStractor.ipynb,GitStractor.ipynb,.ipynb,260
+1,C:\Dev\GitStractorPythonPrototype/./FileAnalyzer.py,C:\Dev\GitStractor,PythonPrototype,.,Scripts,PythonPrototype\Scripts\FileAnalyzer.py,FileAnalyzer.py,.py,188
+2,C:\Dev\GitStractorPythonPrototype/./GitAnalyzer.py,C:\Dev\GitStractor,PythonPrototype,.,Scripts,PythonPrototype\Scripts\GitAnalyzer.py,GitAnalyzer.py,.py,136
+3,C:\Dev\GitStractorPythonPrototype/./GitDataMerger.py,C:\Dev\GitStractor,PythonPrototype,.,Scripts,PythonPrototype\Scripts\GitDataMerger.py,GitDataMerger.py,.py,108
+4,C:\Dev\GitStractor/./README.md,C:\Dev\GitStractor,,.,Root,README.md,README.md,.md,42

@@ -1,4 +1,4 @@
-# GitStractor
+# GitStractor - Git Repository Analysis Tool
 Project by [Matt Eland](https://LinkedIn.com/in/matteland) ([@IntegerMan](https://twitter.com/IntegerMan))
 
 This project is built for Extracting data from local git repositories and their file trees in order to visualize repository information to provide insight to teams.
@@ -13,6 +13,8 @@ Current known bugs:
 - Moved or renamed files are not accurately tracked in the final results
 
 ## Python Prototype
+
+The current working edition of this project involves a Jupyter Notebook that uses PyDriller to mine git repositories and generate CSV files that can be imported into Tableau for analysis.
 
 ### File Analysis Workflow
 
@@ -33,7 +35,7 @@ The data should now be ready to import into Tableau, Power BI, or another tool. 
 
 ### Visualization
 
-Currently, the data is available for viewing in Tableau if you refresh the data sources. Find the `GitAnalysis.twbx` file and refresh the data source after visualizing your code.
+Currently, the data is available for viewing in Tableau if you refresh the data sources. Find the `GitStractor.twb` file and ensure the data source is properly connected to the local CSV files.
 
 ## Contact Information
 

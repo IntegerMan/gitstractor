@@ -1,0 +1,12 @@
+,hash,message,author_name,author_email,author_date,num_deletes,num_inserts,net_lines,filename,old_path,new_path,project_name,project_path
+0,4007dbb0053b857bc4bb6ac611c33b324a9d5e34,Initial commit,Matt Eland,matt.eland@gmail.com,2023-03-19 18:49:39-04:00,0,373,373,.gitignore,,.gitignore,gitstractor,C:\Dev\gitstractor
+1,4007dbb0053b857bc4bb6ac611c33b324a9d5e34,Initial commit,Matt Eland,matt.eland@gmail.com,2023-03-19 18:49:39-04:00,0,373,373,LICENSE,,LICENSE,gitstractor,C:\Dev\gitstractor
+2,4007dbb0053b857bc4bb6ac611c33b324a9d5e34,Initial commit,Matt Eland,matt.eland@gmail.com,2023-03-19 18:49:39-04:00,0,373,373,README.md,,README.md,gitstractor,C:\Dev\gitstractor
+3,295b7306e4522ed7cc95f867db0a3187b70a6488,Ported over code,Matt Eland,matt.eland@gmail.com,2023-03-19 21:36:32-04:00,2,744,742,.gitignore,.gitignore,.gitignore,gitstractor,C:\Dev\gitstractor
+4,295b7306e4522ed7cc95f867db0a3187b70a6488,Ported over code,Matt Eland,matt.eland@gmail.com,2023-03-19 21:36:32-04:00,2,744,742,settings.json,,.vscode\settings.json,gitstractor,C:\Dev\gitstractor
+5,295b7306e4522ed7cc95f867db0a3187b70a6488,Ported over code,Matt Eland,matt.eland@gmail.com,2023-03-19 21:36:32-04:00,2,744,742,GitAnalysis.twbx,PythonPrototype\GitAnalysis.twbx,PythonPrototype\GitAnalysis.twbx,gitstractor,C:\Dev\gitstractor
+6,295b7306e4522ed7cc95f867db0a3187b70a6488,Ported over code,Matt Eland,matt.eland@gmail.com,2023-03-19 21:36:32-04:00,2,744,742,GitStractor.ipynb,,PythonPrototype\GitStractor.ipynb,gitstractor,C:\Dev\gitstractor
+7,295b7306e4522ed7cc95f867db0a3187b70a6488,Ported over code,Matt Eland,matt.eland@gmail.com,2023-03-19 21:36:32-04:00,2,744,742,FileAnalyzer.py,,PythonPrototype\Scripts\FileAnalyzer.py,gitstractor,C:\Dev\gitstractor
+8,295b7306e4522ed7cc95f867db0a3187b70a6488,Ported over code,Matt Eland,matt.eland@gmail.com,2023-03-19 21:36:32-04:00,2,744,742,GitAnalyzer.py,,PythonPrototype\Scripts\GitAnalyzer.py,gitstractor,C:\Dev\gitstractor
+9,295b7306e4522ed7cc95f867db0a3187b70a6488,Ported over code,Matt Eland,matt.eland@gmail.com,2023-03-19 21:36:32-04:00,2,744,742,GitDataMerger.py,,PythonPrototype\Scripts\GitDataMerger.py,gitstractor,C:\Dev\gitstractor
+10,295b7306e4522ed7cc95f867db0a3187b70a6488,Ported over code,Matt Eland,matt.eland@gmail.com,2023-03-19 21:36:32-04:00,2,744,742,README.md,README.md,README.md,gitstractor,C:\Dev\gitstractor
