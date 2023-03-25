@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.4.33205.214
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MattEland.GitStractor", "MattEland.GitStractor\MattEland.GitStractor.csproj", "{3AB099FB-585C-4BE2-B5DF-A5EDE6C58A30}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MattEland.GitStractor.CLI", "MattEland.GitStractor.CLI\MattEland.GitStractor.CLI.csproj", "{E7CC5ED3-6FBE-47C6-978D-5614810D05BA}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3AB099FB-585C-4BE2-B5DF-A5EDE6C58A30}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3AB099FB-585C-4BE2-B5DF-A5EDE6C58A30}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3AB099FB-585C-4BE2-B5DF-A5EDE6C58A30}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3AB099FB-585C-4BE2-B5DF-A5EDE6C58A30}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E7CC5ED3-6FBE-47C6-978D-5614810D05BA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E7CC5ED3-6FBE-47C6-978D-5614810D05BA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E7CC5ED3-6FBE-47C6-978D-5614810D05BA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E7CC5ED3-6FBE-47C6-978D-5614810D05BA}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {E8C25211-1B8D-400C-AAC5-1D0C8BE78F82}
+	EndGlobalSection
+EndGlobal
