@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Root CoveredStatements="27" TotalStatements="42" CoveragePercent="64" ReportType="NDependXML" DotCoverVersion="2022.3.1">
+  <Assembly Name="GitStractor" CoveredStatements="12" TotalStatements="13" CoveragePercent="92">
+    <Namespace Name="GitStractor" CoveredStatements="12" TotalStatements="13" CoveragePercent="92">
+      <Type Name="GitDataExtractor" CoveredStatements="12" TotalStatements="13" CoveragePercent="92">
+        <Method Name="ExtractCommitInformation(String,String)" CoveredStatements="12" TotalStatements="13" CoveragePercent="92" FirstStatementLine="23" />
+      </Type>
+    </Namespace>
+  </Assembly>
+  <Assembly Name="GitStractor.CLI" CoveredStatements="0" TotalStatements="11" CoveragePercent="0">
+    <Namespace Name="GitStractor.CLI" CoveredStatements="0" TotalStatements="11" CoveragePercent="0">
+      <Type Name="Program" CoveredStatements="0" TotalStatements="11" CoveragePercent="0">
+        <Method Name="Main(String[])" CoveredStatements="0" TotalStatements="11" CoveragePercent="0" FirstStatementLine="8" />
+      </Type>
+    </Namespace>
+  </Assembly>
+  <Assembly Name="GitStractor.Tests" CoveredStatements="15" TotalStatements="18" CoveragePercent="83">
+    <Namespace Name="GitStractor.Tests" CoveredStatements="15" TotalStatements="18" CoveragePercent="83">
+      <Type Name="GitStractorAnalyzerTests" CoveredStatements="15" TotalStatements="18" CoveragePercent="83">
+        <Method Name="AnalyzingALocalGitRepositoryShouldNotError()" CoveredStatements="6" TotalStatements="6" CoveragePercent="100" FirstStatementLine="7" />
+        <Method Name="GetParentGitDirectory()" CoveredStatements="9" TotalStatements="12" CoveragePercent="75" FirstStatementLine="26" />
+      </Type>
+    </Namespace>
+  </Assembly>
+</Root>
