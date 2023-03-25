@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\MattEland.GitStractor\GitStractor.csproj" />
+    <ProjectReference Include="..\GitStractor\GitStractor.csproj" />
   </ItemGroup>
 
 </Project>

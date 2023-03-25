@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.4.33205.214
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitStractor", "MattEland.GitStractor\GitStractor.csproj", "{3AB099FB-585C-4BE2-B5DF-A5EDE6C58A30}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitStractor", "GitStractor\GitStractor.csproj", "{3AB099FB-585C-4BE2-B5DF-A5EDE6C58A30}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitStractor.CLI", "MattEland.GitStractor.CLI\GitStractor.CLI.csproj", "{E7CC5ED3-6FBE-47C6-978D-5614810D05BA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitStractor.CLI", "GitStractor.CLI\GitStractor.CLI.csproj", "{E7CC5ED3-6FBE-47C6-978D-5614810D05BA}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{A78DB2FF-6C51-4B25-8CA5-ACE313888DCE}"
 	ProjectSection(SolutionItems) = preProject
