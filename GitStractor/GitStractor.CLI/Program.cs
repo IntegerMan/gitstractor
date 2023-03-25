@@ -6,16 +6,22 @@ public class Program
 {
     private static void Main(string[] args)
     {
-        string path = "C:\\Dev\\GitDataExtractor";
-        string outputPath = Path.Combine(Environment.CurrentDirectory, "output.csv");
+        // First parameter is path, but current directory is used in its absence
+        string? repositoryPath = args.FirstOrDefault() ?? Environment.CurrentDirectory;
 
+        GitExtractionOptions options = new()
+        {
+            RepositoryPath = repositoryPath  
+        };
+        
+        // Analyze the git repository
         try
         {
-            GitDataExtractor.ExtractCommitInformation(path, outputPath);
+            GitDataExtractor.ExtractCommitInformation(options);
         }
         catch (RepositoryNotFoundException)
         {
-            Console.WriteLine($"The repository at {path} could not be found.");
+            Console.WriteLine($"The repository at {repositoryPath} could not be found.");
         }
     }
 }

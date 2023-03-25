@@ -1,1 +1,7 @@
-﻿global using LibGit2Sharp;
+﻿global using System;
+global using System.Collections.Generic;
+global using System.Linq;
+global using System.Text;
+global using System.Threading.Tasks;
+
+global using LibGit2Sharp;

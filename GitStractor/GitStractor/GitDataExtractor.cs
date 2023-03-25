@@ -9,21 +9,19 @@ public static class GitDataExtractor
     /// Extracts commit information into an output file that can be analyzed by other tools.
     /// </summary>
     /// <exception cref="RepositoryNotFoundException">
-    /// Thrown when the repository in <paramref name="repoPath"/> does not exist
+    /// Thrown when the repository listed in <paramref name="options"/> does not exist
     /// </exception>
     /// <exception cref="ArgumentNullException">
-    /// Thrown when <paramref name="repoPath"/> is <c>null</c>.
+    /// Thrown when <paramref name="options"/> is <c>null</c>.
     /// </exception>
-    /// <param name="repoPath">
-    /// The path to the git repository.
-    /// This should be a path to a local folder on disk.
-    /// </param>
-    /// <param name="outputPath"></param>
-    public static void ExtractCommitInformation(string repoPath, string outputPath)
+    /// <param name="options">The configuration options for GitStractor</param>
+    public static void ExtractCommitInformation(GitExtractionOptions options)
     {
-        if (repoPath == null) throw new ArgumentNullException(nameof(repoPath));
+        if (options == null) throw new ArgumentNullException(nameof(options));
 
-        using Repository repo = new(repoPath);
+        string gitPath = FileUtilities.GetParentGitDirectory(options.RepositoryPath);
+
+        using Repository repo = new(gitPath);
         
         foreach (Commit c in repo.Commits)
         {

@@ -1,24 +1,31 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Root CoveredStatements="27" TotalStatements="42" CoveragePercent="64" ReportType="NDependXML" DotCoverVersion="2022.3.1">
-  <Assembly Name="GitStractor" CoveredStatements="12" TotalStatements="13" CoveragePercent="92">
-    <Namespace Name="GitStractor" CoveredStatements="12" TotalStatements="13" CoveragePercent="92">
-      <Type Name="GitDataExtractor" CoveredStatements="12" TotalStatements="13" CoveragePercent="92">
-        <Method Name="ExtractCommitInformation(String,String)" CoveredStatements="12" TotalStatements="13" CoveragePercent="92" FirstStatementLine="23" />
+<Root CoveredStatements="38" TotalStatements="53" CoveragePercent="72" ReportType="NDependXML" DotCoverVersion="2022.3.1">
+  <Assembly Name="GitStractor" CoveredStatements="26" TotalStatements="28" CoveragePercent="93">
+    <Namespace Name="GitStractor" CoveredStatements="26" TotalStatements="28" CoveragePercent="93">
+      <Type Name="FileUtilities" CoveredStatements="10" TotalStatements="12" CoveragePercent="83">
+        <Method Name="GetParentGitDirectory(String)" CoveredStatements="10" TotalStatements="12" CoveragePercent="83" FirstStatementLine="21" />
+      </Type>
+      <Type Name="GitDataExtractor" CoveredStatements="14" TotalStatements="14" CoveragePercent="100">
+        <Method Name="ExtractCommitInformation(GitExtractionOptions)" CoveredStatements="14" TotalStatements="14" CoveragePercent="100" FirstStatementLine="19" />
+      </Type>
+      <Type Name="GitExtractionOptions" CoveredStatements="2" TotalStatements="2" CoveragePercent="100">
+        <Method Name="get_RepositoryPath()" CoveredStatements="1" TotalStatements="1" CoveragePercent="100" FirstStatementLine="13" />
+        <Method Name="set_RepositoryPath(String)" CoveredStatements="1" TotalStatements="1" CoveragePercent="100" FirstStatementLine="13" />
       </Type>
     </Namespace>
   </Assembly>
   <Assembly Name="GitStractor.CLI" CoveredStatements="0" TotalStatements="11" CoveragePercent="0">
     <Namespace Name="GitStractor.CLI" CoveredStatements="0" TotalStatements="11" CoveragePercent="0">
       <Type Name="Program" CoveredStatements="0" TotalStatements="11" CoveragePercent="0">
-        <Method Name="Main(String[])" CoveredStatements="0" TotalStatements="11" CoveragePercent="0" FirstStatementLine="8" />
+        <Method Name="Main(String[])" CoveredStatements="0" TotalStatements="11" CoveragePercent="0" FirstStatementLine="9" />
       </Type>
     </Namespace>
   </Assembly>
-  <Assembly Name="GitStractor.Tests" CoveredStatements="15" TotalStatements="18" CoveragePercent="83">
-    <Namespace Name="GitStractor.Tests" CoveredStatements="15" TotalStatements="18" CoveragePercent="83">
-      <Type Name="GitStractorAnalyzerTests" CoveredStatements="15" TotalStatements="18" CoveragePercent="83">
-        <Method Name="AnalyzingALocalGitRepositoryShouldNotError()" CoveredStatements="6" TotalStatements="6" CoveragePercent="100" FirstStatementLine="7" />
-        <Method Name="GetParentGitDirectory()" CoveredStatements="9" TotalStatements="12" CoveragePercent="75" FirstStatementLine="26" />
+  <Assembly Name="GitStractor.Tests" CoveredStatements="12" TotalStatements="14" CoveragePercent="86">
+    <Namespace Name="GitStractor.Tests" CoveredStatements="12" TotalStatements="14" CoveragePercent="86">
+      <Type Name="GitStractorAnalyzerTests" CoveredStatements="12" TotalStatements="14" CoveragePercent="86">
+        <Method Name="AnalyzingALocalGitRepositoryShouldNotError()" CoveredStatements="5" TotalStatements="5" CoveragePercent="100" FirstStatementLine="26" />
+        <Method Name="AnalyzingWithoutOptionsShouldThrowArgNull()" CoveredStatements="7" TotalStatements="9" CoveragePercent="78" FirstStatementLine="7" />
       </Type>
     </Namespace>
   </Assembly>
