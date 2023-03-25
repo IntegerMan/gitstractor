@@ -27,9 +27,9 @@ public class GitStractor
 
         using Repository repo = new(repoPath);
         
-        repo.Commits.ToList().ForEach(c =>
+        foreach (Commit c in repo.Commits)
         {
             Console.WriteLine($"{c.Sha[..4]}: {c.Author.Name} ({c.Author.Email}): {c.MessageShort.Trim()}");
-        });
+        }
     }
 }
