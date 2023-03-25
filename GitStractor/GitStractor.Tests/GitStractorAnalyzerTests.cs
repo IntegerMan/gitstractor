@@ -6,12 +6,11 @@ namespace GitStractor.Tests
         public void AnalyzingALocalGitRepositoryShouldNotError()
         {
             // Arrange
-            GitStractor sut = new();
             string repoPath = GetParentGitDirectory();
             string outputPath = Path.GetTempFileName();
 
             // Act
-            sut.ExtractCommitInformation(repoPath, outputPath);
+            GitDataExtractor.ExtractCommitInformation(repoPath, outputPath);
 
             // Assert
             Assert.True(true);

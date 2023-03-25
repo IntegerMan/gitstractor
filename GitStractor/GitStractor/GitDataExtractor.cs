@@ -1,11 +1,9 @@
-﻿using LibGit2Sharp;
-
-namespace GitStractor;
+﻿namespace GitStractor;
 
 /// <summary>
-/// This class is the main entry point for using GitStractor to extract information from a Git repository.
+/// This class is the main entry point for using GitDataExtractor to extract information from a Git repository.
 /// </summary>
-public class GitStractor
+public static class GitDataExtractor
 {
     /// <summary>
     /// Extracts commit information into an output file that can be analyzed by other tools.
@@ -21,7 +19,7 @@ public class GitStractor
     /// This should be a path to a local folder on disk.
     /// </param>
     /// <param name="outputPath"></param>
-    public void ExtractCommitInformation(string repoPath, string outputPath)
+    public static void ExtractCommitInformation(string repoPath, string outputPath)
     {
         if (repoPath == null) throw new ArgumentNullException(nameof(repoPath));
 
