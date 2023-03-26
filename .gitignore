@@ -352,3 +352,5 @@ MigrationBackup/
 # Additional Customizations
 ~*.twbr
 Scripts/__pycache__/
+
+GitStractor/NDependOut/
