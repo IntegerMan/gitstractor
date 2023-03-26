@@ -29,7 +29,8 @@ The current working edition of this project involves a Jupyter Notebook that use
    1. `Commits.csv` containing all git commits
    2. `FileCommits.csv` which breaks down commits at a one row per file per commit level
    3. `FileSizes.csv` containing file statistics for all source files in the current version of your project
-   4. `MergedFileData.csv` which joins together `FileCommits.csv` and `FileSizes.csv`
+   4. `MergedFileData.csv` which joins together `FileCommits.csv` and `FileSizes.csv` to provide file information at a per-file-commit basis
+   5. `FileData.csv` which joins together `FileSizes.csv` and `FileCommits.csv` to provide commit aggregate information at a per-file basis
 
 The data should now be ready to import into Tableau, Power BI, or another tool. You can also analyze the data in Python or another programming language
 
