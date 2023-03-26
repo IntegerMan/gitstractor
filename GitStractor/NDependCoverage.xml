@@ -1,31 +1,72 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Root CoveredStatements="38" TotalStatements="53" CoveragePercent="72" ReportType="NDependXML" DotCoverVersion="2022.3.1">
-  <Assembly Name="GitStractor" CoveredStatements="26" TotalStatements="28" CoveragePercent="93">
-    <Namespace Name="GitStractor" CoveredStatements="26" TotalStatements="28" CoveragePercent="93">
-      <Type Name="FileUtilities" CoveredStatements="10" TotalStatements="12" CoveragePercent="83">
-        <Method Name="GetParentGitDirectory(String)" CoveredStatements="10" TotalStatements="12" CoveragePercent="83" FirstStatementLine="21" />
+<Root CoveredStatements="86" TotalStatements="116" CoveragePercent="74" ReportType="NDependXML" DotCoverVersion="2022.3.1">
+  <Assembly Name="GitStractor" CoveredStatements="73" TotalStatements="84" CoveragePercent="87">
+    <Namespace Name="GitStractor" CoveredStatements="38" TotalStatements="42" CoveragePercent="90">
+      <Type Name="GitDataExtractor" CoveredStatements="32" TotalStatements="34" CoveragePercent="94">
+        <Type Name="&lt;ExtractCommitInformation&gt;d__0" CoveredStatements="24" TotalStatements="26" CoveragePercent="92">
+          <Method Name="MoveNext()" CoveredStatements="24" TotalStatements="26" CoveragePercent="92" FirstStatementLine="25" />
+        </Type>
+        <Method Name="CreateCommitFromLibGitCommit(IEnumerable&lt;String&gt;,Commit)" CoveredStatements="1" TotalStatements="1" CoveragePercent="100" FirstStatementLine="70" />
+        <Method Name="WriteCommit(TextWriter,CommitInfo)" CoveredStatements="7" TotalStatements="7" CoveragePercent="100" FirstStatementLine="61" />
       </Type>
-      <Type Name="GitDataExtractor" CoveredStatements="14" TotalStatements="14" CoveragePercent="100">
-        <Method Name="ExtractCommitInformation(GitExtractionOptions)" CoveredStatements="14" TotalStatements="14" CoveragePercent="100" FirstStatementLine="19" />
-      </Type>
-      <Type Name="GitExtractionOptions" CoveredStatements="2" TotalStatements="2" CoveragePercent="100">
+      <Type Name="GitExtractionOptions" CoveredStatements="6" TotalStatements="8" CoveragePercent="75">
+        <Method Name=".ctor()" CoveredStatements="2" TotalStatements="2" CoveragePercent="100" FirstStatementLine="19" />
+        <Method Name="get_CommitFilePath()" CoveredStatements="1" TotalStatements="1" CoveragePercent="100" FirstStatementLine="25" />
+        <Method Name="get_OutputDirectory()" CoveredStatements="1" TotalStatements="1" CoveragePercent="100" FirstStatementLine="19" />
         <Method Name="get_RepositoryPath()" CoveredStatements="1" TotalStatements="1" CoveragePercent="100" FirstStatementLine="13" />
+        <Method Name="set_CommitFilePath(String)" CoveredStatements="0" TotalStatements="1" CoveragePercent="0" FirstStatementLine="25" />
+        <Method Name="set_OutputDirectory(String)" CoveredStatements="0" TotalStatements="1" CoveragePercent="0" FirstStatementLine="19" />
         <Method Name="set_RepositoryPath(String)" CoveredStatements="1" TotalStatements="1" CoveragePercent="100" FirstStatementLine="13" />
       </Type>
     </Namespace>
-  </Assembly>
-  <Assembly Name="GitStractor.CLI" CoveredStatements="0" TotalStatements="11" CoveragePercent="0">
-    <Namespace Name="GitStractor.CLI" CoveredStatements="0" TotalStatements="11" CoveragePercent="0">
-      <Type Name="Program" CoveredStatements="0" TotalStatements="11" CoveragePercent="0">
-        <Method Name="Main(String[])" CoveredStatements="0" TotalStatements="11" CoveragePercent="0" FirstStatementLine="9" />
+    <Namespace Name="GitStractor.Model" CoveredStatements="24" TotalStatements="29" CoveragePercent="83">
+      <Type Name="CommitInfo" CoveredStatements="24" TotalStatements="29" CoveragePercent="83">
+        <Method Name=".ctor(IEnumerable&lt;String&gt;)" CoveredStatements="5" TotalStatements="5" CoveragePercent="100" FirstStatementLine="15" />
+        <Method Name="get_AuthorDateLocal()" CoveredStatements="0" TotalStatements="1" CoveragePercent="0" FirstStatementLine="49" />
+        <Method Name="get_AuthorDateUtc()" CoveredStatements="1" TotalStatements="1" CoveragePercent="100" FirstStatementLine="44" />
+        <Method Name="get_AuthorEmail()" CoveredStatements="1" TotalStatements="1" CoveragePercent="100" FirstStatementLine="39" />
+        <Method Name="get_AuthorName()" CoveredStatements="1" TotalStatements="1" CoveragePercent="100" FirstStatementLine="34" />
+        <Method Name="get_CommitterDateLocal()" CoveredStatements="0" TotalStatements="1" CoveragePercent="0" FirstStatementLine="74" />
+        <Method Name="get_CommitterDateUtc()" CoveredStatements="1" TotalStatements="1" CoveragePercent="100" FirstStatementLine="68" />
+        <Method Name="get_CommitterEmail()" CoveredStatements="1" TotalStatements="1" CoveragePercent="100" FirstStatementLine="62" />
+        <Method Name="get_CommitterName()" CoveredStatements="1" TotalStatements="1" CoveragePercent="100" FirstStatementLine="56" />
+        <Method Name="get_FileNames()" CoveredStatements="1" TotalStatements="1" CoveragePercent="100" FirstStatementLine="89" />
+        <Method Name="get_Files()" CoveredStatements="1" TotalStatements="1" CoveragePercent="100" FirstStatementLine="84" />
+        <Method Name="get_Message()" CoveredStatements="1" TotalStatements="1" CoveragePercent="100" FirstStatementLine="24" />
+        <Method Name="get_NumFiles()" CoveredStatements="1" TotalStatements="1" CoveragePercent="100" FirstStatementLine="79" />
+        <Method Name="get_Sha()" CoveredStatements="1" TotalStatements="1" CoveragePercent="100" FirstStatementLine="29" />
+        <Method Name="set_AuthorDateUtc(DateTime)" CoveredStatements="1" TotalStatements="1" CoveragePercent="100" FirstStatementLine="44" />
+        <Method Name="set_AuthorEmail(String)" CoveredStatements="1" TotalStatements="1" CoveragePercent="100" FirstStatementLine="39" />
+        <Method Name="set_AuthorName(String)" CoveredStatements="1" TotalStatements="1" CoveragePercent="100" FirstStatementLine="34" />
+        <Method Name="set_CommitterDateUtc(DateTime)" CoveredStatements="1" TotalStatements="1" CoveragePercent="100" FirstStatementLine="68" />
+        <Method Name="set_CommitterEmail(String)" CoveredStatements="1" TotalStatements="1" CoveragePercent="100" FirstStatementLine="62" />
+        <Method Name="set_CommitterName(String)" CoveredStatements="1" TotalStatements="1" CoveragePercent="100" FirstStatementLine="56" />
+        <Method Name="set_Message(String)" CoveredStatements="1" TotalStatements="1" CoveragePercent="100" FirstStatementLine="24" />
+        <Method Name="set_Sha(String)" CoveredStatements="1" TotalStatements="1" CoveragePercent="100" FirstStatementLine="29" />
+        <Method Name="ToString()" CoveredStatements="0" TotalStatements="3" CoveragePercent="0" FirstStatementLine="93" />
+      </Type>
+    </Namespace>
+    <Namespace Name="GitStractor.Utilities" CoveredStatements="11" TotalStatements="13" CoveragePercent="85">
+      <Type Name="CsvExtensions" CoveredStatements="1" TotalStatements="1" CoveragePercent="100">
+        <Method Name="ToCsvSafeString(String)" CoveredStatements="1" TotalStatements="1" CoveragePercent="100" FirstStatementLine="18" />
+      </Type>
+      <Type Name="FileUtilities" CoveredStatements="10" TotalStatements="12" CoveragePercent="83">
+        <Method Name="GetParentGitDirectory(String)" CoveredStatements="10" TotalStatements="12" CoveragePercent="83" FirstStatementLine="21" />
       </Type>
     </Namespace>
   </Assembly>
-  <Assembly Name="GitStractor.Tests" CoveredStatements="12" TotalStatements="14" CoveragePercent="86">
-    <Namespace Name="GitStractor.Tests" CoveredStatements="12" TotalStatements="14" CoveragePercent="86">
-      <Type Name="GitStractorAnalyzerTests" CoveredStatements="12" TotalStatements="14" CoveragePercent="86">
-        <Method Name="AnalyzingALocalGitRepositoryShouldNotError()" CoveredStatements="5" TotalStatements="5" CoveragePercent="100" FirstStatementLine="26" />
-        <Method Name="AnalyzingWithoutOptionsShouldThrowArgNull()" CoveredStatements="7" TotalStatements="9" CoveragePercent="78" FirstStatementLine="7" />
+  <Assembly Name="GitStractor.CLI" CoveredStatements="0" TotalStatements="17" CoveragePercent="0">
+    <Namespace Name="GitStractor.CLI" CoveredStatements="0" TotalStatements="17" CoveragePercent="0">
+      <Type Name="Program" CoveredStatements="0" TotalStatements="17" CoveragePercent="0">
+        <Method Name="Main(String[])" CoveredStatements="0" TotalStatements="17" CoveragePercent="0" FirstStatementLine="9" />
+      </Type>
+    </Namespace>
+  </Assembly>
+  <Assembly Name="GitStractor.Tests" CoveredStatements="13" TotalStatements="15" CoveragePercent="87">
+    <Namespace Name="GitStractor.Tests" CoveredStatements="13" TotalStatements="15" CoveragePercent="87">
+      <Type Name="GitStractorAnalyzerTests" CoveredStatements="13" TotalStatements="15" CoveragePercent="87">
+        <Method Name="AnalyzingALocalGitRepositoryShouldReturnResults()" CoveredStatements="6" TotalStatements="6" CoveragePercent="100" FirstStatementLine="32" />
+        <Method Name="AnalyzingWithoutOptionsShouldThrowArgNull()" CoveredStatements="7" TotalStatements="9" CoveragePercent="78" FirstStatementLine="12" />
       </Type>
     </Namespace>
   </Assembly>

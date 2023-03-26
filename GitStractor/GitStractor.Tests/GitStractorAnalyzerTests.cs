@@ -1,3 +1,8 @@
+using System.Diagnostics.CodeAnalysis;
+using GitStractor.Model;
+using GitStractor.Utilities;
+using Shouldly;
+
 namespace GitStractor.Tests
 {
     public class GitStractorAnalyzerTests
@@ -10,7 +15,7 @@ namespace GitStractor.Tests
                 // Arrange
 
                 // Act
-                GitDataExtractor.ExtractCommitInformation(null!);
+                _ = GitDataExtractor.ExtractCommitInformation(null!).ToList();
 
                 // Assert
                 Assert.Fail("An exception should have been thrown but was not");
@@ -22,7 +27,8 @@ namespace GitStractor.Tests
         }
         
         [Fact]
-        public void AnalyzingALocalGitRepositoryShouldNotError()
+        [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
+        public void AnalyzingALocalGitRepositoryShouldReturnResults()
         {
             // Arrange
             GitExtractionOptions options = new()
@@ -31,10 +37,11 @@ namespace GitStractor.Tests
             };
 
             // Act
-            GitDataExtractor.ExtractCommitInformation(options);
+            IEnumerable<CommitInfo> commits = GitDataExtractor.ExtractCommitInformation(options);
 
             // Assert
-            Assert.True(true);
+            commits.ShouldNotBeNull();
+            commits.ShouldNotBeEmpty();
         }
 
     }

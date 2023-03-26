@@ -1,4 +1,4 @@
-﻿namespace GitStractor;
+﻿namespace GitStractor.Utilities;
 
 /// <summary>
 /// This class offers utility methods for working with git directories
@@ -20,9 +20,9 @@ public static class FileUtilities
     public static string GetParentGitDirectory(string? directory = null)
     {
         directory ??= Environment.CurrentDirectory;
-        
+
         DirectoryInfo? dirInfo = new(directory);
-        
+
         // Walk up the drive path until we find a git repo
         while (dirInfo != null && !dirInfo.EnumerateDirectories(".git").Any())
         {
