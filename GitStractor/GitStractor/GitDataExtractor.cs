@@ -33,7 +33,7 @@ public static class GitDataExtractor
         using (StreamWriter writer = new(commitCSVFile, append: false))
         {
             // Write the header row
-            writer.WriteLine("CommitHash,AuthorName,AuthorEmail,AuthorDate,CommitterName,CommitterEmail,CommitterDate,Message");
+            writer.WriteLine("CommitHash,AuthorName,AuthorEmail,AuthorDateUTC,CommitterName,CommitterEmail,CommitterDate,Message");
 
             // Write all commits
             foreach (Commit commit in repo.Commits)
@@ -41,13 +41,20 @@ public static class GitDataExtractor
                 CommitInfo info = new()
                 {
                     Sha = commit.Sha,
+                    Message = commit.MessageShort, // This is just the first line of the commit message. Usually all that's needed
+
+                    // Author information. Author is the person who wrote the contents of the commit
                     AuthorName = commit.Author.Name,
                     AuthorEmail = commit.Author.Email,
-                    AuthorDate = commit.Author.When.UtcDateTime,
-                    Message = commit.MessageShort // This is just the first line of the commit message. Usually all that's needed
+                    AuthorDateUtc = commit.Author.When.UtcDateTime,
+                    
+                    // Committer information. Committer is the person who performed the commit
+                    CommitterName = commit.Committer.Name,
+                    CommitterEmail = commit.Committer.Email,
+                    CommitterDateUtc = commit.Committer.When.UtcDateTime,
                 };
                 
-                writer.WriteLine($"{info.Sha},{info.AuthorName},{info.AuthorEmail},{info.AuthorDate},{info.Message}");
+                writer.WriteLine($"{info.Sha},{info.AuthorName},{info.AuthorEmail},{info.AuthorDateUtc},{info.CommitterName},{info.CommitterEmail},{info.CommitterDateUtc},{info.Message}");
 
                 yield return info;
             }
