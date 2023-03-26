@@ -1,4 +1,5 @@
-﻿using LibGit2Sharp;
+﻿using GitStractor.Model;
+using LibGit2Sharp;
 
 namespace GitStractor.CLI;
 
@@ -11,13 +12,18 @@ public class Program
 
         GitExtractionOptions options = new()
         {
-            RepositoryPath = repositoryPath  
+            RepositoryPath = repositoryPath,
+            OutputDirectory = Environment.CurrentDirectory,
+            CommitFilePath = "Commits.csv"
         };
         
         // Analyze the git repository
         try
         {
-            GitDataExtractor.ExtractCommitInformation(options);
+            foreach (CommitInfo commitInfo in GitDataExtractor.ExtractCommitInformation(options))
+            {
+                Console.WriteLine(commitInfo);
+            }
         }
         catch (RepositoryNotFoundException)
         {
