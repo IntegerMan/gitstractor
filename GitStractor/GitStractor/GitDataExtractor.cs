@@ -35,20 +35,36 @@ public static class GitDataExtractor
         using StreamWriter commitsCsv = new(commitCSVFile, append: false);
        
         // Write the header row
-        commitsCsv.WriteLine("CommitHash,AuthorName,AuthorEmail,AuthorDateUTC,CommitterName,CommitterEmail,CommitterDate,Message,NumFiles,FileNames");
+        commitsCsv.WriteLine("CommitHash,AuthorName,AuthorEmail,AuthorDateUTC,CommitterName,CommitterEmail,CommitterDate,Message,NumFiles,Bytes,FileNames");
 
         // Write all commits
         foreach (Commit commit in repo.Commits)
         {
             // Walk the commit tree to get file information
+            ulong blobSize = 0;
             List<string> files = new();
             foreach (TreeEntry file in commit.Tree)
             {
+                switch (file.TargetType)
+                {
+                    case TreeEntryTargetType.Blob:
+                        Blob blob = (Blob) file.Target;
+                        blobSize += (ulong) blob.Size;
+                        break;
+                    case TreeEntryTargetType.GitLink:
+                        GitLink gitLink = (GitLink)file.Target;
+                        // TODO: Should we do anything with this?
+                        break;
+                    case TreeEntryTargetType.Tree:
+                        // TODO: go recursive?
+                        break;
+                }
+
                 files.Add(file.Path);
             }
                 
             // Create the commit summary info.
-            CommitInfo info = CreateCommitFromLibGitCommit(files, commit);
+            CommitInfo info = CreateCommitFromLibGitCommit(files, commit, blobSize);
 
             // Write to the CSV file, protecting against commas in various fields
             WriteCommit(commitsCsv, info);
@@ -63,14 +79,15 @@ public static class GitDataExtractor
         writer.Write($"{info.AuthorName.ToCsvSafeString()},{info.AuthorEmail.ToCsvSafeString()},{info.AuthorDateUtc},");
         writer.Write($"{info.CommitterName.ToCsvSafeString()},{info.CommitterEmail.ToCsvSafeString()},{info.CommitterDateUtc},");
         writer.Write($"{info.Message.ToCsvSafeString()},");
-        writer.WriteLine($"{info.NumFiles},{info.FileNames.ToCsvSafeString()}");
+        writer.WriteLine($"{info.NumFiles},{info.SizeInBytes},{info.FileNames.ToCsvSafeString()}");
     }
 
-    private static CommitInfo CreateCommitFromLibGitCommit(IEnumerable<string> files, Commit commit) 
+    private static CommitInfo CreateCommitFromLibGitCommit(IEnumerable<string> files, Commit commit, ulong bytes) 
         => new(files)
         {
             Sha = commit.Sha,
             Message = commit.MessageShort, // This is just the first line of the commit message. Usually all that's needed
+            SizeInBytes = bytes,
 
             // Author information. Author is the person who wrote the contents of the commit
             AuthorName = commit.Author.Name,

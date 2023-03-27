@@ -22,6 +22,11 @@ public class CommitInfo
     /// The commit message
     /// </summary>
     public required string Message { get; init; }
+    
+    /// <summary>
+    /// The total blob size of the commit in terms of bytes
+    /// </summary>
+    public ulong SizeInBytes { get; init; }
 
     /// <summary>
     /// The SHA of the commit

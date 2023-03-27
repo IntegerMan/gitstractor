@@ -40,7 +40,4 @@ Global
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E8C25211-1B8D-400C-AAC5-1D0C8BE78F82}
 	EndGlobalSection
-	GlobalSection(NDepend) = preSolution
-		Project = "..\GitStractpr\GitStractor.ndproj"
-	EndGlobalSection
 EndGlobal
