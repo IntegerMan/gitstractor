@@ -44,7 +44,7 @@ public class GitDataExtractor
 
         // Write the header rows
         authorCsv.WriteLine("Name,Email,NumCommits,TotalBytes");
-        commitsCsv.WriteLine("CommitHash,AuthorName,AuthorEmail,AuthorDateUTC,CommitterName,CommitterEmail,CommitterDate,Message,NumFiles,TotalBytes,FileNames");
+        commitsCsv.WriteLine("CommitHash,AuthorEmail,AuthorDateUTC,CommitterEmail,CommitterDate,Message,NumFiles,TotalBytes,FileNames");
 
         // Write all commits
         foreach (Commit commit in repo.Commits)
@@ -130,8 +130,8 @@ public class GitDataExtractor
     private static void WriteCommit(TextWriter writer, CommitInfo info)
     {
         writer.Write($"{info.Sha},");
-        writer.Write($"{info.AuthorName.ToCsvSafeString()},{info.AuthorEmail.ToCsvSafeString()},{info.AuthorDateUtc},");
-        writer.Write($"{info.CommitterName.ToCsvSafeString()},{info.CommitterEmail.ToCsvSafeString()},{info.CommitterDateUtc},");
+        writer.Write($"{info.Author.Email.ToCsvSafeString()},{info.AuthorDateUtc},");
+        writer.Write($"{info.Committer.Email.ToCsvSafeString()},{info.CommitterDateUtc},");
         writer.Write($"{info.Message.ToCsvSafeString()},");
         writer.WriteLine($"{info.NumFiles},{info.SizeInBytes},{info.FileNames.ToCsvSafeString()}");
     }
@@ -148,13 +148,11 @@ public class GitDataExtractor
             SizeInBytes = bytes,
 
             // Author information. Author is the person who wrote the contents of the commit
-            AuthorName = commit.Author.Name,
-            AuthorEmail = commit.Author.Email,
+            Author = author,
             AuthorDateUtc = commit.Author.When.UtcDateTime,
                     
             // Committer information. Committer is the person who performed the commit
-            CommitterName = commit.Committer.Name,
-            CommitterEmail = commit.Committer.Email,
+            Committer = committer,
             CommitterDateUtc = commit.Committer.When.UtcDateTime,
         };
 }

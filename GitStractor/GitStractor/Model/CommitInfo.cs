@@ -34,14 +34,9 @@ public class CommitInfo
     public required string Sha { get; init; }
 
     /// <summary>
-    /// The name of the person who wrote the contents of the commit
+    /// The person who wrote the contents of the commit
     /// </summary>
-    public required string AuthorName { get; init; }
-    
-    /// <summary>
-    /// The email address of the person who wrote the contents of the commit
-    /// </summary>
-    public required string AuthorEmail { get; init; }
+    public required AuthorInfo Author { get; init; }
 
     /// <summary>
     /// The date the commit was authored in UTC time
@@ -53,18 +48,11 @@ public class CommitInfo
     /// </summary>
     public DateTime AuthorDateLocal => AuthorDateUtc.ToLocalTime();
 
-
     /// <summary>
-    /// The name of the person who committed the code.
-    /// This is usually the same as <see cref="AuthorName"/> but may represent someone committing the author's changes.
+    /// The person who committed the commit
+    /// This is usually the same as <see cref="Author"/> but may represent someone committing the author's changes.
     /// </summary>
-    public required string CommitterName { get; init; }
-
-    /// <summary>
-    /// The email address of the person who committed the commit
-    /// This is usually the same as <see cref="AuthorEmail"/> but may represent someone committing the author's changes.
-    /// </summary>
-    public required string CommitterEmail { get; init; }
+    public required AuthorInfo Committer { get; init; }
 
     /// <summary>
     /// The date the commit was committed in UTC time
@@ -96,6 +84,6 @@ public class CommitInfo
     /// <inheritdoc />
     public override string ToString()
     {
-        return $"{Sha[..5]} {AuthorName} @ {AuthorDateLocal.ToShortDateString()} {AuthorDateLocal.ToShortTimeString()}: {Message}";
+        return $"{Sha[..5]} {Author.Name} @ {AuthorDateLocal.ToShortDateString()} {AuthorDateLocal.ToShortTimeString()}: {Message}";
     }
 }
