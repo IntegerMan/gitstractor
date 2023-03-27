@@ -6,8 +6,10 @@ namespace GitStractor;
 /// <summary>
 /// This class is the main entry point for using GitDataExtractor to extract information from a Git repository.
 /// </summary>
-public static class GitDataExtractor
+public class GitDataExtractor
 {
+    private readonly Dictionary<string, AuthorInfo> _authors = new();
+
     /// <summary>
     /// Extracts commit information into an output file that can be analyzed by other tools.
     /// </summary>
@@ -21,27 +23,35 @@ public static class GitDataExtractor
     /// <returns>
     /// An <see cref="IEnumerable{T}"/> of <see cref="CommitInfo"/> objects representing the commits in the repository.
     /// </returns>
-    public static IEnumerable<CommitInfo> ExtractCommitInformation(GitExtractionOptions options)
+    public IEnumerable<CommitInfo> ExtractCommitInformation(GitExtractionOptions options)
     {
         // Validation
         if (options == null) throw new ArgumentNullException(nameof(options));
+
+        _authors.Clear();
 
         // Analyze the git repository
         string gitPath = FileUtilities.GetParentGitDirectory(options.RepositoryPath);
         using Repository repo = new(gitPath);
 
         // Create or overwrite the commit output file
-        string commitCSVFile = Path.Combine(options.OutputDirectory, options.CommitFilePath);
-        using StreamWriter commitsCsv = new(commitCSVFile, append: false);
-       
-        // Write the header row
-        commitsCsv.WriteLine("CommitHash,AuthorName,AuthorEmail,AuthorDateUTC,CommitterName,CommitterEmail,CommitterDate,Message,NumFiles,Bytes,FileNames");
+        string commitCsvFile = Path.Combine(options.OutputDirectory, options.CommitFilePath);
+        using StreamWriter commitsCsv = new(commitCsvFile, append: false);
+
+        // Create or overwrite the author output file
+        string authorCsvFile = Path.Combine(options.OutputDirectory, options.AuthorsFilePath);
+        using StreamWriter authorCsv = new(authorCsvFile, append: false);
+
+        // Write the header rows
+        authorCsv.WriteLine("Name,Email,NumCommits,TotalBytes");
+        commitsCsv.WriteLine("CommitHash,AuthorName,AuthorEmail,AuthorDateUTC,CommitterName,CommitterEmail,CommitterDate,Message,NumFiles,TotalBytes,FileNames");
 
         // Write all commits
         foreach (Commit commit in repo.Commits)
         {
+
             // Walk the commit tree to get file information
-            ulong blobSize = 0;
+            ulong bytes = 0;
             List<string> files = new();
             foreach (TreeEntry file in commit.Tree)
             {
@@ -49,7 +59,7 @@ public static class GitDataExtractor
                 {
                     case TreeEntryTargetType.Blob:
                         Blob blob = (Blob) file.Target;
-                        blobSize += (ulong) blob.Size;
+                        bytes += (ulong) blob.Size;
                         break;
                     case TreeEntryTargetType.GitLink:
                         GitLink gitLink = (GitLink)file.Target;
@@ -62,15 +72,59 @@ public static class GitDataExtractor
 
                 files.Add(file.Path);
             }
-                
+
+            // Identify author
+            AuthorInfo author = GetOrCreateAuthor(commit.Author, bytes, true);
+            AuthorInfo committer = GetOrCreateAuthor(commit.Author, 0, false);
+
             // Create the commit summary info.
-            CommitInfo info = CreateCommitFromLibGitCommit(files, commit, blobSize);
+            CommitInfo info = CreateCommitFromLibGitCommit(files, commit, author, committer, bytes);
 
             // Write to the CSV file, protecting against commas in various fields
             WriteCommit(commitsCsv, info);
 
             yield return info;
         }
+
+        // Write the authors to disk
+        foreach (AuthorInfo author in _authors.Values)
+        {
+            authorCsv.WriteLine($"{author.Name},{author.Email},{author.NumCommits},{author.TotalSizeInBytes}");
+        }
+    }
+
+    private AuthorInfo GetOrCreateAuthor(Signature signature, ulong bytes, bool isAuthor)
+    {
+        string key = signature.Email.ToLowerInvariant();
+        if (!_authors.TryGetValue(key, out AuthorInfo? author))
+        {
+            author = new AuthorInfo()
+            {
+                Email = signature.Email,
+                Name = signature.Name,
+                EarliestCommitDateUtc = signature.When.UtcDateTime,
+                LatestCommitDateUtc = signature.When.UtcDateTime,
+                NumCommits = isAuthor ? 1 : 0,
+                TotalSizeInBytes = bytes
+            };
+            _authors.Add(key, author);
+        }
+        else
+        {
+            author.NumCommits += isAuthor ? 1 : 0;
+            author.TotalSizeInBytes += bytes;
+
+            if (signature.When.UtcDateTime > author.LatestCommitDateUtc)
+            {
+                author.LatestCommitDateUtc = signature.When.UtcDateTime;
+            }
+            if (signature.When.UtcDateTime < author.EarliestCommitDateUtc)
+            {
+                author.EarliestCommitDateUtc = signature.When.UtcDateTime;
+            }
+        }
+
+        return author;
     }
 
     private static void WriteCommit(TextWriter writer, CommitInfo info)
@@ -82,7 +136,11 @@ public static class GitDataExtractor
         writer.WriteLine($"{info.NumFiles},{info.SizeInBytes},{info.FileNames.ToCsvSafeString()}");
     }
 
-    private static CommitInfo CreateCommitFromLibGitCommit(IEnumerable<string> files, Commit commit, ulong bytes) 
+    private static CommitInfo CreateCommitFromLibGitCommit(IEnumerable<string> files, 
+        Commit commit, 
+        AuthorInfo author,
+        AuthorInfo committer, 
+        ulong bytes) 
         => new(files)
         {
             Sha = commit.Sha,

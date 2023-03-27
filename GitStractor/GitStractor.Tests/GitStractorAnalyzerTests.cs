@@ -13,9 +13,10 @@ namespace GitStractor.Tests
             try
             {
                 // Arrange
+                GitDataExtractor extractor = new();
 
                 // Act
-                _ = GitDataExtractor.ExtractCommitInformation(null!).ToList();
+                _ = extractor.ExtractCommitInformation(null!).ToList();
 
                 // Assert
                 Assert.Fail("An exception should have been thrown but was not");
@@ -35,9 +36,10 @@ namespace GitStractor.Tests
             {
                 RepositoryPath = FileUtilities.GetParentGitDirectory()
             };
+            GitDataExtractor extractor = new();
 
             // Act
-            IEnumerable<CommitInfo> commits = GitDataExtractor.ExtractCommitInformation(options);
+            IEnumerable<CommitInfo> commits = extractor.ExtractCommitInformation(options);
 
             // Assert
             commits.ShouldNotBeNull();

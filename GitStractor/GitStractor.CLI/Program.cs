@@ -20,7 +20,8 @@ public class Program
         // Analyze the git repository
         try
         {
-            foreach (CommitInfo commitInfo in GitDataExtractor.ExtractCommitInformation(options))
+            GitDataExtractor extractor = new();
+            foreach (CommitInfo commitInfo in extractor.ExtractCommitInformation(options))
             {
                 Console.WriteLine(commitInfo);
             }

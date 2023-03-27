@@ -23,4 +23,10 @@ public record GitExtractionOptions
     /// This defaults to <c>Commits.csv</c> in the output directory.
     /// </summary>
     public string CommitFilePath { get; init; } = "Commits.csv";
+
+    /// <summary>
+    /// The path that author data will be written to in CSV format.
+    /// This defaults to <c>Authors.csv</c> in the output directory.
+    /// </summary>
+    public string AuthorsFilePath { get; init; } = "Authors.csv";
 }
