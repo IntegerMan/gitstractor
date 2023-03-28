@@ -1,6 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
-using GitStractor.Model;
-using GitStractor.Utilities;
 using GitStractor.Writers;
 using Shouldly;
 
@@ -16,6 +13,7 @@ public class GitStractorAuthorTests
         GitExtractionOptions options = new()
         {
             RepositoryPath = Environment.CurrentDirectory,
+            CommitWriter = new CommitConsoleDataWriter(),
             AuthorWriter = authorWriter
         };
         using GitDataExtractor extractor = new(options);
@@ -26,6 +24,6 @@ public class GitStractorAuthorTests
         // Assert
         authorWriter.Authors.ShouldNotBeEmpty();
         authorWriter.Authors.ShouldContain(a => a.Name == "Matt Eland");
-        authorWriter.Authors.ShouldContain(a => a.Name == "matt.eland@gmail.com");
+        authorWriter.Authors.ShouldContain(a => a.Email == "matt.eland@gmail.com");
     }
 }

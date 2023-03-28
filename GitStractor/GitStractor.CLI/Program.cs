@@ -10,23 +10,14 @@ public static class Program
     {
         // First parameter is path, but current directory is used in its absence
         string repositoryPath = args.FirstOrDefault() ?? Environment.CurrentDirectory;
-
-        //string authorCsvFile = Path.Combine(_options.OutputDirectory, _options.AuthorsFilePath);
-
-        GitExtractionOptions options = new()
-        {
-            RepositoryPath = repositoryPath,
-            OutputDirectory = Environment.CurrentDirectory,
-            CommitFilePath = "Commits.csv",
-            AuthorWriter = new AuthorCompoundDataWriter(new AuthorDataWriter[] {
-                new AuthorConsoleDataWriter(),
-                new AuthorCsvDataWriter(Path.Combine(Environment.CurrentDirectory, "Authors.csv")),
-            })
-        };
+        
+        // For now, let's just always dump into the current directory
+        string outputDirectory = Environment.CurrentDirectory;
         
         // Analyze the git repository
         try
         {
+            GitExtractionOptions options = BuildExtractionOptions(repositoryPath, outputDirectory);
             using GitDataExtractor extractor = new(options);
 
             extractor.ExtractInformation();
@@ -40,4 +31,18 @@ public static class Program
             Console.WriteLine($"A storage-related error occurred while extracting information: {ex.Message}");
         }
     }
+
+    private static GitExtractionOptions BuildExtractionOptions(string repositoryPath, string outputDirectory) 
+        => new()
+        {
+            RepositoryPath = repositoryPath,
+            CommitWriter = new CommitCompoundDataWriter(new CommitDataWriter[] {
+                new CommitConsoleDataWriter(),
+                new CommitCsvDataWriter(Path.Combine(outputDirectory, "Commits.csv")),
+            }),
+            AuthorWriter = new AuthorCompoundDataWriter(new AuthorDataWriter[] {
+                new AuthorConsoleDataWriter(),
+                new AuthorCsvDataWriter(Path.Combine(outputDirectory, "Authors.csv")),
+            })
+        };
 }

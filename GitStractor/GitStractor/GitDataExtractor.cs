@@ -33,17 +33,21 @@ public class GitDataExtractor : IDisposable
     {
         _authors.Clear();
 
-        // Analyze the git repository
-        string gitPath = FileUtilities.GetParentGitDirectory(_options.RepositoryPath);
-        using Repository repo = new(gitPath);
+        // If we got a git directory that isn't actually a git directory, look for a .git file in its parents
+        string? gitPath = FileUtilities.GetParentGitDirectory(_options.RepositoryPath);
 
-        // Create or overwrite the commit output file
-        string commitCsvFile = Path.Combine(_options.OutputDirectory, _options.CommitFilePath);
-        using StreamWriter commitsCsv = new(commitCsvFile, append: false);
+        // If we didn't find a git directory, throw an exception
+        if (gitPath == null)
+        {
+            throw new RepositoryNotFoundException($"Could not find a git repository at {_options.RepositoryPath}");
+        }
+        
+        // Connect to the git repository
+        using Repository repo = new(gitPath);
 
         // Write the header rows
         _options.AuthorWriter.BeginWriting();
-        commitsCsv.WriteLine("CommitHash,AuthorEmail,AuthorDateUTC,CommitterEmail,CommitterDate,Message,NumFiles,TotalBytes,FileNames");
+        _options.CommitWriter.BeginWriting();
 
         // Write all commits
         foreach (Commit commit in repo.Commits)
@@ -69,11 +73,11 @@ public class GitDataExtractor : IDisposable
             // Create the commit summary info.
             CommitInfo info = CreateCommitFromLibGitCommit(files, commit, author, committer, bytes);
 
-            // Write to the CSV file, protecting against commas in various fields
-            WriteCommit(commitsCsv, info);
+            // Write the commit
+            _options.CommitWriter.Write(info);
         }
-
-        // Write the authors to their destination
+        
+        // Write all authors at the end, now that we know aggregate-level information
         _options.AuthorWriter.WriteAuthors(_authors.Values);
     }
 
@@ -111,15 +115,6 @@ public class GitDataExtractor : IDisposable
         return author;
     }
 
-    private static void WriteCommit(TextWriter writer, CommitInfo info)
-    {
-        writer.Write($"{info.Sha},");
-        writer.Write($"{info.Author.Email.ToCsvSafeString()},{info.AuthorDateUtc},");
-        writer.Write($"{info.Committer.Email.ToCsvSafeString()},{info.CommitterDateUtc},");
-        writer.Write($"{info.Message.ToCsvSafeString()},");
-        writer.WriteLine($"{info.NumFiles},{info.SizeInBytes},{info.FileNames.ToCsvSafeString()}");
-    }
-
     private static CommitInfo CreateCommitFromLibGitCommit(IEnumerable<string> files, 
         Commit commit, 
         AuthorInfo author,
@@ -143,5 +138,6 @@ public class GitDataExtractor : IDisposable
     public void Dispose()
     {
         _options.AuthorWriter.Dispose();
+        _options.CommitWriter.Dispose();
     }
 }

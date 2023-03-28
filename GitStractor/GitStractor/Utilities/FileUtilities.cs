@@ -13,11 +13,8 @@ public static class FileUtilities
     /// The directory to analyze. This should be a git repository or part of one.
     /// If this is not specified, <c>Environment.CurrentDirectory</c> will be used.
     /// </param>
-    /// <exception cref="InvalidOperationException">
-    /// Thrown if the directory is not part of a git repository
-    /// </exception>
-    /// <returns>The git folder containing the active repository</returns>
-    public static string GetParentGitDirectory(string? directory = null)
+    /// <returns>The git folder containing the active repository or <c>null</c> if none could be found</returns>
+    public static string? GetParentGitDirectory(string? directory = null)
     {
         directory ??= Environment.CurrentDirectory;
 
@@ -29,13 +26,7 @@ public static class FileUtilities
             dirInfo = dirInfo.Parent;
         }
 
-        // Handle the case where there was no git repo
-        if (dirInfo == null)
-        {
-            throw new InvalidOperationException("Could not find a .git directory in the current directory or any parent directory.");
-        }
-
-        return dirInfo.FullName;
+        return dirInfo?.FullName;
     }
 
 }
