@@ -4,7 +4,7 @@ using LibGit2Sharp;
 
 namespace GitStractor.CLI;
 
-public class Program
+public static class Program
 {
     private static void Main(string[] args)
     {
@@ -29,14 +29,15 @@ public class Program
         {
             using GitDataExtractor extractor = new(options);
 
-            foreach (CommitInfo commitInfo in extractor.ExtractCommitInformation())
-            {
-                Console.WriteLine(commitInfo);
-            }
+            extractor.ExtractInformation();
         }
         catch (RepositoryNotFoundException)
         {
             Console.WriteLine($"The repository at {repositoryPath} could not be found.");
+        }
+        catch (IOException ex)
+        {
+            Console.WriteLine($"A storage-related error occurred while extracting information: {ex.Message}");
         }
     }
 }

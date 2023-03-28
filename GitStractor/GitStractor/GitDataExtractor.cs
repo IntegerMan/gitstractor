@@ -11,25 +11,25 @@ public class GitDataExtractor : IDisposable
     private readonly GitExtractionOptions _options;
     private readonly Dictionary<string, AuthorInfo> _authors = new();
 
+    /// <summary>
+    /// Creates a new instance of the <see cref="GitDataExtractor"/> class.
+    /// </summary>
+    /// <param name="options">The extraction options governing the git analysis</param>
+    /// <exception cref="ArgumentNullException">
+    /// Thrown when <paramref name="options"/> is <c>null</c>.
+    /// </exception>
     public GitDataExtractor(GitExtractionOptions options)
     {
         _options = options ?? throw new ArgumentNullException(nameof(options));
     }
 
     /// <summary>
-    /// Extracts commit information into an output file that can be analyzed by other tools.
+    /// Extracts commit, author, and file information from the git repository.
     /// </summary>
     /// <exception cref="RepositoryNotFoundException">
-    /// Thrown when the repository listed in <paramref name="options"/> does not exist
+    /// Thrown when the repository does not exist
     /// </exception>
-    /// <exception cref="ArgumentNullException">
-    /// Thrown when <paramref name="options"/> is <c>null</c>.
-    /// </exception>
-    /// <param name="options">The configuration options for GitStractor</param>
-    /// <returns>
-    /// An <see cref="IEnumerable{T}"/> of <see cref="CommitInfo"/> objects representing the commits in the repository.
-    /// </returns>
-    public IEnumerable<CommitInfo> ExtractCommitInformation()
+    public void ExtractInformation()
     {
         _authors.Clear();
 
@@ -48,7 +48,6 @@ public class GitDataExtractor : IDisposable
         // Write all commits
         foreach (Commit commit in repo.Commits)
         {
-
             // Walk the commit tree to get file information
             ulong bytes = 0;
             List<string> files = new();
@@ -72,11 +71,9 @@ public class GitDataExtractor : IDisposable
 
             // Write to the CSV file, protecting against commas in various fields
             WriteCommit(commitsCsv, info);
-
-            yield return info;
         }
 
-        // Write the authors to disk
+        // Write the authors to their destination
         _options.AuthorWriter.WriteAuthors(_authors.Values);
     }
 
@@ -145,6 +142,6 @@ public class GitDataExtractor : IDisposable
 
     public void Dispose()
     {
-
+        _options.AuthorWriter.Dispose();
     }
 }
