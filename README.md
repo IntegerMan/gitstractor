@@ -10,7 +10,9 @@ Currently there are two editions of GitStractor:
 - A Python prototype which works, but is slow and doesn't handle move / renames correctly
 - A dotnet version which is much faster, but is still in development
 
-Because there is no current viable option for GitStractor, I recommend you check in on this repository at a later time before using it in a project.
+You can also look at my 2022 talk on [Visualizing Code](https://github.com/integerman/visualizingcode) as an early prototype for GitStractor.
+
+Because there is no current production-ready option for GitStractor, I recommend you check in on this repository at a later time before using it in a project.
 
 My current plan is to develop the dotnet version and make it available as a NuGet package, then make a series of data visualizations available to anyone who is interested.
 
