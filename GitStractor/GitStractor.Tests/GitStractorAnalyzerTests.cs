@@ -1,6 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using GitStractor.Model;
 using GitStractor.Utilities;
+using GitStractor.Writers;
 using Shouldly;
 
 namespace GitStractor.Tests
@@ -13,10 +14,9 @@ namespace GitStractor.Tests
             try
             {
                 // Arrange
-                GitDataExtractor extractor = new();
 
                 // Act
-                _ = extractor.ExtractCommitInformation(null!).ToList();
+                using GitDataExtractor extractor = new(null!);
 
                 // Assert
                 Assert.Fail("An exception should have been thrown but was not");
@@ -34,12 +34,13 @@ namespace GitStractor.Tests
             // Arrange
             GitExtractionOptions options = new()
             {
-                RepositoryPath = FileUtilities.GetParentGitDirectory()
+                RepositoryPath = Environment.CurrentDirectory,
+                AuthorWriter = new AuthorConsoleDataWriter()
             };
-            GitDataExtractor extractor = new();
+            using GitDataExtractor extractor = new(options);
 
             // Act
-            IEnumerable<CommitInfo> commits = extractor.ExtractCommitInformation(options);
+            IEnumerable<CommitInfo> commits = extractor.ExtractCommitInformation();
 
             // Assert
             commits.ShouldNotBeNull();

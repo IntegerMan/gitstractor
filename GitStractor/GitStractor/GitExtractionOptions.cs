@@ -1,10 +1,12 @@
-﻿namespace GitStractor;
+﻿using GitStractor.Writers;
+
+namespace GitStractor;
 
 /// <summary>
 /// This class represents all options that GitStractor needs
 /// to analyze a git repository.
 /// </summary>
-public record GitExtractionOptions
+public class GitExtractionOptions
 {
     /// <summary>
     /// The path to the repository to analyze.
@@ -24,9 +26,5 @@ public record GitExtractionOptions
     /// </summary>
     public string CommitFilePath { get; init; } = "Commits.csv";
 
-    /// <summary>
-    /// The path that author data will be written to in CSV format.
-    /// This defaults to <c>Authors.csv</c> in the output directory.
-    /// </summary>
-    public string AuthorsFilePath { get; init; } = "Authors.csv";
+    public required AuthorDataWriter AuthorWriter { get; init; }
 }

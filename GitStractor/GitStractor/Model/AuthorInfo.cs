@@ -12,4 +12,9 @@ public class AuthorInfo
 
     public required DateTime EarliestCommitDateUtc { get; set; }
     public required DateTime LatestCommitDateUtc { get; set; }
+
+    public override string ToString()
+    {
+        return $"{Name} ({Email}): {NumCommits} Commits from {EarliestCommitDateUtc.ToShortDateString()} - {LatestCommitDateUtc.ToShortDateString()}";
+    }
 }

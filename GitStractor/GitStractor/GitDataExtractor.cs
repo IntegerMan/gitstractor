@@ -6,9 +6,15 @@ namespace GitStractor;
 /// <summary>
 /// This class is the main entry point for using GitDataExtractor to extract information from a Git repository.
 /// </summary>
-public class GitDataExtractor
+public class GitDataExtractor : IDisposable
 {
+    private readonly GitExtractionOptions _options;
     private readonly Dictionary<string, AuthorInfo> _authors = new();
+
+    public GitDataExtractor(GitExtractionOptions options)
+    {
+        _options = options ?? throw new ArgumentNullException(nameof(options));
+    }
 
     /// <summary>
     /// Extracts commit information into an output file that can be analyzed by other tools.
@@ -23,27 +29,20 @@ public class GitDataExtractor
     /// <returns>
     /// An <see cref="IEnumerable{T}"/> of <see cref="CommitInfo"/> objects representing the commits in the repository.
     /// </returns>
-    public IEnumerable<CommitInfo> ExtractCommitInformation(GitExtractionOptions options)
+    public IEnumerable<CommitInfo> ExtractCommitInformation()
     {
-        // Validation
-        if (options == null) throw new ArgumentNullException(nameof(options));
-
         _authors.Clear();
 
         // Analyze the git repository
-        string gitPath = FileUtilities.GetParentGitDirectory(options.RepositoryPath);
+        string gitPath = FileUtilities.GetParentGitDirectory(_options.RepositoryPath);
         using Repository repo = new(gitPath);
 
         // Create or overwrite the commit output file
-        string commitCsvFile = Path.Combine(options.OutputDirectory, options.CommitFilePath);
+        string commitCsvFile = Path.Combine(_options.OutputDirectory, _options.CommitFilePath);
         using StreamWriter commitsCsv = new(commitCsvFile, append: false);
 
-        // Create or overwrite the author output file
-        string authorCsvFile = Path.Combine(options.OutputDirectory, options.AuthorsFilePath);
-        using StreamWriter authorCsv = new(authorCsvFile, append: false);
-
         // Write the header rows
-        authorCsv.WriteLine("Name,Email,NumCommits,TotalBytes");
+        _options.AuthorWriter.BeginWriting();
         commitsCsv.WriteLine("CommitHash,AuthorEmail,AuthorDateUTC,CommitterEmail,CommitterDate,Message,NumFiles,TotalBytes,FileNames");
 
         // Write all commits
@@ -55,19 +54,10 @@ public class GitDataExtractor
             List<string> files = new();
             foreach (TreeEntry file in commit.Tree)
             {
-                switch (file.TargetType)
-                {
-                    case TreeEntryTargetType.Blob:
-                        Blob blob = (Blob) file.Target;
-                        bytes += (ulong) blob.Size;
-                        break;
-                    case TreeEntryTargetType.GitLink:
-                        GitLink gitLink = (GitLink)file.Target;
-                        // TODO: Should we do anything with this?
-                        break;
-                    case TreeEntryTargetType.Tree:
-                        // TODO: go recursive?
-                        break;
+                if (file.TargetType == TreeEntryTargetType.Blob) 
+                { 
+                    Blob blob = (Blob) file.Target;
+                    bytes += (ulong) blob.Size;
                 }
 
                 files.Add(file.Path);
@@ -87,10 +77,7 @@ public class GitDataExtractor
         }
 
         // Write the authors to disk
-        foreach (AuthorInfo author in _authors.Values)
-        {
-            authorCsv.WriteLine($"{author.Name},{author.Email},{author.NumCommits},{author.TotalSizeInBytes}");
-        }
+        _options.AuthorWriter.WriteAuthors(_authors.Values);
     }
 
     private AuthorInfo GetOrCreateAuthor(Signature signature, ulong bytes, bool isAuthor)
@@ -155,4 +142,9 @@ public class GitDataExtractor
             Committer = committer,
             CommitterDateUtc = commit.Committer.When.UtcDateTime,
         };
+
+    public void Dispose()
+    {
+
+    }
 }
