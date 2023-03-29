@@ -36,6 +36,7 @@ public static class Program
         => new()
         {
             RepositoryPath = repositoryPath,
+            FileWriter = new FileConsoleDataWriter(),
             CommitWriter = new CommitCompoundDataWriter(new CommitDataWriter[] {
                 new CommitConsoleDataWriter(),
                 new CommitCsvDataWriter(Path.Combine(outputDirectory, "Commits.csv")),

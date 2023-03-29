@@ -52,33 +52,52 @@ public class GitDataExtractor : IDisposable
         // Write all commits
         foreach (Commit commit in repo.Commits)
         {
-            // Walk the commit tree to get file information
-            ulong bytes = 0;
-            List<string> files = new();
-            foreach (TreeEntry file in commit.Tree)
-            {
-                if (file.TargetType == TreeEntryTargetType.Blob) 
-                { 
-                    Blob blob = (Blob) file.Target;
-                    bytes += (ulong) blob.Size;
-                }
-
-                files.Add(file.Path);
-            }
-
-            // Identify author
-            AuthorInfo author = GetOrCreateAuthor(commit.Author, bytes, true);
-            AuthorInfo committer = GetOrCreateAuthor(commit.Author, 0, false);
-
-            // Create the commit summary info.
-            CommitInfo info = CreateCommitFromLibGitCommit(files, commit, author, committer, bytes);
-
-            // Write the commit
-            _options.CommitWriter.Write(info);
+            ProcessCommit(commit);
         }
         
         // Write all authors at the end, now that we know aggregate-level information
         _options.AuthorWriter.WriteAuthors(_authors.Values);
+    }
+
+    private void ProcessCommit(Commit commit)
+    {
+        ulong bytes = 0;
+        List<string> files = new();
+
+        // Walk the commit tree to get file information
+        foreach (TreeEntry treeEntry in commit.Tree)
+        {
+            if (treeEntry.TargetType == TreeEntryTargetType.Blob)
+            {
+                Blob blob = (Blob) treeEntry.Target;
+                
+                RepositoryFileInfo fileInfo = new()
+                {
+                    Name = treeEntry.Name,
+                    Path = treeEntry.Path,
+                    Sha = blob.Sha,
+                    Bytes = (ulong) blob.Size,
+                    Commit = commit.Sha,
+                    CreatedDateUtc = commit.Author.When.UtcDateTime,
+                };
+
+                bytes += fileInfo.Bytes;
+
+                _options.FileWriter.WriteFile(fileInfo);
+            }
+
+            files.Add(treeEntry.Path);
+        }
+
+        // Identify author
+        AuthorInfo author = GetOrCreateAuthor(commit.Author, bytes, true);
+        AuthorInfo committer = GetOrCreateAuthor(commit.Author, 0, false);
+
+        // Create the commit summary info.
+        CommitInfo info = CreateCommitFromLibGitCommit(files, commit, author, committer, bytes);
+
+        // Write the commit to the appropriate writer
+        _options.CommitWriter.Write(info);
     }
 
     private AuthorInfo GetOrCreateAuthor(Signature signature, ulong bytes, bool isAuthor)
