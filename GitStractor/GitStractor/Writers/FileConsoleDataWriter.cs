@@ -16,6 +16,6 @@ public class FileConsoleDataWriter : FileDataWriter
 
     public override void WriteFile(RepositoryFileInfo file)
     {
-        Console.WriteLine(file);
+        Console.WriteLine("\t" + file);
     }
 }

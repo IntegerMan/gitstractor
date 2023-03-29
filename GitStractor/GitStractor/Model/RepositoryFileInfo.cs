@@ -8,4 +8,7 @@ public class RepositoryFileInfo
     public ulong Bytes { get; init; }
     public string Commit { get; init; }
     public DateTime CreatedDateUtc { get; init; }
+
+    public override string ToString() 
+        => $"{Sha[..5]} {Path} @ {Commit}";
 }

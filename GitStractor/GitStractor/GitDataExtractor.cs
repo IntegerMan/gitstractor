@@ -61,43 +61,54 @@ public class GitDataExtractor : IDisposable
 
     private void ProcessCommit(Commit commit)
     {
-        ulong bytes = 0;
+        GitTreeInfo treeInfo = new();
         List<string> files = new();
 
         // Walk the commit tree to get file information
-        foreach (TreeEntry treeEntry in commit.Tree)
+        WalkTree(commit, commit.Tree, treeInfo, files);
+
+        // Identify author
+        AuthorInfo author = GetOrCreateAuthor(commit.Author, treeInfo.Bytes, true);
+        AuthorInfo committer = GetOrCreateAuthor(commit.Author, 0, false);
+
+        // Create the commit summary info.
+        CommitInfo info = CreateCommitFromLibGitCommit(files, commit, author, committer, treeInfo.Bytes);
+
+        // Write the commit to the appropriate writer
+        _options.CommitWriter.Write(info);
+    }
+
+    private void WalkTree(Commit commit, Tree tree, GitTreeInfo treeInfo, ICollection<string> files)
+    {
+        foreach (TreeEntry treeEntry in tree)
         {
             if (treeEntry.TargetType == TreeEntryTargetType.Blob)
             {
-                Blob blob = (Blob) treeEntry.Target;
-                
+                Blob blob = (Blob)treeEntry.Target;
+
                 RepositoryFileInfo fileInfo = new()
                 {
                     Name = treeEntry.Name,
                     Path = treeEntry.Path,
-                    Sha = blob.Sha,
-                    Bytes = (ulong) blob.Size,
-                    Commit = commit.Sha,
+                    Sha = blob.Id.Sha,
+                    Bytes = (ulong)blob.Size,
+                    Commit = blob.Sha,
                     CreatedDateUtc = commit.Author.When.UtcDateTime,
                 };
 
-                bytes += fileInfo.Bytes;
+                treeInfo.Bytes += fileInfo.Bytes;
 
                 _options.FileWriter.WriteFile(fileInfo);
+                
+                files.Add(treeEntry.Path);
             }
-
-            files.Add(treeEntry.Path);
+            else if (treeEntry.TargetType == TreeEntryTargetType.Tree)
+            {
+                Tree subTree = (Tree)treeEntry.Target;
+                
+                WalkTree(commit, subTree, treeInfo, files);
+            }
         }
-
-        // Identify author
-        AuthorInfo author = GetOrCreateAuthor(commit.Author, bytes, true);
-        AuthorInfo committer = GetOrCreateAuthor(commit.Author, 0, false);
-
-        // Create the commit summary info.
-        CommitInfo info = CreateCommitFromLibGitCommit(files, commit, author, committer, bytes);
-
-        // Write the commit to the appropriate writer
-        _options.CommitWriter.Write(info);
     }
 
     private AuthorInfo GetOrCreateAuthor(Signature signature, ulong bytes, bool isAuthor)
