@@ -15,7 +15,6 @@ public class CommitInfo
     public CommitInfo(IEnumerable<string> files)
     {
         _files = new List<string>(files);
-        NumFiles = _files.Count;
     }
 
     /// <summary>
@@ -75,8 +74,18 @@ public class CommitInfo
     /// <summary>
     /// The number of files in the commit's tree
     /// </summary>
-    public int NumFiles { get; }
-
+    public uint NumFiles => (uint)(_files.Count + DeletedFiles);
+    
+    /// <summary>
+    /// The number of files in this commit's tree that didn't appear with the same path previously
+    /// </summary>
+    public uint AddedFiles { get; set; }
+    
+    /// <summary>
+    /// The number of files in the prior commit's tree that didn't appear in this tree's
+    /// </summary>
+    public uint DeletedFiles { get; set; }
+    
     /// <summary>
     /// The names of the files modified by the commit
     /// </summary>
@@ -90,6 +99,6 @@ public class CommitInfo
     /// <inheritdoc />
     public override string ToString()
     {
-        return $"{Sha[..6]} {Author.Name} @ {AuthorDateLocal.ToShortDateString()} {AuthorDateLocal.ToShortTimeString()}: {Message} ({NumFiles} file(s))";
+        return $"{Sha[..6]} {Author.Name} @ {AuthorDateLocal.ToShortDateString()} {AuthorDateLocal.ToShortTimeString()}: {Message} ({NumFiles} file(s), +{AddedFiles}/-{DeletedFiles})";
     }
 }

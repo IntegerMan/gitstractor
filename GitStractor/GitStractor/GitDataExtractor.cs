@@ -10,6 +10,7 @@ public class GitDataExtractor : IDisposable
 {
     private readonly GitExtractionOptions _options;
     private readonly Dictionary<string, AuthorInfo> _authors = new();
+    private readonly Dictionary<string, GitTreeInfo> _trees = new();
 
     /// <summary>
     /// Creates a new instance of the <see cref="GitDataExtractor"/> class.
@@ -31,8 +32,10 @@ public class GitDataExtractor : IDisposable
     /// </exception>
     public void ExtractInformation()
     {
+        // Clear old state
         _authors.Clear();
         _pathShas.Clear();
+        _trees.Clear();
 
         // If we got a git directory that isn't actually a git directory, look for a .git file in its parents
         string? gitPath = FileUtilities.GetParentGitDirectory(_options.RepositoryPath);
@@ -50,12 +53,18 @@ public class GitDataExtractor : IDisposable
         _options.AuthorWriter.BeginWriting();
         _options.CommitWriter.BeginWriting();
 
-        // Write all commits
-        CommitFilter filter = new CommitFilter()
+        // Customize how we'll traverse commit history
+        CommitFilter filter = new()
         {
+            // It's very important to walk through commits in historical order from oldest to newest
+            // This lets us accurately get a read on the state of the repository at the time of each commit
             SortBy = CommitSortStrategies.Reverse,
+            
+            // We only want to look at commits that are reachable from whatever is HEAD at the moment
             IncludeReachableFrom = repo.Head
         };
+        
+        // Loop over each commit
         foreach (Commit commit in repo.Commits.QueryBy(filter))
         {
             ProcessCommit(commit);
@@ -68,17 +77,32 @@ public class GitDataExtractor : IDisposable
     private void ProcessCommit(Commit commit)
     {
         GitTreeInfo treeInfo = new();
-        List<string> files = new();
+        _trees[commit.Tree.Sha] = treeInfo;
 
         // Walk the commit tree to get file information
-        WalkTree(commit, commit.Tree, treeInfo, files);
+        WalkTree(commit, commit.Tree, treeInfo);
+
+        // Get what we know about the parent commit this came from
+        GitTreeInfo? parentTree = commit.Parents.Any() ? _trees[commit.Parents.First().Tree.Sha] : null;
+
+        // Detect any Deleted Files
+        if (parentTree != null)
+        {
+            foreach (string path in parentTree.Files)
+            {
+                if (!treeInfo.Contains(path))
+                {
+                    treeInfo.DeletedFileCount++;
+                }
+            }
+        }
 
         // Identify author
         AuthorInfo author = GetOrCreateAuthor(commit.Author, treeInfo.Bytes, true);
         AuthorInfo committer = GetOrCreateAuthor(commit.Author, 0, false);
 
         // Create the commit summary info.
-        CommitInfo info = CreateCommitFromLibGitCommit(files, commit, author, committer, treeInfo);
+        CommitInfo info = CreateCommitFromLibGitCommit(commit, author, committer, treeInfo);
 
         // Write the commit to the appropriate writer
         _options.CommitWriter.Write(info);
@@ -86,7 +110,7 @@ public class GitDataExtractor : IDisposable
 
     private readonly Dictionary<string, string> _pathShas = new();
 
-    private void WalkTree(Commit commit, Tree tree, GitTreeInfo treeInfo, ICollection<string> files)
+    private void WalkTree(Commit commit, Tree tree, GitTreeInfo treeInfo)
     {
         foreach (TreeEntry treeEntry in tree)
         {
@@ -96,14 +120,22 @@ public class GitDataExtractor : IDisposable
                 // file changes, its SHA changes. So, we can use the SHA of the file to determine if it changed.
                 // If the SHA is the same, we shouldn't log the file as being part of this commit, though there may
                 // be analysis value of having a full log of all files as of any given commit in the system
-                string fileLowerSha = treeEntry.Path.ToLowerInvariant();
-                if (_pathShas.ContainsKey(treeEntry.Target.Sha) && _pathShas[treeEntry.Target.Sha] == fileLowerSha)
+                string fileLower = treeEntry.Path.ToLowerInvariant();
+                treeInfo.RegisterFile(fileLower);
+                if (!_pathShas.ContainsKey(fileLower))
+                {
+                    // If we didn't have the path before, this is an added file so let's mark it as an added file
+                    treeInfo.AddedFileCount++;
+                }
+                else if (_pathShas[fileLower] == treeEntry.Target.Sha)
                 {
                     continue;
                 }
+
+                treeInfo.RegisterChangedFile(fileLower);
                 
                 // Add or update our entry for the file's path
-                _pathShas[treeEntry.Target.Sha] = fileLowerSha;
+                _pathShas[fileLower] = treeEntry.Target.Sha;
 
                 Blob blob = (Blob)treeEntry.Target;
 
@@ -120,14 +152,12 @@ public class GitDataExtractor : IDisposable
                 treeInfo.Bytes += fileInfo.Bytes;
 
                 _options.FileWriter.WriteFile(fileInfo);
-                
-                files.Add(treeEntry.Path);
             }
             else if (treeEntry.TargetType == TreeEntryTargetType.Tree)
             {
                 Tree subTree = (Tree)treeEntry.Target;
                 
-                WalkTree(commit, subTree, treeInfo, files);
+                WalkTree(commit, subTree, treeInfo);
             }
         }
     }
@@ -166,17 +196,19 @@ public class GitDataExtractor : IDisposable
         return author;
     }
 
-    private static CommitInfo CreateCommitFromLibGitCommit(IEnumerable<string> files, 
+    private static CommitInfo CreateCommitFromLibGitCommit(
         Commit commit, 
         AuthorInfo author,
         AuthorInfo committer, 
         GitTreeInfo treeInfo) 
-        => new(files)
+        => new(treeInfo.ModifiedFiles)
         {
             Sha = commit.Sha,
             Message = commit.MessageShort, // This is just the first line of the commit message. Usually all that's needed
             SizeInBytes = treeInfo.Bytes,
-            TotalFiles = treeInfo.TotalFiles,
+            TotalFiles = treeInfo.TotalFileCount,
+            AddedFiles = treeInfo.AddedFileCount,
+            DeletedFiles = treeInfo.DeletedFileCount,
 
             // Author information. Author is the person who wrote the contents of the commit
             Author = author,
