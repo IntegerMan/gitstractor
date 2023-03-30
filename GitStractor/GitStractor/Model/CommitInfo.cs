@@ -27,6 +27,12 @@ public class CommitInfo
     /// The total blob size of the commit in terms of bytes
     /// </summary>
     public ulong SizeInBytes { get; init; }
+    
+    /// <summary>
+    /// Gets the total number of files in the working tree as of this commit. This is typically not the amount of files
+    /// modified by the commit.
+    /// </summary>
+    public uint TotalFiles { get; init; }
 
     /// <summary>
     /// The SHA of the commit

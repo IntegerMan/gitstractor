@@ -78,7 +78,7 @@ public class GitDataExtractor : IDisposable
         AuthorInfo committer = GetOrCreateAuthor(commit.Author, 0, false);
 
         // Create the commit summary info.
-        CommitInfo info = CreateCommitFromLibGitCommit(files, commit, author, committer, treeInfo.Bytes);
+        CommitInfo info = CreateCommitFromLibGitCommit(files, commit, author, committer, treeInfo);
 
         // Write the commit to the appropriate writer
         _options.CommitWriter.Write(info);
@@ -104,7 +104,7 @@ public class GitDataExtractor : IDisposable
                 
                 // Add or update our entry for the file's path
                 _pathShas[treeEntry.Target.Sha] = fileLowerSha;
-                
+
                 Blob blob = (Blob)treeEntry.Target;
 
                 RepositoryFileInfo fileInfo = new()
@@ -170,12 +170,13 @@ public class GitDataExtractor : IDisposable
         Commit commit, 
         AuthorInfo author,
         AuthorInfo committer, 
-        ulong bytes) 
+        GitTreeInfo treeInfo) 
         => new(files)
         {
             Sha = commit.Sha,
             Message = commit.MessageShort, // This is just the first line of the commit message. Usually all that's needed
-            SizeInBytes = bytes,
+            SizeInBytes = treeInfo.Bytes,
+            TotalFiles = treeInfo.TotalFiles,
 
             // Author information. Author is the person who wrote the contents of the commit
             Author = author,

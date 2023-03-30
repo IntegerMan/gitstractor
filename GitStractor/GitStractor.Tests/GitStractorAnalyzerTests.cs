@@ -32,7 +32,6 @@ public class GitStractorAnalyzerTests
     {
         // Arrange
         CommitInMemoryDataWriter commitDataWriter = new();
-        DateTime yearStart = new DateTime(2023, 1, 1);
         GitExtractionOptions options = new()
         {
             RepositoryPath = Environment.CurrentDirectory,
