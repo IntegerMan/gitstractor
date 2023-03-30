@@ -32,6 +32,7 @@ public class GitDataExtractor : IDisposable
     public void ExtractInformation()
     {
         _authors.Clear();
+        _pathShas.Clear();
 
         // If we got a git directory that isn't actually a git directory, look for a .git file in its parents
         string? gitPath = FileUtilities.GetParentGitDirectory(_options.RepositoryPath);
@@ -50,7 +51,12 @@ public class GitDataExtractor : IDisposable
         _options.CommitWriter.BeginWriting();
 
         // Write all commits
-        foreach (Commit commit in repo.Commits)
+        CommitFilter filter = new CommitFilter()
+        {
+            SortBy = CommitSortStrategies.Reverse,
+            IncludeReachableFrom = repo.Head
+        };
+        foreach (Commit commit in repo.Commits.QueryBy(filter))
         {
             ProcessCommit(commit);
         }
@@ -78,12 +84,27 @@ public class GitDataExtractor : IDisposable
         _options.CommitWriter.Write(info);
     }
 
+    private readonly Dictionary<string, string> _pathShas = new();
+
     private void WalkTree(Commit commit, Tree tree, GitTreeInfo treeInfo, ICollection<string> files)
     {
         foreach (TreeEntry treeEntry in tree)
         {
             if (treeEntry.TargetType == TreeEntryTargetType.Blob)
             {
+                // Each tree consists of ALL files, including those who didn't change at all. When the contents of a
+                // file changes, its SHA changes. So, we can use the SHA of the file to determine if it changed.
+                // If the SHA is the same, we shouldn't log the file as being part of this commit, though there may
+                // be analysis value of having a full log of all files as of any given commit in the system
+                string fileLowerSha = treeEntry.Path.ToLowerInvariant();
+                if (_pathShas.ContainsKey(treeEntry.Target.Sha) && _pathShas[treeEntry.Target.Sha] == fileLowerSha)
+                {
+                    continue;
+                }
+                
+                // Add or update our entry for the file's path
+                _pathShas[treeEntry.Target.Sha] = fileLowerSha;
+                
                 Blob blob = (Blob)treeEntry.Target;
 
                 RepositoryFileInfo fileInfo = new()
@@ -92,7 +113,7 @@ public class GitDataExtractor : IDisposable
                     Path = treeEntry.Path,
                     Sha = blob.Id.Sha,
                     Bytes = (ulong)blob.Size,
-                    Commit = blob.Sha,
+                    Commit = commit.Id.Sha,
                     CreatedDateUtc = commit.Author.When.UtcDateTime,
                 };
 

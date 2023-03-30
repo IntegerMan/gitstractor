@@ -84,6 +84,6 @@ public class CommitInfo
     /// <inheritdoc />
     public override string ToString()
     {
-        return $"{Sha[..5]} {Author.Name} @ {AuthorDateLocal.ToShortDateString()} {AuthorDateLocal.ToShortTimeString()}: {Message}";
+        return $"{Sha[..6]} {Author.Name} @ {AuthorDateLocal.ToShortDateString()} {AuthorDateLocal.ToShortTimeString()}: {Message} ({NumFiles} file(s))";
     }
 }

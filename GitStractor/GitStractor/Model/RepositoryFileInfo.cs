@@ -10,5 +10,5 @@ public class RepositoryFileInfo
     public DateTime CreatedDateUtc { get; init; }
 
     public override string ToString() 
-        => $"{Sha[..5]} {Path} @ {Commit}";
+        => $"{Sha[..6]} {Path} @ {Commit[..6]}";
 }
