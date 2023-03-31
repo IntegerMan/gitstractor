@@ -167,9 +167,7 @@ public class GitDataExtractor : IDisposable
     {
         Blob blob = (Blob)treeEntry.Target;
 
-        string text = blob.GetContentText();
-        int lines = text.Count(c => c == '\n');
-
+        int lines = CountLinesInFile(blob);
 
         RepositoryFileInfo fileInfo = new()
         {
@@ -182,6 +180,20 @@ public class GitDataExtractor : IDisposable
             CreatedDateUtc = commit.Author.When.UtcDateTime,
         };
         return fileInfo;
+    }
+
+    private static int CountLinesInFile(Blob blob)
+    {
+        int lines = 0;
+        using var reader = new StreamReader(blob.GetContentStream());
+        
+        while (!reader.EndOfStream)
+        {
+            _ = reader.ReadLine();
+            lines++;
+        }
+
+        return lines;
     }
 
     private AuthorInfo GetOrCreateAuthor(Signature signature, ulong bytes, bool isAuthor)
