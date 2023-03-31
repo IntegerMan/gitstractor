@@ -32,6 +32,7 @@ public class RepositoryFileInfo
     public ulong Bytes { get; init; }
     public string Commit { get; init; }
     public DateTime CreatedDateUtc { get; init; }
+    public required int Lines { get; init; }
 
     public override string ToString() 
         => $"{Sha[..6]} {Path} @ {Commit[..6]} ({State})";
@@ -41,6 +42,7 @@ public class RepositoryFileInfo
         {
             State = FileState.Final,
             Bytes = this.Bytes,
+            Lines = this.Lines,
             Commit = this.Commit,
             Name = this.Name,
             Path = this.Path,
@@ -53,6 +55,7 @@ public class RepositoryFileInfo
         {
             State = FileState.Deleted,
             Bytes = 0, // TODO: Should this be the size of the file at the time of deletion?
+            Lines = 0,
             Commit = commit,
             Name = this.Name,
             Path = this.Path,

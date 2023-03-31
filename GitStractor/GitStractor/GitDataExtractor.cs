@@ -126,19 +126,7 @@ public class GitDataExtractor : IDisposable
                 // If the SHA is the same, we shouldn't log the file as being part of this commit, though there may
                 // be analysis value of having a full log of all files as of any given commit in the system
                 string fileLower = treeEntry.Path.ToLowerInvariant();
-                if (!_pathShas.ContainsKey(fileLower))
-                {
-                    // If we didn't have the path before, this is an added file so let's mark it as an added file
-                    fileInfo.State = FileState.Added;
-                }
-                else if (_pathShas[fileLower] == treeEntry.Target.Sha)
-                {
-                    fileInfo.State = FileState.Unmodified;
-                }
-                else
-                {
-                    fileInfo.State = FileState.Modified;
-                }
+                fileInfo.State = DetermineFileState(fileLower, fileInfo, treeEntry);
                 
                 treeInfo.Register(fileInfo);
 
@@ -162,15 +150,33 @@ public class GitDataExtractor : IDisposable
         }
     }
 
+    private FileState DetermineFileState(string fileLower, RepositoryFileInfo fileInfo, TreeEntry treeEntry)
+    {
+        if (!_pathShas.ContainsKey(fileLower))
+        {
+            // If we didn't have the path before, this is an added file so let's mark it as an added file
+            return FileState.Added;
+        }
+
+        return _pathShas[fileLower] == treeEntry.Target.Sha 
+            ? FileState.Unmodified 
+            : FileState.Modified;
+    }
+
     private static RepositoryFileInfo BuildFileInfo(Commit commit, TreeEntry treeEntry)
     {
         Blob blob = (Blob)treeEntry.Target;
+
+        string text = blob.GetContentText();
+        int lines = text.Count(c => c == '\n');
+
 
         RepositoryFileInfo fileInfo = new()
         {
             Name = treeEntry.Name,
             Path = treeEntry.Path,
             Sha = blob.Id.Sha,
+            Lines = lines,
             Bytes = (ulong)blob.Size,
             Commit = commit.Id.Sha,
             CreatedDateUtc = commit.Author.When.UtcDateTime,
