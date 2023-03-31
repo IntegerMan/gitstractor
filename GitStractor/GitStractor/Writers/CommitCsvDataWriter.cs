@@ -21,7 +21,7 @@ public class CommitCsvDataWriter : CommitDataWriter
         _writer = new StreamWriter(_path, append: false);
 
         // Write the header row
-        _writer.WriteLine("CommitHash,AuthorEmail,AuthorDateUTC,CommitterEmail,CommitterDate,Message,NumFiles,TotalBytes,FileNames");
+        _writer.WriteLine("CommitHash,AuthorEmail,AuthorDateUTC,CommitterEmail,CommitterDate,Message,NumFiles,AddedFiles,DeletedFiles,TotalFiles,TotalBytes,FileNames");
     }
 
     public override void Write(CommitInfo commit)
@@ -32,7 +32,7 @@ public class CommitCsvDataWriter : CommitDataWriter
         _writer.Write($"{commit.Author.Email.ToCsvSafeString()},{commit.AuthorDateUtc},");
         _writer.Write($"{commit.Committer.Email.ToCsvSafeString()},{commit.CommitterDateUtc},");
         _writer.Write($"{commit.Message.ToCsvSafeString()},");
-        _writer.WriteLine($"{commit.NumFiles},{commit.SizeInBytes},{commit.FileNames.ToCsvSafeString()}");
+        _writer.WriteLine($"{commit.NumFiles},{commit.AddedFiles},{commit.DeletedFiles},{commit.TotalFiles},{commit.SizeInBytes},{commit.FileNames.ToCsvSafeString()}");
     }
 
     protected override void Dispose(bool disposing)

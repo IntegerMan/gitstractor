@@ -32,11 +32,11 @@ public class GitStractorAnalyzerTests
     {
         // Arrange
         CommitInMemoryDataWriter commitDataWriter = new();
-        DateTime yearStart = new DateTime(2023, 1, 1);
         GitExtractionOptions options = new()
         {
             RepositoryPath = Environment.CurrentDirectory,
             AuthorWriter = new AuthorConsoleDataWriter(),
+            FileWriter = new FileInMemoryDataWriter(),
             CommitWriter = commitDataWriter,
         };
         using GitDataExtractor extractor = new(options);
@@ -58,6 +58,7 @@ public class GitStractorAnalyzerTests
         {
             RepositoryPath = Environment.CurrentDirectory,
             AuthorWriter = new AuthorConsoleDataWriter(),
+            FileWriter = new FileInMemoryDataWriter(),
             CommitWriter = commitDataWriter,
         };
         using GitDataExtractor extractor = new(options);
@@ -85,6 +86,7 @@ public class GitStractorAnalyzerTests
         {
             RepositoryPath = Environment.CurrentDirectory,
             AuthorWriter = new AuthorConsoleDataWriter(),
+            FileWriter = new FileInMemoryDataWriter(),
             CommitWriter = commitDataWriter,
         };
         using GitDataExtractor extractor = new(options);
@@ -109,6 +111,7 @@ public class GitStractorAnalyzerTests
         {
             RepositoryPath = Environment.CurrentDirectory,
             AuthorWriter = new AuthorConsoleDataWriter(),
+            FileWriter = new FileInMemoryDataWriter(),
             CommitWriter = commitDataWriter,
         };
         using GitDataExtractor extractor = new(options);

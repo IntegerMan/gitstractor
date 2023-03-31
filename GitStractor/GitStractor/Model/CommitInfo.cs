@@ -15,7 +15,6 @@ public class CommitInfo
     public CommitInfo(IEnumerable<string> files)
     {
         _files = new List<string>(files);
-        NumFiles = _files.Count;
     }
 
     /// <summary>
@@ -27,6 +26,12 @@ public class CommitInfo
     /// The total blob size of the commit in terms of bytes
     /// </summary>
     public ulong SizeInBytes { get; init; }
+    
+    /// <summary>
+    /// Gets the total number of files in the working tree as of this commit. This is typically not the amount of files
+    /// modified by the commit.
+    /// </summary>
+    public int TotalFiles { get; init; }
 
     /// <summary>
     /// The SHA of the commit
@@ -69,8 +74,18 @@ public class CommitInfo
     /// <summary>
     /// The number of files in the commit's tree
     /// </summary>
-    public int NumFiles { get; }
-
+    public uint NumFiles => (uint)(_files.Count + DeletedFiles);
+    
+    /// <summary>
+    /// The number of files in this commit's tree that didn't appear with the same path previously
+    /// </summary>
+    public int AddedFiles { get; set; }
+    
+    /// <summary>
+    /// The number of files in the prior commit's tree that didn't appear in this tree's
+    /// </summary>
+    public int DeletedFiles { get; set; }
+    
     /// <summary>
     /// The names of the files modified by the commit
     /// </summary>
@@ -84,6 +99,6 @@ public class CommitInfo
     /// <inheritdoc />
     public override string ToString()
     {
-        return $"{Sha[..5]} {Author.Name} @ {AuthorDateLocal.ToShortDateString()} {AuthorDateLocal.ToShortTimeString()}: {Message}";
+        return $"{Sha[..6]} {Author.Name} @ {AuthorDateLocal.ToShortDateString()} {AuthorDateLocal.ToShortTimeString()}: {Message} ({NumFiles} file(s), +{AddedFiles}/-{DeletedFiles})";
     }
 }
