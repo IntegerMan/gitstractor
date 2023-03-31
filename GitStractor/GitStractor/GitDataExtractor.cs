@@ -52,6 +52,7 @@ public class GitDataExtractor : IDisposable
         // Write the header rows
         _options.AuthorWriter.BeginWriting();
         _options.CommitWriter.BeginWriting();
+        _options.FileWriter.BeginWriting();
 
         // Customize how we'll traverse commit history
         CommitFilter filter = new()
@@ -67,20 +68,21 @@ public class GitDataExtractor : IDisposable
         // Loop over each commit
         foreach (Commit commit in repo.Commits.QueryBy(filter))
         {
-            ProcessCommit(commit);
+            bool isLast = commit == repo.Head.Tip;
+            ProcessCommit(commit, isLast);
         }
         
         // Write all authors at the end, now that we know aggregate-level information
         _options.AuthorWriter.WriteAuthors(_authors.Values);
     }
 
-    private void ProcessCommit(Commit commit)
+    private void ProcessCommit(Commit commit, bool isLast)
     {
         GitTreeInfo treeInfo = new();
         _trees[commit.Tree.Sha] = treeInfo;
 
         // Walk the commit tree to get file information
-        WalkTree(commit, commit.Tree, treeInfo);
+        WalkTree(commit, commit.Tree, treeInfo, isLast);
 
         // Get what we know about the parent commit this came from
         GitTreeInfo? parentTree = commit.Parents.Any() ? _trees[commit.Parents.First().Tree.Sha] : null;
@@ -92,7 +94,8 @@ public class GitDataExtractor : IDisposable
             {
                 if (!treeInfo.Contains(path))
                 {
-                    treeInfo.DeletedFileCount++;
+                    treeInfo.RegisterDeletedFile(path);
+                    // TODO: I should write this to the file writer
                 }
             }
         }
@@ -110,12 +113,14 @@ public class GitDataExtractor : IDisposable
 
     private readonly Dictionary<string, string> _pathShas = new();
 
-    private void WalkTree(Commit commit, Tree tree, GitTreeInfo treeInfo)
+    private void WalkTree(Commit commit, Tree tree, GitTreeInfo treeInfo, bool isLast)
     {
         foreach (TreeEntry treeEntry in tree)
         {
             if (treeEntry.TargetType == TreeEntryTargetType.Blob)
             {
+                RepositoryFileInfo fileInfo = BuildFileInfo(commit, treeEntry);
+
                 // Each tree consists of ALL files, including those who didn't change at all. When the contents of a
                 // file changes, its SHA changes. So, we can use the SHA of the file to determine if it changed.
                 // If the SHA is the same, we shouldn't log the file as being part of this commit, though there may
@@ -125,41 +130,60 @@ public class GitDataExtractor : IDisposable
                 if (!_pathShas.ContainsKey(fileLower))
                 {
                     // If we didn't have the path before, this is an added file so let's mark it as an added file
-                    treeInfo.AddedFileCount++;
+                    fileInfo.State = FileState.Added;
+                    treeInfo.RegisterNewFile(fileLower);
                 }
                 else if (_pathShas[fileLower] == treeEntry.Target.Sha)
                 {
-                    continue;
+                    fileInfo.State = FileState.Unmodified;
+                    treeInfo.RegisterFile(fileLower);
                 }
-
-                treeInfo.RegisterChangedFile(fileLower);
+                else
+                {
+                    fileInfo.State = FileState.Modified;
+                    treeInfo.RegisterChangedFile(fileLower);
+                }
+                
+                // If the file was modified, let's count its metrics towards the total in the tree
+                if (fileInfo.State != FileState.Unmodified)
+                {
+                    treeInfo.Bytes += fileInfo.Bytes;
+                }
                 
                 // Add or update our entry for the file's path
                 _pathShas[fileLower] = treeEntry.Target.Sha;
-
-                Blob blob = (Blob)treeEntry.Target;
-
-                RepositoryFileInfo fileInfo = new()
-                {
-                    Name = treeEntry.Name,
-                    Path = treeEntry.Path,
-                    Sha = blob.Id.Sha,
-                    Bytes = (ulong)blob.Size,
-                    Commit = commit.Id.Sha,
-                    CreatedDateUtc = commit.Author.When.UtcDateTime,
-                };
-
-                treeInfo.Bytes += fileInfo.Bytes;
-
+                
                 _options.FileWriter.WriteFile(fileInfo);
+
+                // At the very end of the analysis, we want to write out the final state of the file
+                if (isLast)
+                {
+                    _options.FileWriter.WriteFile(fileInfo.AsFinalVersion());
+                }
             }
             else if (treeEntry.TargetType == TreeEntryTargetType.Tree)
             {
                 Tree subTree = (Tree)treeEntry.Target;
                 
-                WalkTree(commit, subTree, treeInfo);
+                WalkTree(commit, subTree, treeInfo, isLast);
             }
         }
+    }
+
+    private static RepositoryFileInfo BuildFileInfo(Commit commit, TreeEntry treeEntry)
+    {
+        Blob blob = (Blob)treeEntry.Target;
+
+        RepositoryFileInfo fileInfo = new()
+        {
+            Name = treeEntry.Name,
+            Path = treeEntry.Path,
+            Sha = blob.Id.Sha,
+            Bytes = (ulong)blob.Size,
+            Commit = commit.Id.Sha,
+            CreatedDateUtc = commit.Author.When.UtcDateTime,
+        };
+        return fileInfo;
     }
 
     private AuthorInfo GetOrCreateAuthor(Signature signature, ulong bytes, bool isAuthor)
@@ -223,5 +247,6 @@ public class GitDataExtractor : IDisposable
     {
         _options.AuthorWriter.Dispose();
         _options.CommitWriter.Dispose();
+        _options.FileWriter.Dispose();
     }
 }
