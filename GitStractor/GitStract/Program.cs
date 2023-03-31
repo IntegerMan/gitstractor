@@ -4,6 +4,12 @@ using LibGit2Sharp;
 
 namespace GitStractor.CLI;
 
+/// <summary>
+/// This program is the command line utility to extract git repository statistics.
+///
+/// The program is intended to be invoked either using just "gitstract" to analyze the current directory (or its parent
+/// git directory) or via "gitstract C:\some\other\repository" to analyze another repository on disk.
+/// </summary>
 public static class Program
 {
     private static void Main(string[] args)

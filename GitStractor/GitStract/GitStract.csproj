@@ -7,6 +7,9 @@
     <Nullable>enable</Nullable>
     <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
     <AnalysisLevel>latest-recommended</AnalysisLevel>
+    <AssemblyName>gitstract</AssemblyName>
+    <ApplicationIcon>favicon.ico</ApplicationIcon>
+    <RootNamespace>GitStractor.CLI</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
