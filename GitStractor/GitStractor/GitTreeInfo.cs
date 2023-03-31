@@ -1,42 +1,34 @@
-﻿namespace GitStractor;
+﻿using GitStractor.Model;
+
+namespace GitStractor;
 
 internal class GitTreeInfo
 {
-    private readonly HashSet<string> _files = new();
-    private readonly HashSet<string> _changedFiles = new();
-    public ulong Bytes { get; set; }
-    public uint TotalFileCount { get; private set; }
-    public uint AddedFileCount { get; private set; }
-    public uint DeletedFileCount { get; private set; }
-    public uint ChangedFileCount => (uint)(_changedFiles.Count + DeletedFileCount);
-
-    public void RegisterFile(string filename)
-    {
-        TotalFileCount++;
-        _files.Add(filename);
-    }
+    private readonly HashSet<RepositoryFileInfo> _files = new();
+    public ulong Bytes { get; private set; }
+    public int TotalFileCount => _files.Count();
+    public int AddedFileCount => _files.Count(f => f.State == FileState.Added);
+    public int DeletedFileCount => _files.Count(f => f.State == FileState.Deleted);
+    public int ChangedFileCount => _files.Count(f => f.State is FileState.Added or FileState.Modified or FileState.Deleted);
     
-    public void RegisterNewFile(string filename)
-    {
-        AddedFileCount++;
-        _changedFiles.Add(filename);
-        _files.Add(filename);
-    }    
+    public IEnumerable<string> Files => _files.Select(f => f.Path);
+    public IEnumerable<string> ModifiedFiles => _files.Where(f => f.State != FileState.Unmodified).Select(f => f.Path);
+
+    public bool Contains(string path) => _files.Select(f => f.Path).Contains(path);
     
-    public void RegisterChangedFile(string filename)
+    public void Register(RepositoryFileInfo file)
     {
-        _changedFiles.Add(filename);
-        _files.Add(filename);
+        if (Contains(file.Path))
+            return;
+        
+        _files.Add(file);
+
+        if (file.State != FileState.Unmodified)
+        {
+            Bytes += file.Bytes;
+        }
     }
 
-    public IEnumerable<string> Files => _files;
-    public IEnumerable<string> ModifiedFiles => _changedFiles;
-
-    public bool Contains(string filename) => _files.Contains(filename);
-
-    public void RegisterDeletedFile(string path)
-    {
-        DeletedFileCount++;
-        _changedFiles.Add(path);
-    }
+    public RepositoryFileInfo? Find(string path) 
+        => _files.FirstOrDefault(f => string.Equals(f.Path, path, StringComparison.InvariantCultureIgnoreCase));
 }

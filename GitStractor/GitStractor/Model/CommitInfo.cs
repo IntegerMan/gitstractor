@@ -31,7 +31,7 @@ public class CommitInfo
     /// Gets the total number of files in the working tree as of this commit. This is typically not the amount of files
     /// modified by the commit.
     /// </summary>
-    public uint TotalFiles { get; init; }
+    public int TotalFiles { get; init; }
 
     /// <summary>
     /// The SHA of the commit
@@ -79,12 +79,12 @@ public class CommitInfo
     /// <summary>
     /// The number of files in this commit's tree that didn't appear with the same path previously
     /// </summary>
-    public uint AddedFiles { get; set; }
+    public int AddedFiles { get; set; }
     
     /// <summary>
     /// The number of files in the prior commit's tree that didn't appear in this tree's
     /// </summary>
-    public uint DeletedFiles { get; set; }
+    public int DeletedFiles { get; set; }
     
     /// <summary>
     /// The names of the files modified by the commit

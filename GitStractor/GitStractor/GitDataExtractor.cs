@@ -94,8 +94,8 @@ public class GitDataExtractor : IDisposable
             {
                 if (!treeInfo.Contains(path))
                 {
-                    treeInfo.RegisterDeletedFile(path);
-                    // TODO: I should write this to the file writer
+                    RepositoryFileInfo file = parentTree.Find(path)!;
+                    _options.FileWriter.WriteFile(file.AsDeletedFile(commit.Sha, commit.Author.When.UtcDateTime));
                 }
             }
         }
@@ -126,30 +126,22 @@ public class GitDataExtractor : IDisposable
                 // If the SHA is the same, we shouldn't log the file as being part of this commit, though there may
                 // be analysis value of having a full log of all files as of any given commit in the system
                 string fileLower = treeEntry.Path.ToLowerInvariant();
-                treeInfo.RegisterFile(fileLower);
                 if (!_pathShas.ContainsKey(fileLower))
                 {
                     // If we didn't have the path before, this is an added file so let's mark it as an added file
                     fileInfo.State = FileState.Added;
-                    treeInfo.RegisterNewFile(fileLower);
                 }
                 else if (_pathShas[fileLower] == treeEntry.Target.Sha)
                 {
                     fileInfo.State = FileState.Unmodified;
-                    treeInfo.RegisterFile(fileLower);
                 }
                 else
                 {
                     fileInfo.State = FileState.Modified;
-                    treeInfo.RegisterChangedFile(fileLower);
                 }
                 
-                // If the file was modified, let's count its metrics towards the total in the tree
-                if (fileInfo.State != FileState.Unmodified)
-                {
-                    treeInfo.Bytes += fileInfo.Bytes;
-                }
-                
+                treeInfo.Register(fileInfo);
+
                 // Add or update our entry for the file's path
                 _pathShas[fileLower] = treeEntry.Target.Sha;
                 

@@ -36,8 +36,8 @@ public class RepositoryFileInfo
     public override string ToString() 
         => $"{Sha[..6]} {Path} @ {Commit[..6]} ({State})";
 
-    public RepositoryFileInfo AsFinalVersion() =>
-        new()
+    public RepositoryFileInfo AsFinalVersion() 
+        => new()
         {
             State = FileState.Final,
             Bytes = this.Bytes,
@@ -46,5 +46,17 @@ public class RepositoryFileInfo
             Path = this.Path,
             Sha = this.Sha,
             CreatedDateUtc = this.CreatedDateUtc,
+        };
+
+    public RepositoryFileInfo AsDeletedFile(string commit, DateTime commitDateUtc)
+        => new()
+        {
+            State = FileState.Deleted,
+            Bytes = 0, // TODO: Should this be the size of the file at the time of deletion?
+            Commit = commit,
+            Name = this.Name,
+            Path = this.Path,
+            Sha = this.Sha, // May want to use string.empty here, but leaving for comparison of same file over time
+            CreatedDateUtc = commitDateUtc,
         };
 }
