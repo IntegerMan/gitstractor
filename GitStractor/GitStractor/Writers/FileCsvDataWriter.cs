@@ -23,7 +23,7 @@ public class FileCsvDataWriter : FileDataWriter
         _writer = new StreamWriter(_path, append: false);
 
         // Write the header row
-        _writer.WriteLine("CommitHash,FileHash,Filename,Extension,FilePath,State,Bytes,CreatedDateUTC");
+        _writer.WriteLine("CommitHash,FileHash,Filename,Extension,FilePath,State,Bytes,CreatedDateUTC,Path1,Path2,Path3");
     }
 
     public override void WriteFile(RepositoryFileInfo fileInfo)
@@ -34,7 +34,9 @@ public class FileCsvDataWriter : FileDataWriter
         if (!_statesToWrite.HasFlag(fileInfo.State)) return;
         
         _writer.Write($"{fileInfo.Commit},{fileInfo.Sha},{fileInfo.Name.ToCsvSafeString()},{fileInfo.Extension},");
-        _writer.WriteLine($"{fileInfo.Path.ToCsvSafeString()},{fileInfo.State},{fileInfo.Bytes},{fileInfo.CreatedDateUtc}");
+        _writer.Write($"{fileInfo.Path.ToCsvSafeString()},{fileInfo.State},{fileInfo.Bytes},{fileInfo.CreatedDateUtc},");
+        _writer.Write($"{fileInfo.Path1?.ToCsvSafeString()},{fileInfo.Path2?.ToCsvSafeString()},{fileInfo.Path3?.ToCsvSafeString()},");
+        _writer.WriteLine($"{fileInfo.Path4?.ToCsvSafeString()},{fileInfo.Path5?.ToCsvSafeString()}");
     }
 
     protected override void Dispose(bool disposing)

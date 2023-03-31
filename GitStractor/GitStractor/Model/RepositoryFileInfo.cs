@@ -15,6 +15,20 @@ public class RepositoryFileInfo
             return info.Extension;
         }
     }
+    public string? Path1 => GetPathElement(0);
+    public string? Path2 => GetPathElement(1);
+    public string? Path3 => GetPathElement(2);
+    public string? Path4 => GetPathElement(3);
+    public string? Path5 => GetPathElement(4);
+
+    private string? GetPathElement(int index)
+    {
+        string[] paths = Path.Split("/");
+        
+        // +1 here is because the filename itself is part of the path
+        return paths.Length > index + 1 ? paths[index] : null;
+    }
+
     public ulong Bytes { get; init; }
     public string Commit { get; init; }
     public DateTime CreatedDateUtc { get; init; }

@@ -14,8 +14,8 @@ public static class CsvExtensions
     /// </summary>
     /// <param name="value">The string to transform</param>
     /// <returns>The CSV safe string</returns>
-    public static string ToCsvSafeString(this string value) =>
-        value.Contains(",")
+    public static string? ToCsvSafeString(this string? value) 
+        => value != null && value.Contains(",")
             ? $"\"{value}\""
             : value;
 }
