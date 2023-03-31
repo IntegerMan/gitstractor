@@ -30,7 +30,7 @@ public class RepositoryFileInfo
     }
 
     public ulong Bytes { get; init; }
-    public string Commit { get; init; }
+    public required string Commit { get; init; }
     public DateTime CreatedDateUtc { get; init; }
     public required int Lines { get; init; }
 

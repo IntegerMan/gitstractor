@@ -36,6 +36,7 @@ public class GitStractorAnalyzerTests
         {
             RepositoryPath = Environment.CurrentDirectory,
             AuthorWriter = new AuthorConsoleDataWriter(),
+            FileWriter = new FileInMemoryDataWriter(),
             CommitWriter = commitDataWriter,
         };
         using GitDataExtractor extractor = new(options);
@@ -57,6 +58,7 @@ public class GitStractorAnalyzerTests
         {
             RepositoryPath = Environment.CurrentDirectory,
             AuthorWriter = new AuthorConsoleDataWriter(),
+            FileWriter = new FileInMemoryDataWriter(),
             CommitWriter = commitDataWriter,
         };
         using GitDataExtractor extractor = new(options);
@@ -84,6 +86,7 @@ public class GitStractorAnalyzerTests
         {
             RepositoryPath = Environment.CurrentDirectory,
             AuthorWriter = new AuthorConsoleDataWriter(),
+            FileWriter = new FileInMemoryDataWriter(),
             CommitWriter = commitDataWriter,
         };
         using GitDataExtractor extractor = new(options);
@@ -108,6 +111,7 @@ public class GitStractorAnalyzerTests
         {
             RepositoryPath = Environment.CurrentDirectory,
             AuthorWriter = new AuthorConsoleDataWriter(),
+            FileWriter = new FileInMemoryDataWriter(),
             CommitWriter = commitDataWriter,
         };
         using GitDataExtractor extractor = new(options);
