@@ -14,6 +14,8 @@ Tree map of the # of commits per file:
 Scatter plot of files in each commit:
 ![GitStractor # Files per Commit](./Images/GitStractorFilesPerCommit_April_1_2023.png)
 
+See [the Jupyter Notebook](Notebooks/GitStractor.ipynb) for additional visualization examples.
+
 ## Project Status
 
 This project is currently usable, but considered in a pre-release state. It is currently missing documentation, polish, and the full range of features I intend to add.
