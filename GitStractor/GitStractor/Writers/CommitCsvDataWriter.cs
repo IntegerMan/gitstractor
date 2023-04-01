@@ -21,18 +21,29 @@ public class CommitCsvDataWriter : CommitDataWriter
         _writer = new StreamWriter(_path, append: false);
 
         // Write the header row
-        _writer.WriteLine("CommitHash,AuthorEmail,AuthorDateUTC,CommitterEmail,CommitterDate,Message,NumFiles,AddedFiles,DeletedFiles,TotalFiles,TotalBytes,FileNames");
+        WriteHeaderRow(_writer);
     }
 
-    public override void Write(CommitInfo commit)
+    protected virtual void WriteHeaderRow(StreamWriter writer)
+    {
+        writer.WriteLine("CommitHash,AuthorEmail,AuthorDateUTC,CommitterEmail,CommitterDate,Message,NumFiles,AddedFiles,DeletedFiles,TotalFiles,TotalBytes,FileNames");
+    }
+
+    public sealed override void Write(CommitInfo commit)
     {
         if (_writer == null) throw new InvalidOperationException("The writer is not currently open");
 
-        _writer.Write($"{commit.Sha},");
-        _writer.Write($"{commit.Author.Email.ToCsvSafeString()},{commit.AuthorDateUtc},");
-        _writer.Write($"{commit.Committer.Email.ToCsvSafeString()},{commit.CommitterDateUtc},");
-        _writer.Write($"{commit.Message.ToCsvSafeString()},");
-        _writer.WriteLine($"{commit.NumFiles},{commit.AddedFiles},{commit.DeletedFiles},{commit.TotalFiles},{commit.SizeInBytes},{commit.FileNames.ToCsvSafeString()}");
+        WriteRow(commit, _writer);
+    }
+
+    protected virtual void WriteRow(CommitInfo commit, TextWriter writer)
+    {
+        writer.Write($"{commit.Sha},");
+        writer.Write($"{commit.Author.Email.ToCsvSafeString()},{commit.AuthorDateUtc},");
+        writer.Write($"{commit.Committer.Email.ToCsvSafeString()},{commit.CommitterDateUtc},");
+        writer.Write($"{commit.Message.ToCsvSafeString()},");
+        writer.WriteLine(
+            $"{commit.NumFiles},{commit.AddedFiles},{commit.DeletedFiles},{commit.TotalFiles},{commit.SizeInBytes},{commit.FileNames.ToCsvSafeString()}");
     }
 
     protected override void Dispose(bool disposing)

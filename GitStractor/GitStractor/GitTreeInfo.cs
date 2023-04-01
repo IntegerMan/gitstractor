@@ -12,7 +12,7 @@ internal class GitTreeInfo
     public int ChangedFileCount => _files.Count(f => f.State is FileState.Added or FileState.Modified or FileState.Deleted);
     
     public IEnumerable<string> Files => _files.Select(f => f.Path);
-    public IEnumerable<string> ModifiedFiles => _files.Where(f => f.State != FileState.Unmodified).Select(f => f.Path);
+    public IEnumerable<RepositoryFileInfo> ModifiedFiles => _files.Where(f => f.State != FileState.Unmodified);
 
     public bool Contains(string path) => _files.Select(f => f.Path).Contains(path);
     

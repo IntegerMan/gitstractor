@@ -23,7 +23,7 @@ public class FileCsvDataWriter : FileDataWriter
         _writer = new StreamWriter(_path, append: false);
 
         // Write the header row
-        _writer.WriteLine("CommitHash,FileHash,Filename,Extension,FilePath,State,Lines,Bytes,CreatedDateUTC,Path1,Path2,Path3");
+        _writer.WriteLine("CommitHash,FileHash,Filename,Extension,FilePath,State,Lines,Bytes,CreatedDateUTC,Path1,Path2,Path3,Path4,Path5");
     }
 
     public override void WriteFile(RepositoryFileInfo fileInfo)

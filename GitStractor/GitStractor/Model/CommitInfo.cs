@@ -6,15 +6,15 @@
 /// </summary>
 public class CommitInfo
 {
-    private readonly List<string> _files;
+    private readonly List<RepositoryFileInfo> _files;
 
     /// <summary>
     /// Creates a new instance of <see cref="CommitInfo"/>.
     /// </summary>
     /// <param name="files">The files associated with the commit</param>
-    public CommitInfo(IEnumerable<string> files)
+    public CommitInfo(IEnumerable<RepositoryFileInfo> files)
     {
-        _files = new List<string>(files);
+        _files = new List<RepositoryFileInfo>(files);
     }
 
     /// <summary>
@@ -89,7 +89,7 @@ public class CommitInfo
     /// <summary>
     /// The names of the files modified by the commit
     /// </summary>
-    public IReadOnlyList<string> Files => _files;
+    public IReadOnlyList<RepositoryFileInfo> Files => _files;
 
     /// <summary>
     /// A comma-separated list of files modified by the commit
