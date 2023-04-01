@@ -126,19 +126,21 @@ public class GitDataExtractor : IDisposable
                 // If the SHA is the same, we shouldn't log the file as being part of this commit, though there may
                 // be analysis value of having a full log of all files as of any given commit in the system
                 string fileLower = treeEntry.Path.ToLowerInvariant();
-                fileInfo.State = DetermineFileState(fileLower, fileInfo, treeEntry);
+                fileInfo.State = DetermineFileState(fileLower, treeEntry);
                 
                 treeInfo.Register(fileInfo);
 
                 // Add or update our entry for the file's path
                 _pathShas[fileLower] = treeEntry.Target.Sha;
-                
-                _options.FileWriter.WriteFile(fileInfo);
 
-                // At the very end of the analysis, we want to write out the final state of the file
-                if (isLast)
+                if (_options.FileMatchesFilter(fileInfo.Extension))
                 {
-                    _options.FileWriter.WriteFile(fileInfo.AsFinalVersion());
+                    _options.FileWriter.WriteFile(fileInfo);
+                    // At the very end of the analysis, we want to write out the final state of the file
+                    if (isLast)
+                    {
+                        _options.FileWriter.WriteFile(fileInfo.AsFinalVersion());
+                    }
                 }
             }
             else if (treeEntry.TargetType == TreeEntryTargetType.Tree)
@@ -150,7 +152,7 @@ public class GitDataExtractor : IDisposable
         }
     }
 
-    private FileState DetermineFileState(string fileLower, RepositoryFileInfo fileInfo, TreeEntry treeEntry)
+    private FileState DetermineFileState(string fileLower, TreeEntry treeEntry)
     {
         if (!_pathShas.ContainsKey(fileLower))
         {

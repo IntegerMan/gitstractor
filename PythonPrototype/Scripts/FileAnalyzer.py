@@ -12,6 +12,7 @@ source_extensions = [
     '.agc', 
     '.fs', 
     '.js', 
+    '.ts',
     '.cpp', 
     '.go', 
     '.aspx', 

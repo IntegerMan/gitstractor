@@ -26,7 +26,7 @@ public class CommitCsvDataWriter : CommitDataWriter
 
     protected virtual void WriteHeaderRow(StreamWriter writer)
     {
-        writer.WriteLine("CommitHash,AuthorEmail,AuthorDateUTC,CommitterEmail,CommitterDate,Message,NumFiles,AddedFiles,DeletedFiles,TotalFiles,TotalBytes,FileNames");
+        writer.WriteLine("CommitHash,AuthorEmail,AuthorDateUTC,CommitterEmail,CommitterDateUTC,Message,NumFiles,AddedFiles,DeletedFiles,TotalFiles,TotalBytes,FileNames");
     }
 
     public sealed override void Write(CommitInfo commit)

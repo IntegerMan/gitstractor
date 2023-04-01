@@ -17,7 +17,7 @@ public static class Program
         // First parameter is path, but current directory is used in its absence
         string repositoryPath = args.FirstOrDefault() ?? Environment.CurrentDirectory;
 
-        Console.WriteLine($"Looking for git repository in {repositoryPath}{Environment.NewLine}");
+        Console.WriteLine($"Analyzing git repository in '{repositoryPath}'...{Environment.NewLine}");
         
         // For now, let's just always dump into the current directory
         string outputDirectory = Environment.CurrentDirectory;
