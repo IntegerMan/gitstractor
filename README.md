@@ -3,6 +3,17 @@ Project by [Matt Eland](https://LinkedIn.com/in/matteland) ([@IntegerMan](https:
 
 This project is built for extracting commit, author, and file data from local git repositories in order to visualize repository history and trends to provide insight to software development teams and their stakeholders.
 
+Here are a few examples of the types of visualizations that can be generated using GitStractor:
+
+Tree map of the # of commits per file:
+![GitStractor # Commits by File](./Images/GitStractorFileCommits_April_1_2023.png)
+
+Scatter plot of files in each commit:
+![GitStractor # Files per Commit](./Images/GitStractorFilesPerCommit_April_1_2023.png)
+
+Stacked bar chart of # of commits per month by day of week:
+![Accessible AI Blog Posts by Month](./Images/AccessibleAIBlogPostsByMonth.png)
+
 ## Project Status
 
 This project is currently usable, but considered in a pre-release state. It is currently missing documentation, polish, and the full range of features I intend to add.

@@ -11,7 +11,7 @@ public class FileCommitCsvDataWriter : CommitCsvDataWriter
 
     protected override void WriteHeaderRow(StreamWriter writer)
     {
-        writer!.WriteLine("FilePath,FileHash,CommitHash,AuthorEmail,AuthorDateUTC,CommitterEmail,CommitterDate,Message,Bytes,Lines");
+        writer!.WriteLine("FilePath,FileHash,CommitHash,AuthorEmail,AuthorDateUTC,CommitterEmail,CommitterDate,Message,Bytes,Lines,NetLines");
     }
 
     protected override void WriteRow(CommitInfo commit, TextWriter writer)
@@ -22,7 +22,7 @@ public class FileCommitCsvDataWriter : CommitCsvDataWriter
             writer.Write($"{commit.Author.Email.ToCsvSafeString()},{commit.AuthorDateUtc},");
             writer.Write($"{commit.Committer.Email.ToCsvSafeString()},{commit.CommitterDateUtc},");
             writer.Write($"{commit.Message.ToCsvSafeString()},");
-            writer.WriteLine($"{file.Bytes},{file.Lines}");
+            writer.WriteLine($"{file.Bytes},{file.Lines},{file.LinesDelta}");
         }
     }
 }

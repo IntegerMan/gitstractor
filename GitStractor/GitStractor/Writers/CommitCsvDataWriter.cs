@@ -26,7 +26,7 @@ public class CommitCsvDataWriter : CommitDataWriter
 
     protected virtual void WriteHeaderRow(StreamWriter writer)
     {
-        writer.WriteLine("CommitHash,AuthorEmail,AuthorDateUTC,CommitterEmail,CommitterDateUTC,Message,NumFiles,AddedFiles,DeletedFiles,TotalFiles,TotalBytes,FileNames");
+        writer.WriteLine("CommitHash,AuthorEmail,AuthorDateUTC,CommitterEmail,CommitterDateUTC,Message,NumFiles,AddedFiles,DeletedFiles,TotalFiles,TotalBytes,FileNames,TotalLines,NetLines");
     }
 
     public sealed override void Write(CommitInfo commit)
@@ -42,8 +42,8 @@ public class CommitCsvDataWriter : CommitDataWriter
         writer.Write($"{commit.Author.Email.ToCsvSafeString()},{commit.AuthorDateUtc},");
         writer.Write($"{commit.Committer.Email.ToCsvSafeString()},{commit.CommitterDateUtc},");
         writer.Write($"{commit.Message.ToCsvSafeString()},");
-        writer.WriteLine(
-            $"{commit.NumFiles},{commit.AddedFiles},{commit.DeletedFiles},{commit.TotalFiles},{commit.SizeInBytes},{commit.FileNames.ToCsvSafeString()}");
+        writer.Write($"{commit.NumFiles},{commit.AddedFiles},{commit.DeletedFiles},{commit.TotalFiles},{commit.SizeInBytes},");
+        writer.WriteLine($"{commit.FileNames.ToCsvSafeString()},{commit.TotalLines},{commit.NetLines}");
     }
 
     protected override void Dispose(bool disposing)

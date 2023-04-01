@@ -33,6 +33,9 @@ public class CommitInfo
     /// </summary>
     public int TotalFiles { get; init; }
 
+    public int TotalLines => _files.Sum(f => f.Lines);
+    public int NetLines => _files.Sum(f => f.LinesDelta);
+    
     /// <summary>
     /// The SHA of the commit
     /// </summary>

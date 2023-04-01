@@ -45,7 +45,7 @@ public class GitDataExtractor : IDisposable
         {
             throw new RepositoryNotFoundException($"Could not find a git repository at {_options.RepositoryPath}");
         }
-        
+
         // Connect to the git repository
         using Repository repo = new(gitPath);
 
@@ -60,18 +60,18 @@ public class GitDataExtractor : IDisposable
             // It's very important to walk through commits in historical order from oldest to newest
             // This lets us accurately get a read on the state of the repository at the time of each commit
             SortBy = CommitSortStrategies.Reverse,
-            
+
             // We only want to look at commits that are reachable from whatever is HEAD at the moment
             IncludeReachableFrom = repo.Head
         };
-        
+
         // Loop over each commit
         foreach (Commit commit in repo.Commits.QueryBy(filter))
         {
             bool isLast = commit == repo.Head.Tip;
             ProcessCommit(commit, isLast);
         }
-        
+
         // Write all authors at the end, now that we know aggregate-level information
         _options.AuthorWriter.WriteAuthors(_authors.Values);
     }
@@ -112,6 +112,7 @@ public class GitDataExtractor : IDisposable
     }
 
     private readonly Dictionary<string, string> _pathShas = new();
+    private readonly Dictionary<string, RepositoryFileInfo> _fileInfo = new();
 
     private void WalkTree(Commit commit, Tree tree, GitTreeInfo treeInfo, bool isLast)
     {
@@ -119,22 +120,35 @@ public class GitDataExtractor : IDisposable
         {
             if (treeEntry.TargetType == TreeEntryTargetType.Blob)
             {
-                RepositoryFileInfo fileInfo = BuildFileInfo(commit, treeEntry);
-
-                // Each tree consists of ALL files, including those who didn't change at all. When the contents of a
-                // file changes, its SHA changes. So, we can use the SHA of the file to determine if it changed.
-                // If the SHA is the same, we shouldn't log the file as being part of this commit, though there may
-                // be analysis value of having a full log of all files as of any given commit in the system
-                string fileLower = treeEntry.Path.ToLowerInvariant();
-                fileInfo.State = DetermineFileState(fileLower, treeEntry);
-                
-                treeInfo.Register(fileInfo);
-
-                // Add or update our entry for the file's path
-                _pathShas[fileLower] = treeEntry.Target.Sha;
-
-                if (_options.FileMatchesFilter(fileInfo.Extension))
+                // Ignore the file if it's not an extension we care about
+                FileInfo info = new(treeEntry.Path);
+                if (_options.FileMatchesFilter(info.Extension))
                 {
+                    _fileInfo.TryGetValue(treeEntry.Path, out RepositoryFileInfo? oldInfo);
+
+                    RepositoryFileInfo fileInfo;
+                    if (oldInfo != null && treeEntry.Target.Sha == oldInfo.Sha)
+                    {
+                        fileInfo = oldInfo.AsUnchanged();
+                    }
+                    else
+                    {
+                        fileInfo = BuildFileInfo(commit, treeEntry, oldInfo);
+                    }
+                    _fileInfo[treeEntry.Path] = fileInfo;
+
+                    // Each tree consists of ALL files, including those who didn't change at all. When the contents of a
+                    // file changes, its SHA changes. So, we can use the SHA of the file to determine if it changed.
+                    // If the SHA is the same, we shouldn't log the file as being part of this commit, though there may
+                    // be analysis value of having a full log of all files as of any given commit in the system
+                    string fileLower = treeEntry.Path.ToLowerInvariant();
+                    fileInfo.State = DetermineFileState(fileLower, treeEntry);
+
+                    treeInfo.Register(fileInfo);
+
+                    // Add or update our entry for the file's path
+                    _pathShas[fileLower] = treeEntry.Target.Sha;
+
                     _options.FileWriter.WriteFile(fileInfo);
                     // At the very end of the analysis, we want to write out the final state of the file
                     if (isLast)
@@ -146,7 +160,7 @@ public class GitDataExtractor : IDisposable
             else if (treeEntry.TargetType == TreeEntryTargetType.Tree)
             {
                 Tree subTree = (Tree)treeEntry.Target;
-                
+
                 WalkTree(commit, subTree, treeInfo, isLast);
             }
         }
@@ -160,16 +174,18 @@ public class GitDataExtractor : IDisposable
             return FileState.Added;
         }
 
-        return _pathShas[fileLower] == treeEntry.Target.Sha 
-            ? FileState.Unmodified 
+        return _pathShas[fileLower] == treeEntry.Target.Sha
+            ? FileState.Unmodified
             : FileState.Modified;
     }
 
-    private static RepositoryFileInfo BuildFileInfo(Commit commit, TreeEntry treeEntry)
+    private static RepositoryFileInfo BuildFileInfo(Commit commit, TreeEntry treeEntry, RepositoryFileInfo? oldInfo)
     {
         Blob blob = (Blob)treeEntry.Target;
 
         int lines = CountLinesInFile(blob);
+
+        int linesDelta = lines - oldInfo?.Lines ?? lines;
 
         RepositoryFileInfo fileInfo = new()
         {
@@ -177,6 +193,7 @@ public class GitDataExtractor : IDisposable
             Path = treeEntry.Path,
             Sha = blob.Id.Sha,
             Lines = lines,
+            LinesDelta = linesDelta,
             Bytes = (ulong)blob.Size,
             Commit = commit.Id.Sha,
             CreatedDateUtc = commit.Author.When.UtcDateTime,
@@ -188,12 +205,20 @@ public class GitDataExtractor : IDisposable
     {
         int lines = 0;
         using var reader = new StreamReader(blob.GetContentStream());
-        
+
         while (!reader.EndOfStream)
         {
             _ = reader.ReadLine();
             lines++;
         }
+
+        return lines;
+    }
+
+    private static int CountLinesInFile2(Blob blob)
+    {
+        string text = blob.GetContentText();
+        int lines = text.Count(c => c == '\n');
 
         return lines;
     }
@@ -223,6 +248,7 @@ public class GitDataExtractor : IDisposable
             {
                 author.LatestCommitDateUtc = signature.When.UtcDateTime;
             }
+
             if (signature.When.UtcDateTime < author.EarliestCommitDateUtc)
             {
                 author.EarliestCommitDateUtc = signature.When.UtcDateTime;
@@ -233,14 +259,15 @@ public class GitDataExtractor : IDisposable
     }
 
     private static CommitInfo CreateCommitFromLibGitCommit(
-        Commit commit, 
+        Commit commit,
         AuthorInfo author,
-        AuthorInfo committer, 
-        GitTreeInfo treeInfo) 
+        AuthorInfo committer,
+        GitTreeInfo treeInfo)
         => new(treeInfo.ModifiedFiles)
         {
             Sha = commit.Sha,
-            Message = commit.MessageShort, // This is just the first line of the commit message. Usually all that's needed
+            Message = commit
+                .MessageShort, // This is just the first line of the commit message. Usually all that's needed
             SizeInBytes = treeInfo.Bytes,
             TotalFiles = treeInfo.TotalFileCount,
             AddedFiles = treeInfo.AddedFileCount,
@@ -249,7 +276,7 @@ public class GitDataExtractor : IDisposable
             // Author information. Author is the person who wrote the contents of the commit
             Author = author,
             AuthorDateUtc = commit.Author.When.UtcDateTime,
-                    
+
             // Committer information. Committer is the person who performed the commit
             Committer = committer,
             CommitterDateUtc = commit.Committer.When.UtcDateTime,

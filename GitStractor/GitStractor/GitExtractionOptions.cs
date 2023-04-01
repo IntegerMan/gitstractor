@@ -20,13 +20,12 @@ public class GitExtractionOptions
     /// </summary>
     public HashSet<string> CodeFileExtensions { get; set; } = new()
     {
-        ".cs", ".csx", ".py", ".ipynb", ".dib", ".fs", ".fsx", ".js", ".ts", ".vb", ".vbx", ".java", ".html", ".css", 
+        ".cs", ".csx", ".py", ".fs", ".fsx", ".js", ".ts", ".vb", ".vbx", ".java", ".html", ".css", ".md", 
         ".scss", ".less", ".less",".cshtml",".vbhtml",".csx",".fsi",".fsscript",".fsscript", ".fsproj", ".csproj", 
         ".vbproj", ".shproj", ".sqlproj",".xproj", ".njsproj",".nuproj",".sln", ".unityproj", ".vcxproj", ".r", ".agc",
         ".c", ".cpp", ".go", ".asp", ".aspx", ".ascx", ".asmx", ".ashx", ".axd", ".cshtml", ".vbhtml", ".csx", ".jsp",
         ".jspx", ".jhtm", ".jhtml", ".wss", ".do", ".action", ".jsf", ".faces", ".xhtml", ".xht", ".xaml", ".cshtml",
         ".lua", ".php", ".php3", ".php4", ".php5", ".phtml", ".py", ".pyw", ".rhtml", ".rpy", ".rb", ".erb", ".rjs", ".rxml",
-        ".ipynb", ".dib", ".md"
     };
 
     /// <summary>

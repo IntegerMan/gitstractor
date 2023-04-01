@@ -33,6 +33,7 @@ public class RepositoryFileInfo
     public required string Commit { get; init; }
     public DateTime CreatedDateUtc { get; init; }
     public required int Lines { get; init; }
+    public required int LinesDelta { get; init; }
 
     public override string ToString() 
         => $"{Sha[..6]} {Path} @ {Commit[..6]} ({State})";
@@ -43,6 +44,7 @@ public class RepositoryFileInfo
             State = FileState.Final,
             Bytes = this.Bytes,
             Lines = this.Lines,
+            LinesDelta = this.Lines,
             Commit = this.Commit,
             Name = this.Name,
             Path = this.Path,
@@ -56,10 +58,25 @@ public class RepositoryFileInfo
             State = FileState.Deleted,
             Bytes = 0, // TODO: Should this be the size of the file at the time of deletion?
             Lines = 0,
+            LinesDelta = this.Lines,
             Commit = commit,
             Name = this.Name,
             Path = this.Path,
             Sha = this.Sha, // May want to use string.empty here, but leaving for comparison of same file over time
             CreatedDateUtc = commitDateUtc,
+        };
+    
+    public RepositoryFileInfo AsUnchanged()
+        => new()
+        {
+            State = FileState.Unmodified,
+            Bytes = this.Bytes,
+            Lines = this.Lines,
+            LinesDelta = 0,
+            Commit = this.Commit,
+            Name = this.Name,
+            Path = this.Path,
+            Sha = this.Sha, // May want to use string.empty here, but leaving for comparison of same file over time
+            CreatedDateUtc = this.CreatedDateUtc,
         };
 }
