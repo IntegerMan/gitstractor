@@ -6,10 +6,29 @@
     <Nullable>enable</Nullable>
     <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
     <AnalysisLevel>latest-recommended</AnalysisLevel>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageVersion>0.1.0</PackageVersion>
+    <Title>GitStractor</Title>
+    <Authors>Matt Eland</Authors>
+    <Description>A library for pulling data out of git repositories for visualization purposes</Description>
+    <Copyright>Copyright 2023 Matt Eland</Copyright>
+    <PackageProjectUrl>https://github.com/integerman/gitstractor</PackageProjectUrl>
+    <PackageLicenseUrl>https://github.com/IntegerMan/gitstractor/blob/main/LICENSE</PackageLicenseUrl>
+    <PackageIcon>CircleLogoTrans.png</PackageIcon>
+    <RepositoryUrl>https://github.com/integerman/gitstractor</RepositoryUrl>
+    <PackageTags>git, data visualization</PackageTags>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="LibGit2Sharp" Version="0.26.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="CircleLogoTrans.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
 
 </Project>

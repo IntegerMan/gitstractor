@@ -23,7 +23,7 @@ public static class Program
         // Analyze the git repository
         try
         {
-            GitExtractionOptions options = BuildExtractionOptions(repositoryPath, outputDirectory);
+            GitExtractionOptions options = GitExtractionOptions.BuildFileOptions(repositoryPath, outputDirectory);
             using GitDataExtractor extractor = new(options);
 
             extractor.ExtractInformation();
@@ -38,22 +38,4 @@ public static class Program
         }
     }
 
-    private static GitExtractionOptions BuildExtractionOptions(string repositoryPath, string outputDirectory) 
-        => new()
-        {
-            RepositoryPath = repositoryPath,
-            FileWriter = new FileCompoundDataWriter(new FileDataWriter[] {
-                new FileConsoleDataWriter(),
-                new FileCsvDataWriter(Path.Combine(outputDirectory, "Files.csv"), FileState.Added | FileState.Deleted | FileState.Modified),
-                new FileCsvDataWriter(Path.Combine(outputDirectory, "FinalStructure.csv"), FileState.Final),
-            }),
-            CommitWriter = new CommitCompoundDataWriter(new CommitDataWriter[] {
-                new CommitConsoleDataWriter(),
-                new CommitCsvDataWriter(Path.Combine(outputDirectory, "Commits.csv")),
-            }),
-            AuthorWriter = new AuthorCompoundDataWriter(new AuthorDataWriter[] {
-                new AuthorConsoleDataWriter(),
-                new AuthorCsvDataWriter(Path.Combine(outputDirectory, "Authors.csv")),
-            })
-        };
 }
