@@ -11,7 +11,7 @@ public class FileCommitCsvDataWriter : CommitCsvDataWriter
 
     protected override void WriteHeaderRow(StreamWriter writer)
     {
-        writer!.WriteLine("FilePath,FileHash,CommitHash,AuthorEmail,AuthorDateUTC,CommitterEmail,CommitterDate,Message,Bytes,Lines,NetLines");
+        writer!.WriteLine("FilePath,FileHash,CommitHash,AuthorEmail,AuthorDateUTC,CommitterEmail,CommitterDateUTC,Message,Bytes,Lines,NetLines");
     }
 
     protected override void WriteRow(CommitInfo commit, TextWriter writer)

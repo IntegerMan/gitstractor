@@ -5,14 +5,14 @@ This project is built for extracting commit, author, and file data from local gi
 
 Here are a few examples of the types of visualizations that can be generated using GitStractor:
 
+Stacked bar chart of # of commits per month by day of week:
+![Accessible AI Blog Posts by Month](./Images/AccessibleAIBlogPostsByMonth.png)
+
 Tree map of the # of commits per file:
 ![GitStractor # Commits by File](./Images/GitStractorFileCommits_April_1_2023.png)
 
 Scatter plot of files in each commit:
 ![GitStractor # Files per Commit](./Images/GitStractorFilesPerCommit_April_1_2023.png)
-
-Stacked bar chart of # of commits per month by day of week:
-![Accessible AI Blog Posts by Month](./Images/AccessibleAIBlogPostsByMonth.png)
 
 ## Project Status
 
