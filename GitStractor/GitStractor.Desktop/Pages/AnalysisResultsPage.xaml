@@ -4,9 +4,39 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:GitStractor.Desktop.Pages"
+             xmlns:telerik="http://schemas.telerik.com/2008/xaml/presentation"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <Grid>
-            <TextBlock Style="{DynamicResource PageHeaderTextStyle}">Analysis Results</TextBlock>
-    </Grid>
+    <!--
+    <telerik:RadNavigationView>
+        <telerik:RadNavigationView.Items>
+            <telerik:RadNavigationViewItem Content="Commits">
+
+            </telerik:RadNavigationViewItem>
+            <telerik:RadNavigationViewItem Content="Authors">
+
+            </telerik:RadNavigationViewItem>
+            <telerik:RadNavigationViewItem Content="Files">
+
+            </telerik:RadNavigationViewItem>
+        </telerik:RadNavigationView.Items>
+    </telerik:RadNavigationView>
+    -->
+    <telerik:RadTabControl TabOrientation="Horizontal" 
+                           TabStripPlacement="Bottom" 
+                           Margin="8" 
+                           Padding="8"
+                           Align="Center" >
+        <telerik:RadTabControl.Items>
+            <telerik:RadTabItem Header="Commits">
+                <TextBlock>Commit content</TextBlock>
+            </telerik:RadTabItem>
+            <telerik:RadTabItem Header="Authors">
+                <TextBlock>Author content</TextBlock>
+            </telerik:RadTabItem>
+            <telerik:RadTabItem Header="Files">
+                <TextBlock>Files content</TextBlock>
+            </telerik:RadTabItem>
+        </telerik:RadTabControl.Items>
+    </telerik:RadTabControl>
 </UserControl>
