@@ -39,7 +39,9 @@
             </telerik:RadToolBar>
             <Grid>
                 <pages:WelcomePage Visibility="{Binding Path=ShowWelcome, Converter={StaticResource ShowIfTrue}}" />
-                <pages:AnalyzeRepositoryPage Visibility="{Binding Path=ShowAnalyze, Converter={StaticResource ShowIfTrue}}" />
+                <Grid Visibility="{Binding Path=ShowAnalyze, Converter={StaticResource ShowIfTrue}}">
+                    <pages:AnalyzeRepositoryPage DataContext="{Binding Path=AnalysisVM}"/>
+                </Grid>
             </Grid>
         </DockPanel>
     </telerik:RadBusyIndicator>

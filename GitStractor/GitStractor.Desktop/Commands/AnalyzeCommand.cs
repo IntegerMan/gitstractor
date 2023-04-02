@@ -13,19 +13,22 @@ namespace GitStractor.Desktop.Commands;
 
 public class AnalyzeCommand : CommandBase, IProgressListener
 {
-    private readonly AppViewModel _vm;
+    private readonly AnalyzeViewModel _vm;
 
-    public AnalyzeCommand(AppViewModel vm)
+    public AnalyzeCommand(AnalyzeViewModel vm)
     {
         _vm = vm;
     }
 
+    public override bool CanExecute(object parameter)
+    {
+        return !_vm.IsAnalyzing && !string.IsNullOrWhiteSpace(_vm.RepositoryPath);
+    }
+
     public override void Execute(object parameter)
     {
-        Dispatcher uiThread = Dispatcher.CurrentDispatcher;
-        
-        _vm.ShowAnalyze = false;
-        _vm.BusyText = "Analyzing...";
+        _vm.IsAnalyzing = true;
+        _vm.SetBusy("Analyzing...", 0);
 
         Task.Run(() =>
         {
@@ -41,10 +44,9 @@ public class AnalyzeCommand : CommandBase, IProgressListener
             }
             catch (Exception ex)
             {
-                uiThread.BeginInvoke(() =>
+                _vm.UIThread.BeginInvoke(() =>
                 {
-                    _vm.BusyText = null;
-                    _vm.ShowAnalyze = true;
+                    _vm.SetNotBusy();
                     RadWindow.Alert(new DialogParameters()
                     {
                         Header = $"Could Not Analyze Repository",
@@ -57,27 +59,25 @@ public class AnalyzeCommand : CommandBase, IProgressListener
 
     public void Started(string busyText)
     {
-        Dispatcher.CurrentDispatcher.Invoke(() =>
+        _vm.UIThread.Invoke(() =>
         {
-            _vm.ShowAnalyze = false;
-            _vm.BusyText = busyText;
+            _vm.SetBusy(busyText, 0);
         });
     }
 
     public void UpdateProgress(double percentComplete, string statusText)
     {
-        Dispatcher.CurrentDispatcher.Invoke(() =>
+        _vm.UIThread.Invoke(() =>
         {
-            _vm.BusyProgress = percentComplete;
-            _vm.BusyText = statusText;
+            _vm.SetBusy(statusText, percentComplete);
         });
     }
 
     public void Completed()
     {
-        Dispatcher.CurrentDispatcher.Invoke(() =>
+        _vm.UIThread.Invoke(() =>
         {
-            _vm.BusyText = null;
+            _vm.CompletedAnalysis();
         });
     }
 }

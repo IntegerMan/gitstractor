@@ -13,18 +13,17 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Telerik.Windows.Controls;
 
-namespace GitStractor.Desktop
-{
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
-    public partial class MainWindow : RadWindow
-    {
-        public MainWindow()
-        {
-            this.DataContext = new AppViewModel();
+namespace GitStractor.Desktop;
 
-            InitializeComponent();
-        }
+/// <summary>
+/// Interaction logic for MainWindow.xaml
+/// </summary>
+public partial class MainWindow : RadWindow
+{
+    public MainWindow()
+    {
+        this.DataContext = new AppViewModel();
+
+        InitializeComponent();
     }
 }

@@ -40,12 +40,14 @@
 		<Compile Include="Commands\ShowAnalyzeCommand.cs" />
 		<Compile Include="Commands\NotImplementedCommand.cs" />
 		<Compile Include="Commands\ShowAboutInfoCommand.cs" />
+		<Compile Include="Converters\BoolToVisibilityConverter.cs" />
 		<Compile Include="MainWindow.xaml.cs">
 			<DependentUpon>MainWindow.xaml</DependentUpon>
 			<SubType>Code</SubType>
 		</Compile>
 		<Compile Include="Pages\AnalyzeRepositoryPage.xaml.cs" />
 		<Compile Include="Pages\WelcomePage.xaml.cs" />
+		<Compile Include="ViewModels\AnalyzeViewModel.cs" />
 		<Compile Include="ViewModels\AppViewModel.cs" />
 	</ItemGroup>
 

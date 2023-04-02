@@ -13,16 +13,15 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace GitStractor.Desktop.Pages
+namespace GitStractor.Desktop.Pages;
+
+/// <summary>
+/// Interaction logic for AnalyzeRepositoryPage.xaml
+/// </summary>
+public partial class AnalyzeRepositoryPage : UserControl
 {
-    /// <summary>
-    /// Interaction logic for AnalyzeRepositoryPage.xaml
-    /// </summary>
-    public partial class AnalyzeRepositoryPage : UserControl
+    public AnalyzeRepositoryPage()
     {
-        public AnalyzeRepositoryPage()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
     }
 }
