@@ -1,5 +1,6 @@
 ﻿using GitStractor.Model;
 using GitStractor.Utilities;
+using LibGit2Sharp;
 
 namespace GitStractor;
 
@@ -46,6 +47,8 @@ public class GitDataExtractor : IDisposable
             throw new RepositoryNotFoundException($"Could not find a git repository at {_options.RepositoryPath}");
         }
 
+        _options.ProgressListener?.Started($"Analyzing {gitPath}");
+
         // Connect to the git repository
         using Repository repo = new(gitPath);
 
@@ -65,16 +68,25 @@ public class GitDataExtractor : IDisposable
             IncludeReachableFrom = repo.Head
         };
 
+        double totalCommits = SearchCommits(repo, filter).Count();
+
         // Loop over each commit
-        foreach (Commit commit in repo.Commits.QueryBy(filter))
+        int commitNum = 0;
+        foreach (Commit commit in SearchCommits(repo, filter))
         {
+            commitNum++;
+            _options.ProgressListener?.UpdateProgress(commitNum / totalCommits, $"Analyzing commit {commitNum} of {totalCommits}");
             bool isLast = commit == repo.Head.Tip;
             ProcessCommit(commit, isLast);
         }
 
         // Write all authors at the end, now that we know aggregate-level information
         _options.AuthorWriter.WriteAuthors(_authors.Values);
+
+        _options.ProgressListener?.Completed();
     }
+
+    private ICommitLog SearchCommits(Repository repo, CommitFilter filter) => repo.Commits.QueryBy(filter);
 
     private void ProcessCommit(Commit commit, bool isLast)
     {

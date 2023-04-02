@@ -14,6 +14,8 @@ public class GitExtractionOptions
     /// This should be a local path to a folder on disk.
     /// </summary>
     public required string RepositoryPath { get; init; }
+
+    public IProgressListener? ProgressListener { get; set; }
     
     /// <summary>
     /// A comma-separated list of lowercased file extensions to include in the analysis. This is typically most code files.

@@ -16,6 +16,7 @@ namespace GitStractor.Desktop.ViewModels
 
         private string _repoPath = @"C:\Dev\GitStractor";
         private string _busyText = null;
+        private double _busyProgress;
 
         public string RepositoryPath
         {
@@ -44,7 +45,7 @@ namespace GitStractor.Desktop.ViewModels
         public string Author => "Matt Eland";
         public string Title => $"{AppName} by {Author}";
         public string Version => "Development Preview";
-        public string Status => $"{AppName} Version";
+        public string Status => BusyText ?? $"{AppName} Version";
 
         public CommandBase AnalyzeCommand { get; }
         public CommandBase ShowAboutInfoCommand { get; }
@@ -79,15 +80,27 @@ namespace GitStractor.Desktop.ViewModels
                 {
                     _busyText = value;
                     OnPropertyChanged(nameof(BusyText));
+                    OnPropertyChanged(nameof(Status));
                     OnPropertyChanged(nameof(ShowWelcome));
                     OnPropertyChanged(nameof(IsBusy));
                 }
             }
         }
 
-        public bool IsBusyIndeterminent => true;
+        public bool IsBusyIndeterminent => false;
 
-        public double BusyProgress => 42;
+        public double BusyProgress
+        {
+            get => _busyProgress;
+            set
+            {
+                if (_busyProgress != value)
+                {
+                    _busyProgress = value;
+                    OnPropertyChanged(nameof(BusyProgress));
+                }
+            }
+        }
 
         public bool IsBusy => !string.IsNullOrEmpty(_busyText);
     }
