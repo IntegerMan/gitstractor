@@ -1,13 +1,25 @@
-﻿<Window x:Class="GitStractor.Desktop.MainWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:GitStractor.Desktop"
-        mc:Ignorable="d"
-        Title="GitStractor by Matt Eland"
-        Width="1080" Height="600">
-    <Grid>
-
-    </Grid>
-</Window>
+﻿<telerik:RadWindow x:Class="GitStractor.Desktop.MainWindow" 
+                         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+                         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+                         xmlns:local="clr-namespace:GitStractor.Desktop"
+                         xmlns:telerik="http://schemas.telerik.com/2008/xaml/presentation">
+    <DockPanel>
+        <telerik:RadMenu DockPanel.Dock="Top">
+            <telerik:RadMenuItem Header="_File">
+                <telerik:RadMenuItem Header="_Analyze Local Git Repository" />
+                <telerik:RadMenuItem Header="_Open GitStractor File" />
+                <telerik:RadMenuItem Header="_Exit" />
+            </telerik:RadMenuItem>
+            <telerik:RadMenuItem Header="_Help">
+                <telerik:RadMenuItem Header="_About this Application" />
+                <telerik:RadMenuItem Header="_View the Repository on GitHub" />
+            </telerik:RadMenuItem>
+        </telerik:RadMenu>
+        <telerik:RadToolBar DockPanel.Dock="Bottom" IsManipulationEnabled="False" AutoHideOverflowButton="True">
+            Development Version. Not yet intended for public usage.
+        </telerik:RadToolBar>
+        <Grid>
+            <local:WelcomePage />
+        </Grid>
+    </DockPanel>
+</telerik:RadWindow> 

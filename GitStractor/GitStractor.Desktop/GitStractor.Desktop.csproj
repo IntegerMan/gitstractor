@@ -1,25 +1,41 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿
+<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
+    <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net7.0-windows</TargetFramework>
-    <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
-    <ApplicationIcon>favicon.ico</ApplicationIcon>
-    <PackageIcon>CircleLogoTrans.png</PackageIcon>
+    <RootNamespace>GitStractor.Desktop</RootNamespace>
+    <EnableDefaultItems>False</EnableDefaultItems>
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="favicon.ico" />
+    <PackageReference Include="Telerik.UI.for.Wpf.70.Xaml" Version="2023.1.315" />
   </ItemGroup>
-
+  
   <ItemGroup>
-    <None Include="..\..\Images\CircleLogoTrans.png">
-      <Pack>True</Pack>
-      <PackagePath>\</PackagePath>
-    </None>
-  </ItemGroup>
-
+  <ApplicationDefinition Include="App.xaml">
+    <Generator>MSBuild:Compile</Generator>
+    <SubType>Designer</SubType>
+  </ApplicationDefinition>
+  <Page Include="MainWindow.xaml">
+    <Generator>MSBuild:Compile</Generator>
+    <SubType>Designer</SubType>
+  </Page>
+  <Page Include="WelcomePage.xaml">
+    <Generator>MSBuild:Compile</Generator>
+  </Page>
+  <Compile Include="App.xaml.cs">
+    <DependentUpon>App.xaml</DependentUpon>
+    <SubType>Code</SubType>
+  </Compile>
+  <Compile Include="MainWindow.xaml.cs">
+    <DependentUpon>MainWindow.xaml</DependentUpon>
+    <SubType>Code</SubType>
+  </Compile>
+  <Compile Include="WelcomePage.xaml.cs" />
+</ItemGroup>
+  
   <ItemGroup>
     <ProjectReference Include="..\GitStractor\GitStractor.csproj" />
   </ItemGroup>
