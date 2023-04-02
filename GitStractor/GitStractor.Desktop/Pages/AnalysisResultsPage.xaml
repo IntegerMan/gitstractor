@@ -29,7 +29,32 @@
                            Align="Center" >
         <telerik:RadTabControl.Items>
             <telerik:RadTabItem Header="Commits">
-                <TextBlock>Commit content</TextBlock>
+                <telerik:RadCartesianChart x:Name="chartCommits">
+                    <telerik:RadCartesianChart.HorizontalAxis>
+                        <telerik:LinearAxis Title="Employee Age">
+                            <telerik:LinearAxis.TitleTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding}" FontSize="11" FontFamily="Segoe UI" />
+                                </DataTemplate>
+                            </telerik:LinearAxis.TitleTemplate>
+                        </telerik:LinearAxis>
+                    </telerik:RadCartesianChart.HorizontalAxis>
+                    <telerik:RadCartesianChart.VerticalAxis>
+                        <telerik:LinearAxis Title="Earnings (GBP/hour)" Minimum="2" Maximum="20" MajorStep="2">
+                            <telerik:LinearAxis.TitleTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding}" FontSize="11" FontFamily="Segoe UI" Margin="0,0,0,5" />
+                                </DataTemplate>
+                            </telerik:LinearAxis.TitleTemplate>
+                        </telerik:LinearAxis>
+                    </telerik:RadCartesianChart.VerticalAxis>
+                    <telerik:RadCartesianChart.Grid>
+                        <telerik:CartesianChartGrid MajorLinesVisibility="XY" />
+                    </telerik:RadCartesianChart.Grid>
+                    <telerik:RadCartesianChart.Series>
+                        <telerik:ScatterPointSeries ItemsSource="{Binding Points}" XValueBinding="XValue" YValueBinding="YValue" />
+                    </telerik:RadCartesianChart.Series>
+                </telerik:RadCartesianChart>
             </telerik:RadTabItem>
             <telerik:RadTabItem Header="Authors">
                 <TextBlock>Author content</TextBlock>
