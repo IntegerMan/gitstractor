@@ -4,13 +4,27 @@
     xmlns:local="clr-namespace:GitStractor.Desktop"
     xmlns:telerik="http://schemas.telerik.com/2008/xaml/presentation">
     <Application.Resources>
-      <ResourceDictionary>
-          <ResourceDictionary.MergedDictionaries>
-        </ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+            </ResourceDictionary.MergedDictionaries>
 
-          <DataTemplate x:Key="WindowIconTemplate">
-              <Image Source="Gitstractor.png" Stretch="None" Width="16" Height="16" />
-          </DataTemplate>
-    </ResourceDictionary>
+            <Style TargetType="TextBlock" x:Key="PageHeaderTextStyle">
+                <Setter Property="FontWeight" Value="Bold" />
+                <Setter Property="FontSize" Value="16" />
+                <Setter Property="HorizontalAlignment" Value="Center" />
+                <Setter Property="Margin" Value="0,0,0,18" />
+            </Style>
+
+            <Style TargetType="TextBlock" x:Key="PageBodyTextStyle">
+                <Setter Property="HorizontalAlignment" Value="Center" />
+                <Setter Property="Margin" Value="0,6,0,6" />
+            </Style>
+
+            <Style x:Key="ControlReference" TargetType="TextElement">
+                <Setter Property="FontWeight" Value="Bold" />
+            </Style>
+
+            <BooleanToVisibilityConverter x:Key="ShowIfTrue" />
+        </ResourceDictionary>
     </Application.Resources>
 </Application>

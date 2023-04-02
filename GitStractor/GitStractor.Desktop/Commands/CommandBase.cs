@@ -14,5 +14,5 @@ public abstract class CommandBase : ICommand
 
     public event EventHandler CanExecuteChanged;
 
-    protected void RaiseCanExecuteChanged() => CanExecuteChanged?.Invoke(this, EventArgs.Empty);
+    public void RaiseCanExecuteChanged() => CanExecuteChanged?.Invoke(this, EventArgs.Empty);
 }
