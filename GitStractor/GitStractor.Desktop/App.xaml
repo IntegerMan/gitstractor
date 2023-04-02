@@ -7,6 +7,10 @@
       <ResourceDictionary>
           <ResourceDictionary.MergedDictionaries>
         </ResourceDictionary.MergedDictionaries>
-        </ResourceDictionary>
+
+          <DataTemplate x:Key="WindowIconTemplate">
+              <Image Source="Gitstractor.png" Stretch="None" Width="16" Height="16" />
+          </DataTemplate>
+    </ResourceDictionary>
     </Application.Resources>
 </Application>

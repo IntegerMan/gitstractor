@@ -13,16 +13,15 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace GitStractor.Desktop
+namespace GitStractor.Desktop.Pages;
+
+/// <summary>
+/// Interaction logic for WelcomePage.xaml
+/// </summary>
+public partial class WelcomePage : UserControl
 {
-    /// <summary>
-    /// Interaction logic for WelcomePage.xaml
-    /// </summary>
-    public partial class WelcomePage : UserControl
+    public WelcomePage()
     {
-        public WelcomePage()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
     }
 }
