@@ -16,7 +16,7 @@
         </TextBlock>
         <TextBlock Style="{DynamicResource PageBodyTextStyle}">
             To get started, 
-            <telerik:RadHyperlinkButton Margin="0,0,0,-3" Command="{Binding Path=NotImplementedCommand}"
+            <telerik:RadHyperlinkButton Margin="0,0,0,-3" Command="{Binding Path=OpenAnalysisCommand}"
                                         telerik:RadToolTipService.ToolTipContent="Opens a previously-generated GitStractor dataset">
                 open an existing GitStractor file
             </telerik:RadHyperlinkButton> 

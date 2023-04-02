@@ -14,6 +14,7 @@ namespace GitStractor.Desktop.ViewModels;
 public class AppViewModel : ViewModelBase
 {
     private bool _showAnalyze;
+    private bool _showResults;
 
     private string _busyText = null;
     private double _busyProgress;
@@ -24,6 +25,7 @@ public class AppViewModel : ViewModelBase
         ShowAboutInfoCommand = new ShowAboutInfoCommand(this);
         ShowAnalyzeCommand = new ShowAnalyzeCommand(this);
         ShowWelcomeCommand = new ShowWelcomeCommand(this);
+        OpenAnalysisCommand = new AnalyzeFilesCommand(this);
         ExitCommand = new ExitCommand();
         NotImplementedCommand = new NotImplementedCommand();
 
@@ -38,14 +40,28 @@ public class AppViewModel : ViewModelBase
     public string Version => "Development Preview";
     public string Status => BusyText ?? $"{AppName} Version";
 
+    public CommandBase OpenAnalysisCommand { get; set; }
     public CommandBase ShowAboutInfoCommand { get; }
     public CommandBase ShowAnalyzeCommand { get; }
     public CommandBase ShowWelcomeCommand { get; }
     public CommandBase ExitCommand { get; }
     public CommandBase NotImplementedCommand { get; }
 
-    public bool ShowWelcome => !ShowAnalyze && !IsBusy && !HasAnalysis;
-    public bool HasAnalysis => false;
+    public bool ShowWelcome => !ShowAnalyze && !IsBusy && !HasAnalysis && !ShowResults;
+
+    private bool _hasAnalysis;
+    public bool HasAnalysis
+    {
+        get => _hasAnalysis;
+        set
+        {
+            if (_hasAnalysis != value)
+            {
+                _hasAnalysis = value;
+                NotifyViewsChanged();
+            }
+        }
+    }
 
     public bool ShowAnalyze
     {
@@ -55,8 +71,32 @@ public class AppViewModel : ViewModelBase
             if (_showAnalyze != value)
             {
                 _showAnalyze = value;
-                base.OnPropertyChanged(nameof(ShowAnalyze));
-                base.OnPropertyChanged(nameof(ShowWelcome));
+                _showResults = false;
+                NotifyViewsChanged();
+            }
+        }
+    }
+
+    private void NotifyViewsChanged()
+    {
+        OnPropertyChanged(nameof(ShowAnalyze));
+        OnPropertyChanged(nameof(ShowWelcome));
+        OnPropertyChanged(nameof(ShowResults));
+        OnPropertyChanged(nameof(HasAnalysis));
+        OnPropertyChanged(nameof(IsBusy));
+        OnPropertyChanged(nameof(Status));
+    }
+
+    public bool ShowResults
+    {
+        get => _showResults;
+        set
+        {
+            if (_showResults != value)
+            {
+                _showResults = value;
+                _showAnalyze = false;
+                NotifyViewsChanged();
             }
         }
     }
@@ -69,10 +109,7 @@ public class AppViewModel : ViewModelBase
             if (_busyText != value)
             {
                 _busyText = value;
-                OnPropertyChanged(nameof(BusyText));
-                OnPropertyChanged(nameof(Status));
-                OnPropertyChanged(nameof(ShowWelcome));
-                OnPropertyChanged(nameof(IsBusy));
+                NotifyViewsChanged();
             }
         }
     }

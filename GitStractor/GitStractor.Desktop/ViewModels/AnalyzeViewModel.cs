@@ -60,6 +60,7 @@ public class AnalyzeViewModel : ViewModelBase
             {
                 _analysisComplete = value;
                 OnPropertyChanged(nameof(AnalysisComplete));
+                _appVm.HasAnalysis = value;
             }
         }
     }

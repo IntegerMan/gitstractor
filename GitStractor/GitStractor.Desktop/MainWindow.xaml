@@ -26,7 +26,7 @@
             <telerik:RadMenu DockPanel.Dock="Top">
                 <telerik:RadMenuItem Header="_File">
                     <telerik:RadMenuItem Header="_Analyze Local Git Repository" Command="{Binding Path=ShowAnalyzeCommand}" />
-                    <telerik:RadMenuItem Header="_Open GitStractor File" Command="{Binding Path=NotImplementedCommand}" />
+                    <telerik:RadMenuItem Header="_Open GitStractor File" Command="{Binding Path=OpenAnalysisCommand}" />
                     <telerik:RadMenuItem Header="_Exit" Command="{Binding Path=ExitCommand}" />
                 </telerik:RadMenuItem>
                 <telerik:RadMenuItem Header="_Help">
@@ -41,6 +41,9 @@
                 <pages:WelcomePage Visibility="{Binding Path=ShowWelcome, Converter={StaticResource ShowIfTrue}}" />
                 <Grid Visibility="{Binding Path=ShowAnalyze, Converter={StaticResource ShowIfTrue}}">
                     <pages:AnalyzeRepositoryPage DataContext="{Binding Path=AnalysisVM}"/>
+                </Grid>
+                <Grid Visibility="{Binding Path=ShowResults, Converter={StaticResource ShowIfTrue}}">
+                    <pages:AnalysisResultsPage />
                 </Grid>
             </Grid>
         </DockPanel>

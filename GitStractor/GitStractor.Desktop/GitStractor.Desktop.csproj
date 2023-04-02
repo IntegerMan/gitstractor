@@ -23,6 +23,9 @@
 			<Generator>MSBuild:Compile</Generator>
 			<SubType>Designer</SubType>
 		</Page>
+		<Page Include="Pages\AnalysisResultsPage.xaml">
+		  <Generator>MSBuild:Compile</Generator>
+		</Page>
 		<Page Include="Pages\AnalyzeRepositoryPage.xaml">
 		  <Generator>MSBuild:Compile</Generator>
 		</Page>
@@ -33,6 +36,7 @@
 			<DependentUpon>App.xaml</DependentUpon>
 			<SubType>Code</SubType>
 		</Compile>
+		<Compile Include="Commands\AnalyzeFilesCommand.cs" />
 		<Compile Include="Commands\CommandBase.cs" />
 		<Compile Include="Commands\ExitCommand.cs" />
 		<Compile Include="Commands\AnalyzeCommand.cs" />
@@ -45,6 +49,7 @@
 			<DependentUpon>MainWindow.xaml</DependentUpon>
 			<SubType>Code</SubType>
 		</Compile>
+		<Compile Include="Pages\AnalysisResultsPage.xaml.cs" />
 		<Compile Include="Pages\AnalyzeRepositoryPage.xaml.cs" />
 		<Compile Include="Pages\WelcomePage.xaml.cs" />
 		<Compile Include="ViewModels\AnalyzeViewModel.cs" />
