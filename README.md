@@ -14,7 +14,7 @@ Tree map of the # of commits per file:
 Scatter plot of files in each commit:
 ![GitStractor # Files per Commit](./Images/GitStractorFilesPerCommit_April_1_2023.png)
 
-See [the Jupyter Notebook](Notebooks/GitStractor.ipynb) for additional visualization examples.
+See [the Jupyter Notebook](Notebooks/GitStractor.ipynb) and the Power BI instructions below for additional visualization examples.
 
 ## Project Status
 
@@ -40,13 +40,33 @@ Once that file is generated, run the following command to extract data from a lo
 
 This will create a series of comma-separated value (CSV) files in the same folder as the `gitstract.exe` file.
 
-### Visualizing Commit Data
+### Visualizing Commit Data in Jupyter Notebooks
 
-Next, open the `GitStractor.ipynb` Jupyter notebook in the `Notebooks` folder. 
+To view the full range of data visualizations in Jupyter Notebooks, open the `GitStractor.ipynb` Jupyter notebook in the `Notebooks` folder. 
 
 In there, you will need to customize the `data_dir` variable to point to the folder where you extracted the data.
 
 I also recommend you change `project_name` to be something appropriate to your project as this value appears on most charts.
+
+### Visualizing Commit Data in Power BI
+
+GitStractor comes with a [Power BI desktop](https://powerbi.microsoft.com/en-us/desktop/) template that can be used to visualize your code without additional configuration steps.
+
+To view the Power BI visuals, open the `GitStractor.pbit` template file in the `PowerBI` directory.
+
+> Note: Do not open the `GitStractor.pbix` file to visualize your data as this stores the GitStractor project metrics.
+
+When you open the Power BI template you will need to provide a value for the `GitStractor Data Folder` parameter.
+
+![Power BI Parameters](./Images/PowerBIParameter.png)
+
+This should be the path to the folder containing your `.csv` files and should end with a `\`.
+
+Once you have configured the parameter and clicked Load, Power BI will reference your data and populate its visuals as shown below:
+
+![Power BI Visuals](./Images/PowerBICommits.png)
+
+You can also click on the tabs at the bottom of the page to view information on Authors and File Structure.
 
 ## What's Next?
 
@@ -54,7 +74,7 @@ Future efforts on this project will focus on:
 
 - Expanding the range of visualizations available in the Jupyter notebook
 - Improving the user experience pulling data from larger repositories
-- Investigating Power BI Integration
+- Expanding the Range of Power BI Visualizations through additional measures, tabs, and visuals
 - Creating a desktop application for extracting and visualizing data
 
 If you'd like to submit a feature request or view the current backlog, please visit the [GitHub Issues tab](https://github.com/IntegerMan/gitstractor/issues)
