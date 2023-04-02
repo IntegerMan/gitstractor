@@ -9,14 +9,20 @@
              d:DesignHeight="450" d:DesignWidth="800">
     <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
         <TextBlock HorizontalAlignment="Center" FontWeight="Bold" FontSize="16">
-            Welcome to GitStractor Desktop Edition.
+            Welcome to GitStractor Desktop Edition
         </TextBlock>
         <TextBlock HorizontalAlignment="Center" Margin="0,24,0,0">
             GitStractor helps you analyze git repositories to identify trends in commits, authors, and files.
         </TextBlock>
         <TextBlock HorizontalAlignment="Center" Margin="0,12,0,0" VerticalAlignment="Center">
-            To get started, <telerik:RadHyperlinkButton Margin="0,0,0,-3">open an existing GitStractor file</telerik:RadHyperlinkButton> 
-            or <telerik:RadHyperlinkButton Margin="0,0,0,-3">analyze a local repository</telerik:RadHyperlinkButton>.
+            To get started, 
+            <telerik:RadHyperlinkButton Margin="0,0,0,-3" Command="{Binding Path=NotImplementedCommand}">
+                open an existing GitStractor file
+            </telerik:RadHyperlinkButton> 
+            or 
+            <telerik:RadHyperlinkButton Margin="0,0,0,-3" Command="{Binding Path=NotImplementedCommand}">
+                analyze a local repository
+            </telerik:RadHyperlinkButton>.
         </TextBlock>
     </StackPanel>
 </UserControl>

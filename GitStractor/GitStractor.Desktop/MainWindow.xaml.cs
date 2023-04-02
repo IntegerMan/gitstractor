@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GitStractor.Desktop.ViewModels;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Windows;
@@ -21,6 +22,8 @@ namespace GitStractor.Desktop
     {
         public MainWindow()
         {
+            this.DataContext = new AppViewModel();
+
             InitializeComponent();
         }
     }
