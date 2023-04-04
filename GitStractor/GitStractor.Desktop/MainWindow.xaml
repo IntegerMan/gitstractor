@@ -43,7 +43,7 @@
                     <pages:AnalyzeRepositoryPage DataContext="{Binding Path=AnalysisVM}"/>
                 </Grid>
                 <Grid Visibility="{Binding Path=ShowResults, Converter={StaticResource ShowIfTrue}}">
-                    <pages:AnalysisResultsPage />
+                    <pages:AnalysisResultsPage DataContext="{Binding Path=ReportVM}"/>
                 </Grid>
             </Grid>
         </DockPanel>

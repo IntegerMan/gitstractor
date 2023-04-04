@@ -30,9 +30,11 @@ public class AppViewModel : ViewModelBase
         NotImplementedCommand = new NotImplementedCommand();
 
         AnalysisVM = new AnalyzeViewModel(this);
+        ReportVM = new ReportViewModel(this, @"C:\Tools\GitStractor");
     }
 
     public AnalyzeViewModel AnalysisVM { get; set; }
+    public ReportViewModel ReportVM { get; set; }
 
     public string AppName => "GitStractor";
     public string Author => "Matt Eland";

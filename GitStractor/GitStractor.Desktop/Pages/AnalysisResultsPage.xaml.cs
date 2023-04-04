@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using GitStractor.Desktop.ViewModels;
 using Telerik.Windows.Controls.ChartView;
 
 namespace GitStractor.Desktop.Pages
