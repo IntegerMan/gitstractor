@@ -6,7 +6,7 @@
                          Header="{Binding Path=Title}"
                          WindowStartupLocation="CenterScreen"
                          Width="1080"
-                         Height="600"
+                         Height="800"
                          xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
                          xmlns:pages="clr-namespace:GitStractor.Desktop.Pages"
                          xmlns:telerik="http://schemas.telerik.com/2008/xaml/presentation" 

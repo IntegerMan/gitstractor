@@ -19,6 +19,13 @@
 			<Generator>MSBuild:Compile</Generator>
 			<SubType>Designer</SubType>
 		</ApplicationDefinition>
+		<Page Include="Controls\AuthorsOverTimeChart.xaml">
+		  <SubType>Designer</SubType>
+		  <Generator>MSBuild:Compile</Generator>
+		</Page>
+		<Page Include="Controls\FilesPerCommitChart.xaml">
+		  <Generator>MSBuild:Compile</Generator>
+		</Page>
 		<Page Include="MainWindow.xaml">
 			<Generator>MSBuild:Compile</Generator>
 			<SubType>Designer</SubType>
@@ -44,6 +51,10 @@
 		<Compile Include="Commands\ShowAnalyzeCommand.cs" />
 		<Compile Include="Commands\NotImplementedCommand.cs" />
 		<Compile Include="Commands\ShowAboutInfoCommand.cs" />
+		<Compile Include="Controls\AuthorsOverTimeChart.xaml.cs">
+		  <SubType>Code</SubType>
+		</Compile>
+		<Compile Include="Controls\FilesPerCommitChart.xaml.cs" />
 		<Compile Include="Converters\BoolToVisibilityConverter.cs" />
 		<Compile Include="MainWindow.xaml.cs">
 			<DependentUpon>MainWindow.xaml</DependentUpon>

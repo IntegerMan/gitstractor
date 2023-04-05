@@ -4,24 +4,10 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:GitStractor.Desktop.Pages"
+             xmlns:controls="clr-namespace:GitStractor.Desktop.Controls"
              xmlns:telerik="http://schemas.telerik.com/2008/xaml/presentation"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <!--
-    <telerik:RadNavigationView>
-        <telerik:RadNavigationView.Items>
-            <telerik:RadNavigationViewItem Content="Commits">
-
-            </telerik:RadNavigationViewItem>
-            <telerik:RadNavigationViewItem Content="Authors">
-
-            </telerik:RadNavigationViewItem>
-            <telerik:RadNavigationViewItem Content="Files">
-
-            </telerik:RadNavigationViewItem>
-        </telerik:RadNavigationView.Items>
-    </telerik:RadNavigationView>
-    -->
     <telerik:RadTabControl TabOrientation="Horizontal" 
                            TabStripPlacement="Bottom" 
                            Margin="8" 
@@ -29,27 +15,10 @@
                            Align="Center" >
         <telerik:RadTabControl.Items>
             <telerik:RadTabItem Header="Commits">
-                <telerik:RadCartesianChart x:Name="chartCommits" Palette="VisualStudio2019">
-                    <telerik:RadCartesianChart.HorizontalAxis>
-                        <telerik:DateTimeContinuousAxis Title="Date" 
-                                                        MajorStepUnit="Day"
-                                                        MajorStep="1"/>
-                    </telerik:RadCartesianChart.HorizontalAxis>
-                    <telerik:RadCartesianChart.VerticalAxis>
-                        <telerik:LinearAxis Title="# Files" />
-                    </telerik:RadCartesianChart.VerticalAxis>
-                    <telerik:RadCartesianChart.Grid>
-                        <telerik:CartesianChartGrid MajorLinesVisibility="XY" />
-                    </telerik:RadCartesianChart.Grid>
-                    <telerik:RadCartesianChart.Series>
-                        <telerik:ScatterPointSeries ItemsSource="{Binding Commits}" 
-                                                    XValueBinding="AuthorDateUTC" 
-                                                    YValueBinding="TotalBytes" />
-                    </telerik:RadCartesianChart.Series>
-                </telerik:RadCartesianChart>
+                <controls:FilesPerCommitChart />
             </telerik:RadTabItem>
             <telerik:RadTabItem Header="Authors">
-                <TextBlock>Author content</TextBlock>
+                <controls:AuthorsOverTimeChart />
             </telerik:RadTabItem>
             <telerik:RadTabItem Header="Files">
                 <TextBlock>Files content</TextBlock>
