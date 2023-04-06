@@ -13,15 +13,40 @@ namespace GitStractor.Desktop.ViewModels;
 public class ReportViewModel : ViewModelBase
 {
     private readonly AppViewModel _appVm;
-    private readonly List<CommitData> _commits = new();
+    private readonly List<CommitData> _commits;
+    private readonly List<FileData> _fileCommits;
 
     public ReportViewModel(AppViewModel appVM, string csvFilePath)
     {
         _appVm = appVM;
 
         string commitPath = Path.Combine(csvFilePath, "Commits.csv");
+        string fileCommitPath = Path.Combine(csvFilePath, "FileCommits.csv");
 
         _commits = CommitsCsvReader.ReadCommits(commitPath).OrderBy(c => c.AuthorDateUTC).ToList();
+        _fileCommits = FileCsvReader.ReadFileCommits(fileCommitPath).OrderBy(c => c.AuthorDateUTC).ToList();
+    }
+
+    public IEnumerable<TreeMapNode> FileCommits
+    {
+        get
+        {
+            List<TreeMapNode> nodes = new();
+            
+            _fileCommits.GroupBy(c => c.FilePath).ToList().ForEach(g =>
+            {
+                TreeMapNode node = new()
+                {
+                    Value = g.Count(),
+                    Label = g.Key,
+                    // TODO: Set Children
+                };
+
+                nodes.Add(node);
+            });
+            
+            return nodes;
+        }
     }
 
     public IEnumerable<CommitData> Commits => _commits;

@@ -19,7 +19,12 @@
 			<Generator>MSBuild:Compile</Generator>
 			<SubType>Designer</SubType>
 		</ApplicationDefinition>
+		<Compile Include="ViewModels\TreeMapNode.cs" />
 		<Page Include="Controls\AuthorsOverTimeChart.xaml">
+		  <SubType>Designer</SubType>
+		  <Generator>MSBuild:Compile</Generator>
+		</Page>
+		<Page Include="Controls\FileCommitsTreeMap.xaml">
 		  <SubType>Designer</SubType>
 		  <Generator>MSBuild:Compile</Generator>
 		</Page>
@@ -53,6 +58,10 @@
 		<Compile Include="Commands\ShowAboutInfoCommand.cs" />
 		<Compile Include="Controls\AuthorsOverTimeChart.xaml.cs">
 		  <SubType>Code</SubType>
+		</Compile>
+		<Compile Include="Controls\FileCommitsTreeMap.xaml.cs">
+		  <SubType>Code</SubType>
+		  <DependentUpon>FileCommitsTreeMap.xaml</DependentUpon>
 		</Compile>
 		<Compile Include="Controls\FilesPerCommitChart.xaml.cs" />
 		<Compile Include="Converters\BoolToVisibilityConverter.cs" />

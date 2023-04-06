@@ -21,7 +21,7 @@
                 <controls:AuthorsOverTimeChart />
             </telerik:RadTabItem>
             <telerik:RadTabItem Header="Files">
-                <TextBlock>Files content</TextBlock>
+                <controls:FileCommitsTreeMap />
             </telerik:RadTabItem>
         </telerik:RadTabControl.Items>
     </telerik:RadTabControl>
