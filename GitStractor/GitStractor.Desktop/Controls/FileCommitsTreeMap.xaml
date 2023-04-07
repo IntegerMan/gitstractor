@@ -13,19 +13,43 @@
         </TextBlock>
         <telerik:RadTreeMap ItemsSource="{Binding FileCommits}" LayoutStrategy="Squarified" Foreground="White">
             <telerik:RadTreeMap.TypeDefinitions>
-                <telerik:TypeDefinition TargetTypeName="TreeMapNode" ValuePath="Value" LabelPath="Label" ToolTipPath="ToolTip">
+                <telerik:TypeDefinition TargetTypeName="ParentTreeMapNode" ValuePath="Value" LabelPath="Label" ToolTipPath="ToolTip" ChildrenPath="Children">
                     <telerik:TypeDefinition.ItemStyle>
                         <Style TargetType="telerik:RadTreeMapItem" >
                             <Setter Property="Control.Foreground" Value="White" />
-                            <Setter Property="Control.FontSize" Value="6pt" />
+                            <Setter Property="Control.FontSize" Value="8pt" />
+                            <Setter Property="Control.FontWeight" Value="Bold" />
                             <Setter Property="Background" Value="{Binding DataItem.BackgroundBrush}" />
                             <Setter Property="Template">
                                 <Setter.Value>
                                     <ControlTemplate>
                                         <Border Background="{TemplateBinding Background}">
                                             <Grid>
-                                                <TextBlock Text="{Binding Label}" Foreground="Black" Margin="1,1,0,0" />
-                                                <TextBlock Text="{Binding Label}" Foreground="White" />
+                                                <TextBlock Text="{Binding Label}" Foreground="Black" Margin="3,1,0,0" />
+                                                <TextBlock Text="{Binding Label}" Foreground="White" Margin="2,0,0,0"/>
+                                                <ItemsPresenter Margin="4,16,4,4" />
+                                            </Grid>
+                                        </Border>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </telerik:TypeDefinition.ItemStyle>
+                </telerik:TypeDefinition>
+                <telerik:TypeDefinition TargetTypeName="TreeMapNode" ValuePath="Value" LabelPath="Label" ToolTipPath="ToolTip">
+                    <telerik:TypeDefinition.ItemStyle>
+                        <Style TargetType="telerik:RadTreeMapItem" >
+                            <Setter Property="Control.Foreground" Value="White" />
+                            <Setter Property="Control.FontSize" Value="6pt" />
+                            <Setter Property="Control.FontWeight" Value="SemiBold" />
+                            <Setter Property="Background" Value="{Binding DataItem.BackgroundBrush}" />
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate>
+                                        <Border Background="{TemplateBinding Background}" Padding="1" Margin="0" BorderBrush="Black" BorderThickness="1">
+                                            <Grid>
+                                                <TextBlock Text="{Binding Label}" Foreground="Black" Margin="3,1,0,0" />
+                                                <TextBlock Text="{Binding Label}" Foreground="White" Margin="2,0,0,0" />
                                             </Grid>
                                         </Border>
                                     </ControlTemplate>

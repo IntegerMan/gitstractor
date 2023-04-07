@@ -19,6 +19,9 @@
 			<Generator>MSBuild:Compile</Generator>
 			<SubType>Designer</SubType>
 		</ApplicationDefinition>
+		<Compile Include="ViewModels\GradientColorizer.cs" />
+		<Compile Include="ViewModels\ITreeMapNode.cs" />
+		<Compile Include="ViewModels\ParentTreeMapNode.cs" />
 		<Compile Include="ViewModels\TreeMapNode.cs" />
 		<Page Include="Controls\AuthorsOverTimeChart.xaml">
 		  <SubType>Designer</SubType>

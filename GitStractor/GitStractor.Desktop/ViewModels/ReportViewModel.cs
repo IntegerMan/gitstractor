@@ -30,32 +30,97 @@ public class ReportViewModel : ViewModelBase
         _files = FileCsvReader.ReadFiles(filesPath).OrderBy(c => c.FilePath).ToList();
     }
 
-    public IEnumerable<TreeMapNode> FileCommits
+    public IEnumerable<ITreeMapNode> FileCommits
     {
         get
         {
-            List<TreeMapNode> nodes = new();
+            List<ITreeMapNode> nodes = new();
+
+            Dictionary<string, ParentTreeMapNode> rootDirectories = new();
 
             IEnumerable<IGrouping<string, FileCommitData>> commits = _fileCommits.GroupBy(c => c.FilePath);
             double maxCommits = commits.Max(g => g.Count());
             double minCommits = commits.Min(g => g.Count());
 
-            _files.ForEach(f =>
+            // Loop over files by the length of their path. This ensures that the parent directories are handled before nested directories
+            _files.OrderBy(f => f.FilePath.Length).ToList().ForEach(f =>
             {
-                int numCommits = _fileCommits.Count(c => c.FilePath == f.FilePath);
-                TreeMapNode node = new()
-                {
-                    Value = f.Lines,
-                    ColorValue = (numCommits - minCommits) / maxCommits,
-                    ToolTip = f.Filename + " (" + f.Lines + " lines, " + numCommits + " commits)",
-                    Label = f.FilePath,
-                };
+                string[] parts = f.FilePath.Split('/');
 
-                nodes.Add(node);
+                if (parts.Length <= 1)
+                {
+                    TreeMapNode node = GetTreeNodeFromFile(f, minCommits, maxCommits);
+
+                    nodes.Add(node);
+                }
+                else
+                {
+
+                    ParentTreeMapNode node = null;
+                    string directoryPath = string.Join('/', parts.Take(parts.Length - 1));
+                    string directoryName = "";
+
+                    // Find the nearest parent directory
+                    int i = parts.Length - 1;
+                    while (node == null && i > 0)
+                    {
+                        string partialPath = string.Join('/', parts.Take(i));
+
+                        if (rootDirectories.ContainsKey(partialPath.ToLowerInvariant()))
+                        {
+                            node = rootDirectories[partialPath.ToLowerInvariant()];
+                            directoryName = parts[i];
+                        }
+
+                        i--;
+                    }
+                    
+                    if (node == null)
+                    {
+                        // This is a new root-level directory
+                        node = new()
+                        {
+                            Label = directoryPath,
+                            Key = directoryPath,
+                        };
+                        rootDirectories[directoryPath.ToLowerInvariant()] = node;
+                        nodes.Add(node);
+                    } 
+                    else if (node.Key.ToLowerInvariant() != directoryPath.ToLowerInvariant())
+                    {
+                        // This is a new nested directory
+                        ParentTreeMapNode subdir = new()
+                        {
+                            Label = parts[parts.Length - 2],
+                            ToolTip = directoryPath,
+                            Key = directoryPath,
+                        };
+                        rootDirectories[directoryPath.ToLowerInvariant()] = subdir;
+                        node.Children.Add(subdir);
+
+                        // The file should be added to the subdirectory
+                        node = subdir;
+                    }
+
+                    node.Children.Add(GetTreeNodeFromFile(f, minCommits,maxCommits));
+                }
             });
 
             return nodes;
         }
+    }
+
+    private TreeMapNode GetTreeNodeFromFile(FileData fileData, double minCommits, double maxCommits)
+    {
+        int numCommits = _fileCommits.Count(c => c.FilePath == fileData.FilePath);
+
+        return new TreeMapNode()
+        {
+            Value = fileData.Lines,
+            ColorValue = (numCommits - minCommits) / maxCommits,
+            ToolTip = fileData.FilePath + " (" + fileData.Lines + " lines, " + numCommits + " commits)",
+            Label = fileData.Filename,
+        };
     }
 
     public IEnumerable<TreeMapNode> FileCommits2
