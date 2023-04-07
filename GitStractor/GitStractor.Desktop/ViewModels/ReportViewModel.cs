@@ -14,7 +14,8 @@ public class ReportViewModel : ViewModelBase
 {
     private readonly AppViewModel _appVm;
     private readonly List<CommitData> _commits;
-    private readonly List<FileData> _fileCommits;
+    private readonly List<FileCommitData> _fileCommits;
+    private readonly List<FileData> _files;
 
     public ReportViewModel(AppViewModel appVM, string csvFilePath)
     {
@@ -22,12 +23,35 @@ public class ReportViewModel : ViewModelBase
 
         string commitPath = Path.Combine(csvFilePath, "Commits.csv");
         string fileCommitPath = Path.Combine(csvFilePath, "FileCommits.csv");
+        string filesPath = Path.Combine(csvFilePath, "Files.csv");
 
         _commits = CommitsCsvReader.ReadCommits(commitPath).OrderBy(c => c.AuthorDateUTC).ToList();
         _fileCommits = FileCsvReader.ReadFileCommits(fileCommitPath).OrderBy(c => c.AuthorDateUTC).ToList();
+        _files = FileCsvReader.ReadFiles(filesPath).OrderBy(c => c.FilePath).ToList();
     }
 
     public IEnumerable<TreeMapNode> FileCommits
+    {
+        get
+        {
+            List<TreeMapNode> nodes = new();
+
+            _files.ForEach(f =>
+            {
+                TreeMapNode node = new()
+                {
+                    Value = _fileCommits.Count(c => c.FilePath == f.FilePath),
+                    Label = f.FilePath,
+                };
+
+                nodes.Add(node);
+            });
+
+            return nodes;
+        }
+    }
+
+    public IEnumerable<TreeMapNode> FileCommits2
     {
         get
         {
