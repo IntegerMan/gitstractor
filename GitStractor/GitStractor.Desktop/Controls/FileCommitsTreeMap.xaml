@@ -13,18 +13,19 @@
         </TextBlock>
         <telerik:RadTreeMap ItemsSource="{Binding FileCommits}" LayoutStrategy="Squarified" Foreground="White">
             <telerik:RadTreeMap.TypeDefinitions>
-                <telerik:TypeDefinition TargetTypeName="TreeMapNode" ValuePath="Value" LabelPath="Label">
+                <telerik:TypeDefinition TargetTypeName="TreeMapNode" ValuePath="Value" LabelPath="Label" ToolTipPath="ToolTip">
                     <telerik:TypeDefinition.ItemStyle>
                         <Style TargetType="telerik:RadTreeMapItem" >
                             <Setter Property="Control.Foreground" Value="White" />
                             <Setter Property="Control.FontSize" Value="6pt" />
+                            <Setter Property="Background" Value="{Binding DataItem.BackgroundBrush}" />
                             <Setter Property="Template">
                                 <Setter.Value>
                                     <ControlTemplate>
                                         <Border Background="{TemplateBinding Background}">
                                             <Grid>
-                                            <TextBlock Text="{Binding Label}" Foreground="Black" Margin="1,1,0,0" />
-                                            <TextBlock Text="{Binding Label}" Foreground="White" />
+                                                <TextBlock Text="{Binding Label}" Foreground="Black" Margin="1,1,0,0" />
+                                                <TextBlock Text="{Binding Label}" Foreground="White" />
                                             </Grid>
                                         </Border>
                                     </ControlTemplate>
@@ -32,14 +33,6 @@
                             </Setter>
                         </Style>
                     </telerik:TypeDefinition.ItemStyle>
-                    <telerik:TypeDefinition.Mappings>
-                        <telerik:ValueGradientColorizer>
-                            <!--<GradientStop Offset="1" Color="#F0F921" />-->
-                            <GradientStop Offset="1" Color="#FDCB26" />
-                            <GradientStop Offset="0.5" Color="#D04D72" />
-                            <GradientStop Offset="0" Color="#110889" />
-                        </telerik:ValueGradientColorizer>
-                    </telerik:TypeDefinition.Mappings>
                 </telerik:TypeDefinition>
             </telerik:RadTreeMap.TypeDefinitions>
         </telerik:RadTreeMap>

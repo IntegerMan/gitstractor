@@ -23,7 +23,7 @@ public class ReportViewModel : ViewModelBase
 
         string commitPath = Path.Combine(csvFilePath, "Commits.csv");
         string fileCommitPath = Path.Combine(csvFilePath, "FileCommits.csv");
-        string filesPath = Path.Combine(csvFilePath, "Files.csv");
+        string filesPath = Path.Combine(csvFilePath, "FinalStructure.csv");
 
         _commits = CommitsCsvReader.ReadCommits(commitPath).OrderBy(c => c.AuthorDateUTC).ToList();
         _fileCommits = FileCsvReader.ReadFileCommits(fileCommitPath).OrderBy(c => c.AuthorDateUTC).ToList();
@@ -36,11 +36,18 @@ public class ReportViewModel : ViewModelBase
         {
             List<TreeMapNode> nodes = new();
 
+            IEnumerable<IGrouping<string, FileCommitData>> commits = _fileCommits.GroupBy(c => c.FilePath);
+            double maxCommits = commits.Max(g => g.Count());
+            double minCommits = commits.Min(g => g.Count());
+
             _files.ForEach(f =>
             {
+                int numCommits = _fileCommits.Count(c => c.FilePath == f.FilePath);
                 TreeMapNode node = new()
                 {
-                    Value = _fileCommits.Count(c => c.FilePath == f.FilePath),
+                    Value = f.Lines,
+                    ColorValue = (numCommits - minCommits) / maxCommits,
+                    ToolTip = f.Filename + " (" + f.Lines + " lines, " + numCommits + " commits)",
                     Label = f.FilePath,
                 };
 
