@@ -36,7 +36,7 @@ public class AppViewModel : ViewModelBase
     public AnalyzeViewModel AnalysisVM { get; set; }
     public ReportViewModel ReportVM { get; set; }
 
-    public string AppName => "GitStractor";
+    public string AppName => "GitStractor Desktop Edition";
     public string Author => "Matt Eland";
     public string Title => $"{AppName} by {Author}";
     public string Version => "Development Preview";
