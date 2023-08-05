@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "GitStractor-Acquisition": {
+      "commandName": "Project",
+      "commandLineArgs": "https://github.com/PacktPublishing/Refactoring-with-CSharp C:\\Dev\\GitStractorClone\\PacktBook"
+    }
+  }
+}
