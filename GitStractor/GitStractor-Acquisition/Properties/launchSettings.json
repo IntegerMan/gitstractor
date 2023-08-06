@@ -4,6 +4,10 @@
       "commandName": "Project",
       "commandLineArgs": "-r https://github.com/PacktPublishing/Refactoring-with-CSharp -p C:\\Dev\\GitStractorClone\\PacktBook"
     },
+    "GitStractor-Acquisition-NoParams": {
+      "commandName": "Project",
+      "commandLineArgs": ""
+    },
     "Docker": {
       "commandName": "Docker",
       "environmentVariables": {

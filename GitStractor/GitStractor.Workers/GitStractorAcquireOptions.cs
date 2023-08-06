@@ -1,19 +1,16 @@
-﻿using CommandLine;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace GitStractor.Workers;
 
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 public class GitStractorAcquireOptions
 {
-    [Required]
+    [Required(ErrorMessage = "Repository is required. Specify a git repository via -r or --repository")]
     public string Repository { get; set; }
 
-    [Required]
+    [Required(ErrorMessage="Extraction folder path is required. Specify extract path via -p or --path")]
     public string ExtractPath { get; set; }
 
     public bool OverwriteIfExists { get; set; }
-
-    public bool IsValid => !string.IsNullOrWhiteSpace(Repository) && !string.IsNullOrWhiteSpace(ExtractPath);
 }
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.

@@ -27,10 +27,9 @@ public class GitStractorAcquisitionWorker : IHostedService, ICanStopEarly, IDisp
 
     public const int InitialDelayInSeconds = 2;
 
-    // TODO: Use an IOptions<GitStractorAcquireOptions> here
-    public GitStractorAcquisitionWorker(ILogger<GitStractorAcquisitionWorker> log, GitStractorAcquireOptions options, RepositoryCloner cloner) {
+    public GitStractorAcquisitionWorker(ILogger<GitStractorAcquisitionWorker> log, IOptions<GitStractorAcquireOptions> options, RepositoryCloner cloner) {
         Log = log;
-        this.options = options;
+        this.options = options.Value;
         this.cloner = cloner;
     }
 

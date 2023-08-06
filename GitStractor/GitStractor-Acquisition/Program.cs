@@ -1,10 +1,10 @@
-﻿using CommandLine;
-using GitStractor.Cloning;
+﻿using GitStractor.Cloning;
 using GitStractor.Workers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace GitStractor.Acquire;
 
@@ -19,19 +19,34 @@ public class Program {
 
             return host.Succeeded ? 0 : -1;
         }
-        catch (ConfigurationException ex) {
-            // This happens when we can't create the host builder
-            Console.Error.WriteLine(ex.Message);
-
+        catch (OptionsValidationException ex) {
+            // Validate the provided configuration options
+            WriteErrorToConsole(ex.Message);
+            WriteHelpToConsole(@"Usage: GitStractor-Acquire -r https://GitHub.com/IntegerMan/GitStractor -p C:\dev\GitStractor");
             return -2;
         }
         catch (AggregateException ex) {
             // This typically happens when a worker encounters an exception shutting down
-            Console.Error.WriteLine(ex.Message);
+            WriteErrorToConsole(ex.Message);
 
             return -3;
         }
     }
+
+    private static void WriteErrorToConsole(string message) {
+        Console.ForegroundColor = ConsoleColor.Red;
+        Console.WriteLine();
+        Console.Error.WriteLine(message);
+        Console.WriteLine();
+        Console.ResetColor();
+    }
+
+    private static void WriteHelpToConsole(string message) {
+        Console.ForegroundColor = ConsoleColor.Blue;
+        Console.WriteLine(message);
+        Console.ResetColor();
+    }
+
 
     private static IHostBuilder CreateHostBuilder(string[] args) =>
         Host.CreateDefaultBuilder(args)
@@ -42,17 +57,12 @@ public class Program {
             })
             .ConfigureServices((hostContext, services) => {
                 services.AddSingleton<IHost, GitStractorHost>();
-                services.AddSingleton(serviceProvider => {
-                    GitStractorAcquireOptions options = new();
-                    // Use our environment variable and config file to specify defaults
-                    hostContext.Configuration.GetSection("Acquire").Bind(options);
-
-                    if (!options.IsValid) {
-                        throw new ConfigurationException("Required configuration options were not supplied");
-                    }
-
-                    return options;
-                });
+                services.AddOptions<GitStractorAcquireOptions>()
+                        .Configure(options => {
+                            // Use our environment variable and config file to specify defaults
+                            hostContext.Configuration.GetSection("Acquire").Bind(options);
+                        })
+                        .ValidateDataAnnotations();
                 services.AddTransient<RepositoryCloner>();
 
                 // Register our service
