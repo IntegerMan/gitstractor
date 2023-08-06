@@ -3,6 +3,15 @@
     "GitStractor-Acquisition": {
       "commandName": "Project",
       "commandLineArgs": "-r https://github.com/PacktPublishing/Refactoring-with-CSharp -p C:\\Dev\\GitStractorClone\\PacktBook"
+    },
+    "Docker": {
+      "commandName": "Docker",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development",
+        "GITSTRACTOR_Acquire:Repository": "https://github.com/PacktPublishing/Refactoring-with-CSharp",
+        "GITSTRACTOR_Acquire:ExtractPath": "/dev/GitStractor/PacktBook",
+        "GITSTRACTOR_Acquire:OverwriteIfExists": "true"
+      }
     }
   }
 }

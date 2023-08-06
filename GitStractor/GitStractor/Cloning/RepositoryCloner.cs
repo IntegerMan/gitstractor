@@ -63,6 +63,10 @@ public class RepositoryCloner {
                 throw new CloneException($"Could not save the repository to disk: {ex.Message}", repository, extractPath, ex);
             }
 
+            if (ex.Message.Contains("could not write data: permission denied", StringComparison.OrdinalIgnoreCase)) {
+                throw new CloneException($"Could not save the repository to disk. Permission was denied for the path {extractPath}", repository, extractPath, ex);
+            }
+
             throw new CloneException($"An unexpected error occurred cloning '{repository}': {ex.GetType().Name} {ex.Message}", repository, extractPath, ex);
         }
     }

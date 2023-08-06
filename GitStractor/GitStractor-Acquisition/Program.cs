@@ -42,11 +42,14 @@ public class Program {
             })
             .ConfigureServices((hostContext, services) => {
                 services.AddSingleton<IHost, GitStractorHost>();
-                services.AddScoped(serviceProvider => LoadOptions(args, hostContext));
+                services.AddSingleton(serviceProvider => LoadOptions(args, hostContext));
                 services.AddTransient<RepositoryCloner>();
 
                 // Register our service
                 services.AddHostedService<GitStractorAcquisitionWorker>();
+            })
+            .ConfigureAppConfiguration(services => {
+                services.AddEnvironmentVariables(prefix: "GITSTRACTOR_");
             })
             .ConfigureLogging((hostContext, config) => {
                 config.AddConfiguration(hostContext.Configuration.GetSection("Logging"));
@@ -58,26 +61,29 @@ public class Program {
         // Use our environment variable and config file to specify defaults
         hostContext.Configuration.GetSection("Acquire").Bind(options);
 
-        Parser parser = new(config => {
-            config.AllowMultiInstance = false;
-            config.AutoVersion = true;
-            config.AutoHelp = true;
-            config.CaseInsensitiveEnumValues = true;
-            config.CaseSensitive = false;
-            config.HelpWriter = Console.Error;
-        });
-        ParserResult<GitStractorAcquireOptions> parserResult =
-           parser.ParseArguments<GitStractorAcquireOptions>(args);
+        if (args.Length > 0) {
+            // TODO: At this point CommandLine is hurting more than it helps
+            Parser parser = new(config => {
+                config.AllowMultiInstance = false;
+                config.AutoVersion = true;
+                config.AutoHelp = true;
+                config.CaseInsensitiveEnumValues = true;
+                config.CaseSensitive = false;
+                config.HelpWriter = Console.Error;
+            });
+            ParserResult<GitStractorAcquireOptions> parserResult =
+               parser.ParseArguments<GitStractorAcquireOptions>(args);
 
-        // If this passes validation, apply the resulting values to our configured object
-        if (parserResult.Value != null) {
-            options.OverwriteIfExists = options.OverwriteIfExists || parserResult.Value.OverwriteIfExists;
-            options.ExtractPath = parserResult.Value.ExtractPath ?? options.ExtractPath;
-            options.Repository = parserResult.Value.Repository ?? options.Repository;
+            // If this passes validation, apply the resulting values to our configured object
+            if (parserResult.Value != null) {
+                options.OverwriteIfExists = options.OverwriteIfExists || parserResult.Value.OverwriteIfExists;
+                options.ExtractPath = parserResult.Value.ExtractPath ?? options.ExtractPath;
+                options.Repository = parserResult.Value.Repository ?? options.Repository;
+            }
         }
 
         if (!options.IsValid) {
-            throw new ConfigurationException("Required configuration options were not supplied", parserResult.Errors);
+            throw new ConfigurationException("Required configuration options were not supplied");
         }
 
         return options;
