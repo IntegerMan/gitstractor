@@ -6,11 +6,31 @@
     <RootNamespace>GitStractor.Acquire</RootNamespace>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <Title>GitStractor Acquisition Worker</Title>
+    <Authors>Matt Eland</Authors>
+    <Copyright>Matt Eland</Copyright>
+    <PackageProjectUrl>https://gitstractor.com</PackageProjectUrl>
+    <Description>This is a worker application that clones git repositories to disk so they can be analyzed</Description>
+    <RepositoryUrl>https://github.com/integerman/gitstractor</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackAsTool>True</PackAsTool>
+    <AnalysisLevel>latest-recommended</AnalysisLevel>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="CommandLineParser" Version="2.9.1" />
     <PackageReference Include="LibGit2Sharp" Version="0.26.2" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="7.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="7.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="7.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="appsettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>
