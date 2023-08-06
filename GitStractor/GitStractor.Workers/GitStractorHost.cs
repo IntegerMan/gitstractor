@@ -11,6 +11,7 @@ public class GitStractorHost : IHost {
     private readonly IHostLifetime _hostLifetime;
     private readonly ApplicationLifetime _applicationLifetime;
     private readonly HostOptions _options;
+    private readonly GitStractorHostOptions _gitStractorOptions;
     private IEnumerable<IHostedService>? _hostedServices;
 
     private bool _started;
@@ -30,16 +31,16 @@ public class GitStractorHost : IHost {
     private static readonly Action<ILogger, Exception?> logStoppingEarly = LoggerMessage.Define(LogLevel.Information, new EventId(8, "StoppingHostEarly"), $"All workers completed. {Name} will now shut down.");
 
     public ILogger<GitStractorHost> Log { get; }
-    public bool AllowEarlyExit { get; set; } = true; // TODO: Read this from options
 
     public GitStractorHost(IServiceProvider services, IHostApplicationLifetime applicationLifetime, ILogger<GitStractorHost> logger,
-        IHostLifetime hostLifetime, IOptions<HostOptions> options) {
+        IHostLifetime hostLifetime, IOptions<HostOptions> options, IOptions<GitStractorHostOptions> gitstractorOptions) {
 
         Services = services;
         Log = logger;
         _applicationLifetime = (ApplicationLifetime)applicationLifetime;
         _hostLifetime = hostLifetime;
         _options = options?.Value ?? throw new ArgumentNullException(nameof(options));
+        _gitStractorOptions = gitstractorOptions.Value;
     }
 
     public IServiceProvider Services { get; }
@@ -85,7 +86,7 @@ public class GitStractorHost : IHost {
 
         int remainingServices = Interlocked.Decrement(ref _runningServices);
 
-        if (remainingServices <= 0 && AllowEarlyExit) {
+        if (remainingServices <= 0 && _gitStractorOptions.AllowEarlyStop) {
             logStoppingEarly(Log, null);
             _applicationLifetime.StopApplication();
         }

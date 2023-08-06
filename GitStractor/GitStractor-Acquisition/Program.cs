@@ -51,19 +51,15 @@ public class Program {
     private static IHostBuilder CreateHostBuilder(string[] args) =>
         Host.CreateDefaultBuilder(args)
             .UseConsoleLifetime()
-            .ConfigureHostOptions(hostOptions => {
-                hostOptions.BackgroundServiceExceptionBehavior = BackgroundServiceExceptionBehavior.StopHost;
-                hostOptions.ShutdownTimeout = TimeSpan.FromSeconds(30);
-            })
-            .ConfigureServices((hostContext, services) => {
+            .ConfigureServices((context, services) => {
                 services.AddSingleton<IHost, GitStractorHost>();
-                services.AddOptions<GitStractorAcquireOptions>()
-                        .Configure(options => {
-                            // Use our environment variable and config file to specify defaults
-                            hostContext.Configuration.GetSection("Acquire").Bind(options);
-                        })
-                        .ValidateDataAnnotations();
                 services.AddTransient<RepositoryCloner>();
+
+                services.AddOptions<GitStractorHostOptions>()
+                        .Configure(options => context.Configuration.GetSection("GitStractorHost").Bind(options));
+                services.AddOptions<GitStractorAcquireOptions>()
+                        .Configure(options => context.Configuration.GetSection("Acquire").Bind(options))
+                        .ValidateDataAnnotations();
 
                 // Register our service
                 services.AddHostedService<GitStractorAcquisitionWorker>();
