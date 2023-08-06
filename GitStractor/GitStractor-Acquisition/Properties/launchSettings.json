@@ -2,7 +2,7 @@
   "profiles": {
     "GitStractor-Acquisition": {
       "commandName": "Project",
-      "commandLineArgs": "https://github.com/PacktPublishing/Refactoring-with-CSharp C:\\Dev\\GitStractorClone\\PacktBook"
+      "commandLineArgs": "-r https://github.com/PacktPublishing/Refactoring-with-CSharp -p C:\\Dev\\GitStractorClone\\PacktBook"
     }
   }
 }
