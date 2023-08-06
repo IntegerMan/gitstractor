@@ -11,6 +11,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="7.0.0" />
 		<PackageReference Include="Telerik.UI.for.Wpf.70.Xaml" Version="2023.1.315" />
 	</ItemGroup>
 

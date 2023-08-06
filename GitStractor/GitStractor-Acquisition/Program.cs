@@ -1,4 +1,6 @@
 ﻿using CommandLine;
+using GitStractor.Cloning;
+using GitStractor.Workers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -8,50 +10,48 @@ namespace GitStractor.Acquire;
 
 public class Program {
 
-    public static void Main(string[] args) {
-        IHostBuilder builder = Host
-             .CreateDefaultBuilder(args)
-             .UseConsoleLifetime()
-             .ConfigureHostOptions(hostOptions => {
-                 hostOptions.BackgroundServiceExceptionBehavior = BackgroundServiceExceptionBehavior.StopHost;
-                 hostOptions.ShutdownTimeout = TimeSpan.FromSeconds(5);
-             })
-             .ConfigureHostConfiguration(config => {
-                 config.AddEnvironmentVariables();
-                 config.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
-                 if (args != null) {
-                     config.AddCommandLine(args);
-                 }
-             })
-             .ConfigureAppConfiguration(config => {
-                 config.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
-                 config.AddEnvironmentVariables();
-
-                 if (args != null) {
-                     config.AddCommandLine(args);
-                 }
-             })
-             .ConfigureServices((hostContext, services) => {
-                 services.AddSingleton<IHost, GitStractorHost>();
-                 services.AddScoped(serviceProvider => LoadOptions(args, hostContext));
-                 services.AddTransient<RepositoryCloner>();
-
-                 // Register our service
-                 services.AddHostedService<GitStractorAcquisitionWorker>();
-             })
-             .ConfigureLogging((hostContext, config) => {
-                 config.AddConfiguration(hostContext.Configuration.GetSection("Logging"));
-                 config.AddConsole();
-             });
+    public static int Main(string[] args) {
+        IHostBuilder builder = CreateHostBuilder(args);
 
         try {
-            using IHost host = builder.Build();
+            using GitStractorHost host = (GitStractorHost)builder.Build();
             host.Run();
+
+            return host.Succeeded ? 0 : -1;
         }
         catch (ConfigurationException ex) {
-            Console.WriteLine(ex.Message);
+            // This happens when we can't create the host builder
+            Console.Error.WriteLine(ex.Message);
+
+            return -2;
+        }
+        catch (AggregateException ex) {
+            // This typically happens when a worker encounters an exception shutting down
+            Console.Error.WriteLine(ex.Message);
+
+            return -3;
         }
     }
+
+    private static IHostBuilder CreateHostBuilder(string[] args) =>
+        Host.CreateDefaultBuilder(args)
+            .UseConsoleLifetime()
+            .ConfigureHostOptions(hostOptions => {
+                hostOptions.BackgroundServiceExceptionBehavior = BackgroundServiceExceptionBehavior.StopHost;
+                hostOptions.ShutdownTimeout = TimeSpan.FromSeconds(5);
+            })
+            .ConfigureServices((hostContext, services) => {
+                services.AddSingleton<IHost, GitStractorHost>();
+                services.AddScoped(serviceProvider => LoadOptions(args, hostContext));
+                services.AddTransient<RepositoryCloner>();
+
+                // Register our service
+                services.AddHostedService<GitStractorAcquisitionWorker>();
+            })
+            .ConfigureLogging((hostContext, config) => {
+                config.AddConfiguration(hostContext.Configuration.GetSection("Logging"));
+                config.AddConsole();
+            });
 
     private static GitStractorAcquireOptions LoadOptions(string[] args, HostBuilderContext hostContext) {
         GitStractorAcquireOptions options = new();
@@ -67,11 +67,13 @@ public class Program {
             config.HelpWriter = Console.Error;
         });
         ParserResult<GitStractorAcquireOptions> parserResult =
-           parser.ParseArguments(() => options, args);
+           parser.ParseArguments<GitStractorAcquireOptions>(args);
 
-        // If this passes validation, grab the resulting values
+        // If this passes validation, apply the resulting values to our configured object
         if (parserResult.Value != null) {
-            options = parserResult.Value;
+            options.OverwriteIfExists = options.OverwriteIfExists || parserResult.Value.OverwriteIfExists;
+            options.ExtractPath = parserResult.Value.ExtractPath ?? options.ExtractPath;
+            options.Repository = parserResult.Value.Repository ?? options.Repository;
         }
 
         if (!options.IsValid) {

@@ -23,6 +23,7 @@
   <ItemGroup>
     <PackageReference Include="CsvHelper" Version="30.0.1" />
     <PackageReference Include="LibGit2Sharp" Version="0.26.2" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="7.0.0" />
   </ItemGroup>
 
   <ItemGroup>

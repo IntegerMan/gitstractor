@@ -1,7 +1,7 @@
 ﻿using LibGit2Sharp;
 using Microsoft.Extensions.Logging;
 
-namespace GitStractor.Acquire;
+namespace GitStractor.Cloning;
 
 public class RepositoryCloner {
     public ILogger<RepositoryCloner> Log { get; }

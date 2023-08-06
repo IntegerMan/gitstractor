@@ -1,6 +1,6 @@
 ﻿using CommandLine;
 
-namespace GitStractor.Acquire; 
+namespace GitStractor.Workers; 
 
 public class ConfigurationException : Exception {
 

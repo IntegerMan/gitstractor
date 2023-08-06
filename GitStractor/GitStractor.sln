@@ -17,7 +17,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GitStractor.Tests", "GitStr
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GitStractor.Desktop", "GitStractor.Desktop\GitStractor.Desktop.csproj", "{A0F0CF20-83D6-4A22-8C62-9BBE1580FC6F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitStractor-Acquire", "GitStractor-Acquisition\GitStractor-Acquire.csproj", "{42C9F8F2-8BAF-4F23-82FC-91922E6DB536}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GitStractor-Acquire", "GitStractor-Acquisition\GitStractor-Acquire.csproj", "{42C9F8F2-8BAF-4F23-82FC-91922E6DB536}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitStractor.Workers", "GitStractor.Workers\GitStractor.Workers.csproj", "{4752D027-E881-4E72-AA7A-0F0034552EE7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,6 +47,10 @@ Global
 		{42C9F8F2-8BAF-4F23-82FC-91922E6DB536}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{42C9F8F2-8BAF-4F23-82FC-91922E6DB536}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{42C9F8F2-8BAF-4F23-82FC-91922E6DB536}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4752D027-E881-4E72-AA7A-0F0034552EE7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4752D027-E881-4E72-AA7A-0F0034552EE7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4752D027-E881-4E72-AA7A-0F0034552EE7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4752D027-E881-4E72-AA7A-0F0034552EE7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

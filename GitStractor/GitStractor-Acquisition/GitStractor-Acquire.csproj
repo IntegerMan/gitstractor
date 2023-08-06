@@ -20,6 +20,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="appsettings.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="appsettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="CommandLineParser" Version="2.9.1" />
     <PackageReference Include="LibGit2Sharp" Version="0.26.2" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="7.0.1" />
@@ -28,9 +38,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="appsettings.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    <ProjectReference Include="..\GitStractor.Workers\GitStractor.Workers.csproj" />
+    <ProjectReference Include="..\GitStractor\GitStractor.csproj" />
   </ItemGroup>
 
 </Project>
