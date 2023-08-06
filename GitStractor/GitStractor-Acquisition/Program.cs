@@ -38,11 +38,21 @@ public class Program {
             .UseConsoleLifetime()
             .ConfigureHostOptions(hostOptions => {
                 hostOptions.BackgroundServiceExceptionBehavior = BackgroundServiceExceptionBehavior.StopHost;
-                hostOptions.ShutdownTimeout = TimeSpan.FromSeconds(5);
+                hostOptions.ShutdownTimeout = TimeSpan.FromSeconds(30);
             })
             .ConfigureServices((hostContext, services) => {
                 services.AddSingleton<IHost, GitStractorHost>();
-                services.AddSingleton(serviceProvider => LoadOptions(args, hostContext));
+                services.AddSingleton(serviceProvider => {
+                    GitStractorAcquireOptions options = new();
+                    // Use our environment variable and config file to specify defaults
+                    hostContext.Configuration.GetSection("Acquire").Bind(options);
+
+                    if (!options.IsValid) {
+                        throw new ConfigurationException("Required configuration options were not supplied");
+                    }
+
+                    return options;
+                });
                 services.AddTransient<RepositoryCloner>();
 
                 // Register our service
@@ -50,42 +60,17 @@ public class Program {
             })
             .ConfigureAppConfiguration(services => {
                 services.AddEnvironmentVariables(prefix: "GITSTRACTOR_");
+                services.AddCommandLine(args, new Dictionary<string, string>() {
+                    { "-r", "Acquire:Repository" },
+                    { "--repository", "Acquire:Repository" },
+                    { "-p", "Acquire:ExtractPath" },
+                    { "--path", "Acquire:ExtractPath" },
+                    { "-o", "Acquire:OverwriteIfExists" },
+                    { "--overwrite", "Acquire:OverwriteIfExists" },
+                });
             })
             .ConfigureLogging((hostContext, config) => {
                 config.AddConfiguration(hostContext.Configuration.GetSection("Logging"));
                 config.AddConsole();
             });
-
-    private static GitStractorAcquireOptions LoadOptions(string[] args, HostBuilderContext hostContext) {
-        GitStractorAcquireOptions options = new();
-        // Use our environment variable and config file to specify defaults
-        hostContext.Configuration.GetSection("Acquire").Bind(options);
-
-        if (args.Length > 0) {
-            // TODO: At this point CommandLine is hurting more than it helps
-            Parser parser = new(config => {
-                config.AllowMultiInstance = false;
-                config.AutoVersion = true;
-                config.AutoHelp = true;
-                config.CaseInsensitiveEnumValues = true;
-                config.CaseSensitive = false;
-                config.HelpWriter = Console.Error;
-            });
-            ParserResult<GitStractorAcquireOptions> parserResult =
-               parser.ParseArguments<GitStractorAcquireOptions>(args);
-
-            // If this passes validation, apply the resulting values to our configured object
-            if (parserResult.Value != null) {
-                options.OverwriteIfExists = options.OverwriteIfExists || parserResult.Value.OverwriteIfExists;
-                options.ExtractPath = parserResult.Value.ExtractPath ?? options.ExtractPath;
-                options.Repository = parserResult.Value.Repository ?? options.Repository;
-            }
-        }
-
-        if (!options.IsValid) {
-            throw new ConfigurationException("Required configuration options were not supplied");
-        }
-
-        return options;
-    }
 }
