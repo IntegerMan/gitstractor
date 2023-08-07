@@ -11,6 +11,9 @@ public class GitStractorExtract : GitStractorProgram {
     protected override IHostBuilder ConfigureHostBuilder(IHostBuilder builder, string[] args) =>
         builder.UseConsoleLifetime()
             .ConfigureServices((context, services) => {
+                // Register dependencies
+                services.AddTransient<GitDataExtractor>();
+
                 // Detect Options
                 services.AddOptions<GitStractorExtractOptions>()
                         .BindConfiguration("Extract")

@@ -1,38 +1,26 @@
 ﻿using GitStractor.Model;
 using GitStractor.Utilities;
-using LibGit2Sharp;
 
 namespace GitStractor;
 
 /// <summary>
 /// This class is the main entry point for using GitDataExtractor to extract information from a Git repository.
 /// </summary>
-public class GitDataExtractor : IDisposable
-{
-    private readonly GitExtractionOptions _options;
+public class GitDataExtractor : IDisposable {
+    private GitExtractionOptions? _options;
     private readonly Dictionary<string, AuthorInfo> _authors = new();
     private readonly Dictionary<string, GitTreeInfo> _trees = new();
 
     /// <summary>
-    /// Creates a new instance of the <see cref="GitDataExtractor"/> class.
-    /// </summary>
-    /// <param name="options">The extraction options governing the git analysis</param>
-    /// <exception cref="ArgumentNullException">
-    /// Thrown when <paramref name="options"/> is <c>null</c>.
-    /// </exception>
-    public GitDataExtractor(GitExtractionOptions options)
-    {
-        _options = options ?? throw new ArgumentNullException(nameof(options));
-    }
-
-    /// <summary>
     /// Extracts commit, author, and file information from the git repository.
     /// </summary>
+    /// <param name="options">The options to use when extracting information</param>
     /// <exception cref="RepositoryNotFoundException">
     /// Thrown when the repository does not exist
     /// </exception>
-    public void ExtractInformation()
-    {
+    public void ExtractInformation(GitExtractionOptions options) {
+        _options = options;
+
         // Clear old state
         _authors.Clear();
         _pathShas.Clear();
@@ -42,54 +30,62 @@ public class GitDataExtractor : IDisposable
         string? gitPath = FileUtilities.GetParentGitDirectory(_options.RepositoryPath);
 
         // If we didn't find a git directory, throw an exception
-        if (gitPath == null)
-        {
+        if (gitPath == null) {
             throw new RepositoryNotFoundException($"Could not find a git repository at {_options.RepositoryPath}");
         }
 
         _options.ProgressListener?.Started($"Analyzing {gitPath}");
 
         // Connect to the git repository
-        using Repository repo = new(gitPath);
-
-        // Write the header rows
-        _options.AuthorWriter.BeginWriting();
-        _options.CommitWriter.BeginWriting();
-        _options.FileWriter.BeginWriting();
-
-        // Customize how we'll traverse commit history
-        CommitFilter filter = new()
-        {
-            // It's very important to walk through commits in historical order from oldest to newest
-            // This lets us accurately get a read on the state of the repository at the time of each commit
-            SortBy = CommitSortStrategies.Reverse,
-
-            // We only want to look at commits that are reachable from whatever is HEAD at the moment
-            IncludeReachableFrom = repo.Head
+        var repoOptions = new RepositoryOptions() {
+            Identity = new Identity("Test", "Testerson@gmail.com"),            
         };
+        try {
+            using Repository repo = new(gitPath, repoOptions);
 
-        double totalCommits = SearchCommits(repo, filter).Count();
+            // Write the header rows
+            _options.AuthorWriter.BeginWriting();
+            _options.CommitWriter.BeginWriting();
+            _options.FileWriter.BeginWriting();
 
-        // Loop over each commit
-        int commitNum = 0;
-        foreach (Commit commit in SearchCommits(repo, filter))
-        {
-            commitNum++;
-            _options.ProgressListener?.UpdateProgress(commitNum / totalCommits, $"Analyzing commit {commitNum} of {totalCommits}");
-            bool isLast = commit == repo.Head.Tip;
-            ProcessCommit(commit, isLast);
+            // Customize how we'll traverse commit history
+            CommitFilter filter = new() {
+                // It's very important to walk through commits in historical order from oldest to newest
+                // This lets us accurately get a read on the state of the repository at the time of each commit
+                SortBy = CommitSortStrategies.Reverse,
+
+                // We only want to look at commits that are reachable from whatever is HEAD at the moment
+                IncludeReachableFrom = repo.Head
+            };
+
+            double totalCommits = SearchCommits(repo, filter).Count();
+
+            // Loop over each commit
+            int commitNum = 0;
+            foreach (Commit commit in SearchCommits(repo, filter)) {
+                commitNum++;
+                _options.ProgressListener?.UpdateProgress(commitNum / totalCommits, $"Analyzing commit {commitNum} of {totalCommits}");
+                bool isLast = commit == repo.Head.Tip;
+                ProcessCommit(commit, isLast);
+            }
+
+            // Write all authors at the end, now that we know aggregate-level information
+            _options.AuthorWriter.WriteAuthors(_authors.Values);
+
+            _options.ProgressListener?.Completed();
         }
+        catch (LibGit2SharpException ex) {
+            if (ex.Message.Contains("is not owned by current user", StringComparison.OrdinalIgnoreCase)) {
+                throw new InvalidOperationException("GitStractor requires the directory to be marked as safe. You can mark all directories as safe globally via the following git command: git config --global --add safe.directory \"*\"", ex);
+            }
 
-        // Write all authors at the end, now that we know aggregate-level information
-        _options.AuthorWriter.WriteAuthors(_authors.Values);
-
-        _options.ProgressListener?.Completed();
+            throw;
+        }
     }
 
     private ICommitLog SearchCommits(Repository repo, CommitFilter filter) => repo.Commits.QueryBy(filter);
 
-    private void ProcessCommit(Commit commit, bool isLast)
-    {
+    private void ProcessCommit(Commit commit, bool isLast) {
         GitTreeInfo treeInfo = new();
         _trees[commit.Tree.Sha] = treeInfo;
 
@@ -100,14 +96,11 @@ public class GitDataExtractor : IDisposable
         GitTreeInfo? parentTree = commit.Parents.Any() ? _trees[commit.Parents.First().Tree.Sha] : null;
 
         // Detect any Deleted Files
-        if (parentTree != null)
-        {
-            foreach (string path in parentTree.Files)
-            {
-                if (!treeInfo.Contains(path))
-                {
+        if (parentTree != null) {
+            foreach (string path in parentTree.Files) {
+                if (!treeInfo.Contains(path)) {
                     RepositoryFileInfo file = parentTree.Find(path)!;
-                    _options.FileWriter.WriteFile(file.AsDeletedFile(commit.Sha, commit.Author.When.UtcDateTime));
+                    _options!.FileWriter.WriteFile(file.AsDeletedFile(commit.Sha, commit.Author.When.UtcDateTime));
                 }
             }
         }
@@ -120,31 +113,24 @@ public class GitDataExtractor : IDisposable
         CommitInfo info = CreateCommitFromLibGitCommit(commit, author, committer, treeInfo);
 
         // Write the commit to the appropriate writer
-        _options.CommitWriter.Write(info);
+        _options!.CommitWriter.Write(info);
     }
 
     private readonly Dictionary<string, string> _pathShas = new();
     private readonly Dictionary<string, RepositoryFileInfo> _fileInfo = new();
 
-    private void WalkTree(Commit commit, Tree tree, GitTreeInfo treeInfo, bool isLast)
-    {
-        foreach (TreeEntry treeEntry in tree)
-        {
-            if (treeEntry.TargetType == TreeEntryTargetType.Blob)
-            {
+    private void WalkTree(Commit commit, Tree tree, GitTreeInfo treeInfo, bool isLast) {
+        foreach (TreeEntry treeEntry in tree) {
+            if (treeEntry.TargetType == TreeEntryTargetType.Blob) {
                 // Ignore the file if it's not an extension we care about
                 FileInfo info = new(treeEntry.Path);
-                if (_options.FileMatchesFilter(info.Extension))
-                {
+                if (_options!.FileMatchesFilter(info.Extension)) {
                     _fileInfo.TryGetValue(treeEntry.Path, out RepositoryFileInfo? oldInfo);
 
                     RepositoryFileInfo fileInfo;
-                    if (oldInfo != null && treeEntry.Target.Sha == oldInfo.Sha)
-                    {
+                    if (oldInfo != null && treeEntry.Target.Sha == oldInfo.Sha) {
                         fileInfo = oldInfo.AsUnchanged();
-                    }
-                    else
-                    {
+                    } else {
                         fileInfo = BuildFileInfo(commit, treeEntry, oldInfo);
                     }
                     _fileInfo[treeEntry.Path] = fileInfo;
@@ -163,14 +149,11 @@ public class GitDataExtractor : IDisposable
 
                     _options.FileWriter.WriteFile(fileInfo);
                     // At the very end of the analysis, we want to write out the final state of the file
-                    if (isLast)
-                    {
+                    if (isLast) {
                         _options.FileWriter.WriteFile(fileInfo.AsFinalVersion());
                     }
                 }
-            }
-            else if (treeEntry.TargetType == TreeEntryTargetType.Tree)
-            {
+            } else if (treeEntry.TargetType == TreeEntryTargetType.Tree) {
                 Tree subTree = (Tree)treeEntry.Target;
 
                 WalkTree(commit, subTree, treeInfo, isLast);
@@ -178,10 +161,8 @@ public class GitDataExtractor : IDisposable
         }
     }
 
-    private FileState DetermineFileState(string fileLower, TreeEntry treeEntry)
-    {
-        if (!_pathShas.ContainsKey(fileLower))
-        {
+    private FileState DetermineFileState(string fileLower, TreeEntry treeEntry) {
+        if (!_pathShas.ContainsKey(fileLower)) {
             // If we didn't have the path before, this is an added file so let's mark it as an added file
             return FileState.Added;
         }
@@ -191,16 +172,14 @@ public class GitDataExtractor : IDisposable
             : FileState.Modified;
     }
 
-    private static RepositoryFileInfo BuildFileInfo(Commit commit, TreeEntry treeEntry, RepositoryFileInfo? oldInfo)
-    {
+    private static RepositoryFileInfo BuildFileInfo(Commit commit, TreeEntry treeEntry, RepositoryFileInfo? oldInfo) {
         Blob blob = (Blob)treeEntry.Target;
 
         int lines = CountLinesInFile(blob);
 
         int linesDelta = lines - oldInfo?.Lines ?? lines;
 
-        RepositoryFileInfo fileInfo = new()
-        {
+        RepositoryFileInfo fileInfo = new() {
             Name = treeEntry.Name,
             Path = treeEntry.Path,
             Sha = blob.Id.Sha,
@@ -213,13 +192,11 @@ public class GitDataExtractor : IDisposable
         return fileInfo;
     }
 
-    private static int CountLinesInFile(Blob blob)
-    {
+    private static int CountLinesInFile(Blob blob) {
         int lines = 0;
         using var reader = new StreamReader(blob.GetContentStream());
 
-        while (!reader.EndOfStream)
-        {
+        while (!reader.EndOfStream) {
             _ = reader.ReadLine();
             lines++;
         }
@@ -227,21 +204,10 @@ public class GitDataExtractor : IDisposable
         return lines;
     }
 
-    private static int CountLinesInFile2(Blob blob)
-    {
-        string text = blob.GetContentText();
-        int lines = text.Count(c => c == '\n');
-
-        return lines;
-    }
-
-    private AuthorInfo GetOrCreateAuthor(Signature signature, ulong bytes, bool isAuthor)
-    {
+    private AuthorInfo GetOrCreateAuthor(Signature signature, ulong bytes, bool isAuthor) {
         string key = signature.Email.ToLowerInvariant();
-        if (!_authors.TryGetValue(key, out AuthorInfo? author))
-        {
-            author = new AuthorInfo()
-            {
+        if (!_authors.TryGetValue(key, out AuthorInfo? author)) {
+            author = new AuthorInfo() {
                 Email = signature.Email,
                 Name = signature.Name,
                 EarliestCommitDateUtc = signature.When.UtcDateTime,
@@ -250,19 +216,15 @@ public class GitDataExtractor : IDisposable
                 TotalSizeInBytes = bytes
             };
             _authors.Add(key, author);
-        }
-        else
-        {
+        } else {
             author.NumCommits += isAuthor ? 1 : 0;
             author.TotalSizeInBytes += bytes;
 
-            if (signature.When.UtcDateTime > author.LatestCommitDateUtc)
-            {
+            if (signature.When.UtcDateTime > author.LatestCommitDateUtc) {
                 author.LatestCommitDateUtc = signature.When.UtcDateTime;
             }
 
-            if (signature.When.UtcDateTime < author.EarliestCommitDateUtc)
-            {
+            if (signature.When.UtcDateTime < author.EarliestCommitDateUtc) {
                 author.EarliestCommitDateUtc = signature.When.UtcDateTime;
             }
         }
@@ -275,8 +237,7 @@ public class GitDataExtractor : IDisposable
         AuthorInfo author,
         AuthorInfo committer,
         GitTreeInfo treeInfo)
-        => new(treeInfo.ModifiedFiles)
-        {
+        => new(treeInfo.ModifiedFiles) {
             Sha = commit.Sha,
             Message = commit
                 .MessageShort, // This is just the first line of the commit message. Usually all that's needed
@@ -294,10 +255,12 @@ public class GitDataExtractor : IDisposable
             CommitterDateUtc = commit.Committer.When.UtcDateTime,
         };
 
-    public void Dispose()
-    {
-        _options.AuthorWriter.Dispose();
-        _options.CommitWriter.Dispose();
-        _options.FileWriter.Dispose();
+    public void Dispose() {
+        if (_options != null) {
+            _options.AuthorWriter.Dispose();
+            _options.CommitWriter.Dispose();
+            _options.FileWriter.Dispose();
+            _options = null;
+        }
     }
 }
