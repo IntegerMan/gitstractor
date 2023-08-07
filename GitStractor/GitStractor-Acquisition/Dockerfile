@@ -9,7 +9,8 @@ COPY ["NuGet.Config", "."]
 COPY ["GitStractor-Acquisition/GitStractor-Acquire.csproj", "GitStractor-Acquisition/"]
 COPY ["GitStractor.Workers/GitStractor.Workers.csproj", "GitStractor.Workers/"]
 COPY ["GitStractor/GitStractor.csproj", "GitStractor/"]
-RUN dotnet restore "GitStractor-Acquisition/GitStractor-Acquire.csproj"
+# Ignore failed sources is needed since Telerik uses its own NuGet Feed
+RUN dotnet restore "GitStractor-Acquisition/GitStractor-Acquire.csproj" --ignore-failed-sources
 COPY . .
 WORKDIR "/src/GitStractor-Acquisition"
 RUN dotnet build "GitStractor-Acquire.csproj" -c Release -o /app/build
