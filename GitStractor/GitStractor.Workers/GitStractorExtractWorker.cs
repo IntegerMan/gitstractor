@@ -24,6 +24,7 @@ public class GitStractorExtractWorker : GitStractorWorkerBase {
     }
 
     protected override async Task OnStartAsync() {
+        // TODO: This belongs in a new base class
         _timer = new Timer(DoWork, null, TimeSpan.FromSeconds(InitialDelayInSeconds), TimeSpan.FromMilliseconds(-1));
 
         await base.OnStartAsync();
@@ -42,7 +43,10 @@ public class GitStractorExtractWorker : GitStractorWorkerBase {
             logExecuting(Log, null);
 
             // Create output directory
+            // TODO: only do this if doesn't exist
             Directory.CreateDirectory(_options.OutputPath);
+
+            // TODO: fail if any file exists and we're not set to overwrite
 
             // Extract
             GitExtractionOptions extractOptions = new() {
@@ -51,11 +55,14 @@ public class GitStractorExtractWorker : GitStractorWorkerBase {
                 CommitWriter = new CommitCsvDataWriter(Path.Combine(_options.OutputPath, "Commits.csv")),
                 FileWriter = new FileCsvDataWriter(Path.Combine(_options.OutputPath, "Files.csv")),
             };
-            _extractor.ExtractInformation(extractOptions);
+            _extractor.ExtractInformation(extractOptions); // TODO: This really need to log
 
             logExtracted(Log, _options.OutputPath, null);
+
+            // TODO: pass this off to something else, potentially, for analysis
+
         }
-        catch (CloneException ex) {
+        catch (InvalidOperationException ex) { // TODO: Revisit
             logWorkError(Log, ex.Message, ex);
             succeeded = false;
         }
