@@ -21,6 +21,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GitStractor-Acquire", "GitS
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitStractor.Workers", "GitStractor.Workers\GitStractor.Workers.csproj", "{4752D027-E881-4E72-AA7A-0F0034552EE7}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GitStractor-Extract", "GitStractor-Extract\GitStractor-Extract.csproj", "{12277A3A-BF93-4FE4-8044-125391D0C633}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,6 +53,10 @@ Global
 		{4752D027-E881-4E72-AA7A-0F0034552EE7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4752D027-E881-4E72-AA7A-0F0034552EE7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4752D027-E881-4E72-AA7A-0F0034552EE7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{12277A3A-BF93-4FE4-8044-125391D0C633}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{12277A3A-BF93-4FE4-8044-125391D0C633}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{12277A3A-BF93-4FE4-8044-125391D0C633}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{12277A3A-BF93-4FE4-8044-125391D0C633}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

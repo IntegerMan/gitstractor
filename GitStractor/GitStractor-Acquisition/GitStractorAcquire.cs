@@ -12,14 +12,16 @@ public class GitStractorAcquire : GitStractorProgram {
     protected override IHostBuilder ConfigureHostBuilder(IHostBuilder builder, string[] args) =>
         builder.UseConsoleLifetime()
             .ConfigureServices((context, services) => {
+                // Dependencies needed by our worker
                 services.AddTransient<RepositoryCloner>();
 
+                // Detect Options
                 services.AddOptions<GitStractorAcquireOptions>()
-                        .Configure(options => context.Configuration.GetSection("Acquire").Bind(options))
+                        .BindConfiguration("Acquire")
                         .ValidateDataAnnotations();
 
                 // Register our service
-                services.AddHostedService<GitStractorAcquisitionWorker>();
+                services.AddHostedService<GitStractorAcquireWorker>();
             })
             .ConfigureAppConfiguration(services => {
                 services.AddCommandLine(args, new Dictionary<string, string>() {

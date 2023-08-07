@@ -5,7 +5,7 @@
     <RootNamespace>GitStractor.Acquire</RootNamespace>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <Title>GitStractor Acquisition Worker</Title>
+    <Title>GitStractor Acquire Worker</Title>
     <Authors>Matt Eland</Authors>
     <Copyright>Matt Eland</Copyright>
     <PackageProjectUrl>https://gitstractor.com</PackageProjectUrl>
@@ -21,9 +21,15 @@
     <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="appsettings.Development.json" />
     <None Remove="appsettings.json" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="appsettings.Development.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
     <Content Include="appsettings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

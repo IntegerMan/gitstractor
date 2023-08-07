@@ -23,6 +23,7 @@ public abstract class GitStractorProgram {
                 .ConfigureAppConfiguration(services => {
                     services.AddEnvironmentVariables(prefix: GitStractorEnvironmentVariablePrefix);
                 })
+                // TODO: This might not be needed
                 .ConfigureLogging((hostContext, config) => {
                     config.AddConfiguration(hostContext.Configuration.GetSection(LoggingConfigSection));
                     config.AddConsole();
