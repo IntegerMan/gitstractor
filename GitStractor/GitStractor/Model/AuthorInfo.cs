@@ -12,6 +12,8 @@ public class AuthorInfo
 
     public required DateTime EarliestCommitDateUtc { get; set; }
     public required DateTime LatestCommitDateUtc { get; set; }
+    public bool IsBot { get; set; }
+    public int Id { get; set; } = -1;
 
     public override string ToString()
     {

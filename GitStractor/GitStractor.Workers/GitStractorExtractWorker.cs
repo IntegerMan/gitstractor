@@ -49,13 +49,15 @@ public class GitStractorExtractWorker : GitStractorWorkerBase {
             // TODO: fail if any file exists and we're not set to overwrite
 
             // Extract
+            /*
             GitExtractionOptions extractOptions = new() {
                 RepositoryPath = _options.SourcePath,
                 AuthorWriter = new AuthorCsvDataWriter(Path.Combine(_options.OutputPath, "Authors.csv")),
                 CommitWriter = new CommitCsvDataWriter(Path.Combine(_options.OutputPath, "Commits.csv")),
                 FileWriter = new FileCsvDataWriter(Path.Combine(_options.OutputPath, "Files.csv")),
             };
-            _extractor.ExtractInformation(extractOptions); // TODO: This really need to log
+            */
+            _extractor.ExtractInformation(_options.SourcePath, _options.OutputPath);
 
             logExtracted(Log, _options.OutputPath, null);
 

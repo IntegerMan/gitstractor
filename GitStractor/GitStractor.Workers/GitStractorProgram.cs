@@ -10,7 +10,7 @@ public abstract class GitStractorProgram {
 
     public virtual string HostConfigSection { get; } = "GitStractorHost";
     public virtual string LoggingConfigSection { get; } = "Logging";
-    public virtual string GitStractorEnvironmentVariablePrefix { get; } = "GITSTRACTOR_";
+    public virtual string EnvironmentVariablePrefix { get; } = "GITSTRACTOR_";
 
     public int Run(string[] args) {
         IHostBuilder builder = 
@@ -21,7 +21,7 @@ public abstract class GitStractorProgram {
                             .Configure(options => context.Configuration.GetSection(HostConfigSection).Bind(options));
                 })
                 .ConfigureAppConfiguration(services => {
-                    services.AddEnvironmentVariables(prefix: GitStractorEnvironmentVariablePrefix);
+                    services.AddEnvironmentVariables(prefix: EnvironmentVariablePrefix);
                 })
                 // TODO: This might not be needed
                 .ConfigureLogging((hostContext, config) => {

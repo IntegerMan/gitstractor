@@ -1,5 +1,5 @@
-﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<NDepend AppName="GitStractor" Platform="DotNet" FileWrittenByProductVersion="2023.1.0.9670">
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<NDepend AppName="GitStractor" Platform="DotNet" FileWrittenByProductVersion="2023.1.1.9675">
   <OutputDir KeepXmlFiles="False">.\NDependOut</OutputDir>
   <IDEFiles>
     <IDEFile FilePath="..\GitStractor\GitStractor.sln" Filters="-test" Configuration="DEBUG|AnyCPU">
@@ -80,8 +80,7 @@
       <High2Critical_SeverityThreshold>72000000000</High2Critical_SeverityThreshold>
       <Critical2Blocker_SeverityThreshold>360000000000</Critical2Blocker_SeverityThreshold>
     </DebtSettings>
-  </ProjectDebtSettings>
-  <Queries>
+  </ProjectDebtSettings><Queries>
     <Group Name="Quality Gates" Active="True" ShownInReport="False">
       <Query Active="True" DisplayList="True" DisplayStat="False" DisplaySelectionView="False" IsCriticalRule="False"><![CDATA[$Quality Gates Evolution$]]></Query>
       <Query Active="True" DisplayList="True" DisplayStat="False" DisplaySelectionView="False" IsCriticalRule="False"><![CDATA[$Percentage Coverage$]]></Query>
@@ -547,5 +546,4 @@ select new { r,
         <Query Active="False" DisplayList="True" DisplayStat="False" DisplaySelectionView="False" IsCriticalRule="False"><![CDATA[$ND9916$]]></Query>
       </Group>
     </Group>
-  </Queries>
-</NDepend>
+  </Queries></NDepend>
