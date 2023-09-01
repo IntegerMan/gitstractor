@@ -61,7 +61,7 @@ public class GitStractorAnalyzerTests
             FileWriter = new FileInMemoryDataWriter(),
             CommitWriter = commitDataWriter,
         };
-        using GitDataExtractor extractor = new(options);
+        GitDataExtractor extractor = new(options);
 
         // Act
         extractor.ExtractInformation();

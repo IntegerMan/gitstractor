@@ -12,6 +12,7 @@ public class GitStractorExtract : GitStractorProgram {
         builder.UseConsoleLifetime()
             .ConfigureServices((context, services) => {
                 // Register dependencies
+                services.AddTransient<GitTreeWalker>();
                 services.AddTransient<IGitObserver, LoggingGitObserver>();
                 services.AddTransient<IGitObserver, GitAuthorObserver>();
                 services.AddTransient<IGitObserver, GitCommitObserver>();

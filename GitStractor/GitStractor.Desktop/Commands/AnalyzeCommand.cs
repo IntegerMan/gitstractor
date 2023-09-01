@@ -37,10 +37,8 @@ public class AnalyzeCommand : CommandBase, IProgressListener
                 GitExtractionOptions options = GitExtractionOptions.BuildFileOptions(_vm.RepositoryPath);
                 options.ProgressListener = this;
 
-                using (GitDataExtractor extractor = new(options))
-                {
-                    extractor.ExtractInformation();
-                }
+                GitDataExtractor extractor = new(options);
+                extractor.ExtractInformation();
             }
             catch (Exception ex)
             {
