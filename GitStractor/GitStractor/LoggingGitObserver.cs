@@ -24,7 +24,7 @@ public class LoggingGitObserver : IGitObserver {
         Log.LogInformation($"Found new author: {author.Name} ({author.Email})");
     }
 
-    public void OnProcessingCommit(Commit commit, bool isLast) {
+    public void OnProcessingCommit(CommitInfo commit, bool isLast) {
         string displayMessage = commit.Message.Substring(0, Math.Min(commit.Message.Length, 140));
         Log.LogDebug($"Analyzing commit {commit.Sha.Substring(0, 5)} by {commit.Author.Name}: {displayMessage}");
     }

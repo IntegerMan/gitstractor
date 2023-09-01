@@ -14,6 +14,7 @@ public class GitAuthorObserver : IGitObserver, IDisposable {
         _writer.WriteField("Email");
         _writer.WriteField("Name");
         _writer.WriteField("IsBot");
+        _writer.WriteField("FirstCommitDateUTC");
         _writer.NextRecord();
     }
 
@@ -22,6 +23,7 @@ public class GitAuthorObserver : IGitObserver, IDisposable {
         _writer.WriteField(author.Email);
         _writer.WriteField(author.Name);
         _writer.WriteField(author.IsBot);
+        _writer.WriteField(author.EarliestCommitDateUtc);
         _writer.NextRecord();
     }
 
@@ -31,13 +33,14 @@ public class GitAuthorObserver : IGitObserver, IDisposable {
         _writer = null;
     }
 
-    public void OnProcessingCommit(Commit commit, bool isLast) {
+    public void OnProcessingCommit(CommitInfo commit, bool isLast) {
     }
 
     public void UpdateProgress(double percent, int commitNum, double totalCommits) {
     }
 
     public void Dispose() {
+        GC.SuppressFinalize(this);
         _writer?.Dispose();
     }
 }

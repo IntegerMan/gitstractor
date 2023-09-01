@@ -105,9 +105,10 @@ public class GitDataExtractor : IDisposable {
 
     private void ProcessCommit(Commit commit, bool isLast) {
         GitTreeInfo treeInfo = new();
+
+        /*
         _trees[commit.Tree.Sha] = treeInfo;
 
-        Observers.ForEach(o => o.OnProcessingCommit(commit, isLast));
 
         // Walk the commit tree to get file information
         WalkTree(commit, commit.Tree, treeInfo, isLast);
@@ -125,6 +126,7 @@ public class GitDataExtractor : IDisposable {
                 }
             }
         }
+        */
 
         // Identify author
         AuthorInfo author = GetOrCreateAuthor(commit.Author, treeInfo.Bytes, true);
@@ -133,8 +135,8 @@ public class GitDataExtractor : IDisposable {
         // Create the commit summary info.
         CommitInfo info = CreateCommitFromLibGitCommit(commit, author, committer, treeInfo);
 
-        // Write the commit to the appropriate writer
-        //_options!.CommitWriter.Write(info);
+        // Write the commit to the appropriate writers
+        Observers.ForEach(o => o.OnProcessingCommit(info, isLast));
     }
 
     private readonly Dictionary<string, string> _pathShas = new();
