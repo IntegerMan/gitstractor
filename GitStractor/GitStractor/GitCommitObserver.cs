@@ -15,6 +15,10 @@ public class GitCommitObserver : IGitObserver, IDisposable {
         _writer.WriteField("CommitterId");
         _writer.WriteField("CommitterDateUtc");
         _writer.WriteField("Message");
+        _writer.WriteField("ParentSha");
+        _writer.WriteField("Total Files");
+        _writer.WriteField("Added Files");
+        _writer.WriteField("Deleted Files");
         _writer.NextRecord();
     }
 
@@ -35,6 +39,10 @@ public class GitCommitObserver : IGitObserver, IDisposable {
         _writer.WriteField(commit.Committer.Id);
         _writer.WriteField(commit.CommitterDateUtc);
         _writer.WriteField(commit.Message);
+        _writer.WriteField(commit.ParentSha);
+        _writer.WriteField(commit.TotalFiles);
+        _writer.WriteField(commit.AddedFiles);
+        _writer.WriteField(commit.DeletedFiles);
         _writer.NextRecord();
     }
 

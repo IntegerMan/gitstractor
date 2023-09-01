@@ -1,4 +1,5 @@
 ﻿using GitStractor.Model;
+using LibGit2Sharp;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections;
@@ -22,17 +23,18 @@ public class GitTreeWalker {
 
     private readonly Dictionary<string, GitTreeInfo> _trees = new();
 
-    public GitTreeInfo WalkCommitTree(Commit commit, bool isLastCommit) {
+    public GitTreeInfo WalkCommitTree(Commit commit) {
         GitTreeInfo treeInfo = new();
         _trees[commit.Tree.Sha] = treeInfo;
 
         // Walk the commit tree to get file information
-        WalkTree(commit, commit.Tree, treeInfo, isLastCommit);
-
-        // Get what we know about the parent commit this came from
-        GitTreeInfo? parentTree = commit.Parents.Any() ? _trees[commit.Parents.First().Tree.Sha] : null;
+        WalkTree(commit, commit.Tree, treeInfo);
 
         // Detect any Deleted Files
+        // Get what we know about the parent commit this came from
+        Commit? parentCommit = commit.Parents.FirstOrDefault();
+        GitTreeInfo? parentTree = parentCommit != null ? _trees[parentCommit.Tree.Sha] : null;
+
         if (parentTree != null) {
             foreach (string path in parentTree.Files) {
                 if (!treeInfo.Contains(path)) {
@@ -46,12 +48,15 @@ public class GitTreeWalker {
         return treeInfo;
     }
 
-    private void WalkTree(Commit commit, Tree tree, GitTreeInfo treeInfo, bool isLast) {
-        foreach (TreeEntry treeEntry in tree) {
-            if (treeEntry.TargetType == TreeEntryTargetType.Blob) {
-                // Ignore the file if it's not an extension we care about
-                FileInfo info = new(treeEntry.Path);
-                if (true) { //_options!.FileMatchesFilter(info.Extension)) {
+    private void WalkTree(Commit commit, Tree tree, GitTreeInfo treeInfo) {
+        Queue<TreeEntry> entries = new(tree);
+
+        while (entries.Count > 0) {
+            TreeEntry treeEntry = entries.Dequeue();
+
+            switch (treeEntry.Mode) {
+                case Mode.NonExecutableFile:
+                case Mode.NonExecutableGroupWritableFile:
                     _fileInfo.TryGetValue(treeEntry.Path, out RepositoryFileInfo? oldInfo);
 
                     RepositoryFileInfo fileInfo;
@@ -75,15 +80,22 @@ public class GitTreeWalker {
                     _pathShas[fileLower] = treeEntry.Target.Sha;
 
                     //_options.FileWriter.WriteFile(fileInfo);
-                    // At the very end of the analysis, we want to write out the final state of the file
-                    if (isLast) {
-                        //_options.FileWriter.WriteFile(fileInfo.AsFinalVersion());
-                    }
-                }
-            } else if (treeEntry.TargetType == TreeEntryTargetType.Tree) {
-                Tree subTree = (Tree)treeEntry.Target;
+                    break;
 
-                WalkTree(commit, subTree, treeInfo, isLast);
+                case Mode.Directory:
+                    // Avoid nested recursion by appending to a queue
+                    foreach (TreeEntry nestedEntry in (Tree)treeEntry.Target) {
+                        entries.Enqueue(nestedEntry);
+                    }
+                    break;
+
+                case Mode.SymbolicLink:
+                    throw new NotSupportedException("Git repositories with Symbolic Links are not yet supported by GitStractor");
+                case Mode.GitLink:
+                    throw new NotSupportedException("Git repositories with GitLinks are not yet supported by GitStractor");
+                case Mode.ExecutableFile:
+                    // Maybe this is supportable as a standard file?
+                    throw new NotSupportedException("Git repositories with Executable Files are not yet supported by GitStractor");
             }
         }
     }

@@ -99,6 +99,8 @@ public class CommitInfo
     /// </summary>
     public string FileNames => string.Join(", ", Files);
 
+    public string? ParentSha { get; init; }
+
     /// <inheritdoc />
     public override string ToString()
     {

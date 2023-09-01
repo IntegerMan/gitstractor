@@ -58,6 +58,9 @@ public class GitDataExtractor {
                 // This lets us accurately get a read on the state of the repository at the time of each commit
                 SortBy = CommitSortStrategies.Reverse,
 
+                // Don't include branch details
+                FirstParentOnly = true,
+
                 // We only want to look at commits that are reachable from whatever is HEAD at the moment
                 IncludeReachableFrom = repo.Head
             };
@@ -105,7 +108,7 @@ public class GitDataExtractor {
 
     private void ProcessCommit(Commit commit, bool isLast) {
 
-        GitTreeInfo treeInfo = _treeWalker.WalkCommitTree(commit, isLast);
+        GitTreeInfo treeInfo = _treeWalker.WalkCommitTree(commit);
 
         // Identify author
         AuthorInfo author = GetOrCreateAuthor(commit.Author, true);
@@ -154,6 +157,7 @@ public class GitDataExtractor {
         GitTreeInfo treeInfo)
         => new(treeInfo.ModifiedFiles) {
             Sha = commit.Sha,
+            ParentSha = commit.Parents.FirstOrDefault()?.Sha,
             Message = commit.MessageShort, // This is just the first line of the commit message. Usually all that's needed
             SizeInBytes = treeInfo.Bytes,
             TotalFiles = treeInfo.TotalFileCount,
