@@ -1,8 +1,9 @@
 ﻿using GitStractor.Model;
 
-namespace GitStractor;
+namespace GitStractor.GitObservers;
 
-public interface IGitObserver {
+public interface IGitObserver
+{
     void OnBeginningIteration(int totalCommits, string outputPath);
     void OnCompletedIteration(string outputPath);
     void OnNewAuthor(AuthorInfo author);

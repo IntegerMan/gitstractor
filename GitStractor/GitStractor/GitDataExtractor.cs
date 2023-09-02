@@ -1,4 +1,5 @@
-﻿using GitStractor.Model;
+﻿using GitStractor.GitObservers;
+using GitStractor.Model;
 using GitStractor.Utilities;
 using LibGit2Sharp;
 using Microsoft.Extensions.Logging;

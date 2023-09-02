@@ -2,23 +2,26 @@
 using GitStractor.Model;
 using System.Globalization;
 
-namespace GitStractor;
+namespace GitStractor.GitObservers;
 
-public class GitAuthorObserver : IGitObserver, IDisposable {
+public class GitAuthorObserver : IGitObserver, IDisposable
+{
     private CsvWriter? _writer;
 
-    public void OnBeginningIteration(int totalCommits, string outputPath) {
+    public void OnBeginningIteration(int totalCommits, string outputPath)
+    {
         _writer = new CsvWriter(new StreamWriter(Path.Combine(outputPath, "Authors.csv"), append: false), CultureInfo.InvariantCulture);
 
         _writer.WriteField("Id");
         _writer.WriteField("Email");
         _writer.WriteField("Name");
-        _writer.WriteField("IsBot");
-        _writer.WriteField("FirstCommitDateUTC");
+        _writer.WriteField("Is Bot?");
+        _writer.WriteField("First Commit Date UTC");
         _writer.NextRecord();
     }
 
-    public void OnNewAuthor(AuthorInfo author) {
+    public void OnNewAuthor(AuthorInfo author)
+    {
         _writer!.WriteField(author.Id);
         _writer.WriteField(author.Email);
         _writer.WriteField(author.Name);
@@ -27,26 +30,32 @@ public class GitAuthorObserver : IGitObserver, IDisposable {
         _writer.NextRecord();
     }
 
-    public void OnCompletedIteration(string outputPath) {
+    public void OnCompletedIteration(string outputPath)
+    {
         _writer!.Flush();
         _writer.Dispose();
         _writer = null;
     }
 
-    public void OnProcessingCommit(string sha, bool isLast) {
+    public void OnProcessingCommit(string sha, bool isLast)
+    {
     }
 
-    public void OnProcessedCommit(CommitInfo commit) {
+    public void OnProcessedCommit(CommitInfo commit)
+    {
     }
 
-    public void UpdateProgress(double percent, int commitNum, double totalCommits) {
+    public void UpdateProgress(double percent, int commitNum, double totalCommits)
+    {
     }
 
-    public void Dispose() {
+    public void Dispose()
+    {
         GC.SuppressFinalize(this);
         _writer?.Dispose();
     }
 
-    public void OnProcessingFile(RepositoryFileInfo fileInfo, string commitSha) {
+    public void OnProcessingFile(RepositoryFileInfo fileInfo, string commitSha)
+    {
     }
 }

@@ -33,7 +33,7 @@ public class RepositoryFileInfo
     public DateTime CreatedDateUtc { get; init; }
     public required int Lines { get; init; }
     public required int LinesDelta { get; init; }
-    public string OldPath { get; internal set; }
+    public string? OldPath { get; init; }
 
     public override string ToString() 
         => $"{Sha[..6]} {Path} @ {Commit[..6]} ({State})";

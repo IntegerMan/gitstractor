@@ -79,11 +79,7 @@ public class GitExtractionOptions
                 new CommitCsvDataWriter(Path.Combine(outputDirectory, "Commits.csv")),
                 new FileCommitCsvDataWriter(Path.Combine(outputDirectory, "FileCommits.csv")),
             }),
-            FileWriter = new FileCompoundDataWriter(new[]
-            {
-                new FileCsvDataWriter(Path.Combine(outputDirectory, "Files.csv")),
-                new FileCsvDataWriter(Path.Combine(outputDirectory, "FinalStructure.csv"), FileState.Final),
-            })
+            FileWriter = new FileCompoundDataWriter(Array.Empty<FileDataWriter>())
         };
     }
 

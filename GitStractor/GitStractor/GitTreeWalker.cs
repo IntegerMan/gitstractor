@@ -1,4 +1,5 @@
-﻿using GitStractor.Model;
+﻿using GitStractor.GitObservers;
+using GitStractor.Model;
 using LibGit2Sharp;
 using Microsoft.Extensions.Logging;
 using System;
@@ -38,7 +39,7 @@ public class GitTreeWalker {
                 Sha = change.Oid.Sha,
                 Commit = commit.Sha,
                 Path = change.Path,
-                OldPath = change.OldPath,
+                OldPath = change.Path == change.OldPath ? null : change.OldPath,
                 Lines = 0, // TODO
                 LinesDelta = 0, // TODO
                 Bytes = 0,
@@ -49,7 +50,7 @@ public class GitTreeWalker {
         }
 
         if (commit == repo.Head.Tip) {
-            // TODO: Loop over the tree and report the final file structure
+            WalkTree(commit, treeInfo, observers);
         }
 
         return treeInfo;
@@ -70,8 +71,8 @@ public class GitTreeWalker {
             _ => FileState.Untracked,
         };
 
-    private void WalkTree(Commit commit, Tree tree, GitTreeInfo treeInfo, List<IGitObserver> observers) {
-        Queue<TreeEntry> entries = new(tree);
+    private void WalkTree(Commit commit, GitTreeInfo treeInfo, List<IGitObserver> observers) {
+        Queue<TreeEntry> entries = new(commit.Tree);
 
         while (entries.Count > 0) {
             TreeEntry treeEntry = entries.Dequeue();
@@ -79,27 +80,22 @@ public class GitTreeWalker {
             switch (treeEntry.Mode) {
                 case Mode.NonExecutableFile:
                 case Mode.NonExecutableGroupWritableFile:
-                    _fileInfo.TryGetValue(treeEntry.Path, out RepositoryFileInfo? oldInfo);
+                    Blob blob = (Blob)treeEntry.Target;
 
-                    RepositoryFileInfo fileInfo;
-                    if (oldInfo != null && treeEntry.Target.Sha == oldInfo.Sha) {
-                        fileInfo = oldInfo.AsUnchanged();
-                    } else {
-                        fileInfo = BuildFileInfo(commit, treeEntry, oldInfo);
-                    }
-                    _fileInfo[treeEntry.Path] = fileInfo;
+                    (int lines, ulong bytes) = CountLinesAndBytes(blob);
 
-                    // Each tree consists of ALL files, including those who didn't change at all. When the contents of a
-                    // file changes, its SHA changes. So, we can use the SHA of the file to determine if it changed.
-                    // If the SHA is the same, we shouldn't log the file as being part of this commit, though there may
-                    // be analysis value of having a full log of all files as of any given commit in the system
-                    string fileLower = treeEntry.Path.ToLowerInvariant();
-                    fileInfo.State = DetermineFileState(fileLower, treeEntry);
+                    RepositoryFileInfo fileInfo = new() {
+                        Sha = blob.Id.Sha,
+                        Commit = commit.Sha,
+                        Path = treeEntry.Path,
+                        OldPath = null,
+                        Lines = lines,
+                        LinesDelta = 0,
+                        Bytes = bytes,
+                        State = FileState.Final
+                    };
 
                     treeInfo.Register(fileInfo);
-
-                    // Add or update our entry for the file's path
-                    _pathShas[fileLower] = treeEntry.Target.Sha;
 
                     observers.ForEach(o => o.OnProcessingFile(fileInfo, commit.Sha));
                     break;
@@ -112,12 +108,15 @@ public class GitTreeWalker {
                     break;
 
                 case Mode.SymbolicLink:
-                    throw new NotSupportedException("Git repositories with Symbolic Links are not yet supported by GitStractor");
+                    Log.LogWarning("Repository contained a Symbolic Link which is not currently supported by GitStractor. Some entries may be missing");
+                    break;
                 case Mode.GitLink:
-                    throw new NotSupportedException("Git repositories with GitLinks are not yet supported by GitStractor");
+                    Log.LogWarning("Repository contained a GitLink which is not currently supported by GitStractor. Some entries may be missing");
+                    break;
                 case Mode.ExecutableFile:
                     // Maybe this is supportable as a standard file?
-                    throw new NotSupportedException("Git repositories with Executable Files are not yet supported by GitStractor");
+                    Log.LogWarning("Repository contained an executable file which is not currently supported by GitStractor. Some entries may be missing");
+                    break;
             }
         }
     }
@@ -128,46 +127,19 @@ public class GitTreeWalker {
         _fileInfo.Clear();
     }
 
-    private FileState DetermineFileState(string fileLower, TreeEntry treeEntry) {
-        if (!_pathShas.TryGetValue(fileLower, out string? value)) {
-            // If we didn't have the path before, this is an added file so let's mark it as an added file
-            return FileState.Added;
-        }
-
-        return value == treeEntry.Target.Sha
-            ? FileState.Unmodified
-            : FileState.Modified;
-    }
-
-    private static RepositoryFileInfo BuildFileInfo(Commit commit, TreeEntry treeEntry, RepositoryFileInfo? oldInfo) {
-        Blob blob = (Blob)treeEntry.Target;
-
-        int lines = CountLinesInFile(blob);
-
-        int linesDelta = lines - oldInfo?.Lines ?? lines;
-
-        return new RepositoryFileInfo() {
-            Name = treeEntry.Name,
-            Path = treeEntry.Path,
-            Sha = blob.Id.Sha,
-            Lines = lines,
-            LinesDelta = linesDelta,
-            Bytes = (ulong)blob.Size,
-            Commit = commit.Id.Sha,
-            CreatedDateUtc = commit.Author.When.UtcDateTime,
-        };
-    }
-
-    private static int CountLinesInFile(Blob blob) {
+    public static (int lines, ulong bytes) CountLinesAndBytes(Blob blob) {
         int lines = 0;
-        using var reader = new StreamReader(blob.GetContentStream());
-
+        ulong bytes = 0;
+        using var stream = blob.GetContentStream();
+        using var reader = new StreamReader(stream, Encoding.UTF8, true, 1024, true);
         while (!reader.EndOfStream) {
-            _ = reader.ReadLine();
+            string? line = reader.ReadLine();
             lines++;
+            if (line != null) {
+                bytes += (ulong)(Encoding.UTF8.GetByteCount(line) + Encoding.UTF8.GetByteCount(Environment.NewLine));
+            }
         }
-
-        return lines;
+        return (lines, bytes);
     }
 
 }
