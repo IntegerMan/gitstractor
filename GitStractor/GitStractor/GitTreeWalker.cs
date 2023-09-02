@@ -79,7 +79,7 @@ public class GitTreeWalker {
                     // Add or update our entry for the file's path
                     _pathShas[fileLower] = treeEntry.Target.Sha;
 
-                    observers.ForEach(o => o.OnProcessingFile(fileInfo));
+                    observers.ForEach(o => o.OnProcessingFile(fileInfo, commit.Sha));
                     break;
 
                 case Mode.Directory:

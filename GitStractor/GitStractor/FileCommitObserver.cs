@@ -33,7 +33,7 @@ public class FileCommitObserver : IGitObserver, IDisposable {
         _writer = null;
     }
 
-    public void OnProcessingFile(RepositoryFileInfo fileInfo) {
+    public void OnProcessingFile(RepositoryFileInfo fileInfo, string commitSha) {
         _writer!.WriteField(fileInfo.Commit);
         _writer.WriteField(fileInfo.Sha);
         _writer.WriteField(fileInfo.Path);

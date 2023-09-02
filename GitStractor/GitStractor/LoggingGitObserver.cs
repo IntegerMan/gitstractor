@@ -33,7 +33,7 @@ public class LoggingGitObserver : IGitObserver {
         Log.LogDebug($"Analyzed commit {commit.Sha.Substring(0, 5)} by {commit.Author.Name}: {displayMessage}");
     }
 
-    public void OnProcessingFile(RepositoryFileInfo fileInfo) {
+    public void OnProcessingFile(RepositoryFileInfo fileInfo, string commitSha) {
     }
 
     public void UpdateProgress(double percent, int commitNum, double totalCommits) {

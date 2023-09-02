@@ -47,6 +47,6 @@ public class GitAuthorObserver : IGitObserver, IDisposable {
         _writer?.Dispose();
     }
 
-    public void OnProcessingFile(RepositoryFileInfo fileInfo) {
+    public void OnProcessingFile(RepositoryFileInfo fileInfo, string commitSha) {
     }
 }
