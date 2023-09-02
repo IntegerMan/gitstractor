@@ -2,7 +2,7 @@
 
 namespace GitStractor.GitObservers;
 
-public class GitAuthorObserver : FileWriterObserverBase
+public class StreamingAuthorObserver : FileWriterObserverBase
 {
     public override string Filename => "Authors.csv";
 

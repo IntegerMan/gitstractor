@@ -15,7 +15,7 @@ public class GitStractorExtract : GitStractorProgram {
                 // Register dependencies
                 services.AddTransient<GitTreeWalker>();
                 services.AddTransient<IGitObserver, LoggingGitObserver>();
-                services.AddTransient<IGitObserver, GitAuthorObserver>();
+                services.AddTransient<IGitObserver, SummaryAuthorObserver>();
                 services.AddTransient<IGitObserver, GitCommitObserver>();
                 services.AddTransient<IGitObserver, FileObserver>();
                 services.AddTransient<IGitObserver, FileCommitObserver>();

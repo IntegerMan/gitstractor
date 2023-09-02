@@ -21,7 +21,7 @@ public static class Program {
         string outputDirectory = Environment.CurrentDirectory;
 
         List<IGitObserver> observers = new() {
-                new GitAuthorObserver(),
+                new StreamingAuthorObserver(),
                 new GitCommitObserver(),
                 new FileObserver(),
                 new FileCommitObserver(),

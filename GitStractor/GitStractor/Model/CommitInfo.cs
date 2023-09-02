@@ -23,19 +23,14 @@ public class CommitInfo
     public required string Message { get; init; }
     
     /// <summary>
-    /// The total blob size of the commit in terms of bytes
-    /// </summary>
-    public ulong SizeInBytes { get; init; }
-    
-    /// <summary>
     /// Gets the total number of files in the working tree as of this commit. This is typically not the amount of files
     /// modified by the commit.
     /// </summary>
     public int TotalFiles { get; init; }
 
-    public int TotalLines => _files.Sum(f => f.Lines);
-    public int NetLines => _files.Sum(f => f.LinesDelta);
-    
+    public int LinesDeleted { get; init; }
+    public int LinesAdded { get; init; }
+
     /// <summary>
     /// The SHA of the commit
     /// </summary>

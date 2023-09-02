@@ -116,6 +116,9 @@ public class GitDataExtractor {
         // Create the commit summary info.
         CommitInfo info = CreateCommitFromLibGitCommit(commit, author, committer, treeInfo);
 
+        author.LinesDeleted += info.LinesDeleted;
+        author.LinesAdded += info.LinesAdded;
+
         // Write the commit to the appropriate writers
         Observers.ForEach(o => o.OnProcessedCommit(info));
     }
@@ -135,7 +138,9 @@ public class GitDataExtractor {
             Observers.ForEach(o => o.OnNewAuthor(author));
             _authors.Add(key, author);
         } else {
-            author.NumCommits += isAuthor ? 1 : 0;
+            if (isAuthor) {
+                author.NumCommits++;
+            }
 
             if (signature.When.UtcDateTime > author.LatestCommitDateUtc) {
                 author.LatestCommitDateUtc = signature.When.UtcDateTime;
@@ -160,10 +165,11 @@ public class GitDataExtractor {
             Parent2Sha = commit.Parents.Count() > 1 ? commit.Parents.Last().Sha : null,
             Message = commit.MessageShort, // This is just the first line of the commit message. Usually all that's needed
 
-            SizeInBytes = treeInfo.Bytes,
             TotalFiles = treeInfo.TotalFileCount,
             AddedFiles = treeInfo.AddedFileCount,
             DeletedFiles = treeInfo.DeletedFileCount,
+            LinesAdded = treeInfo.LinesAdded,
+            LinesDeleted = treeInfo.LinesDeleted,
 
             // Author information. Author is the person who wrote the contents of the commit
             Author = author,

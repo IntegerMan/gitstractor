@@ -7,8 +7,8 @@ public class AuthorInfo
     public required string Email { get; init; }
 
     public int NumCommits { get; set; }
-
-    public ulong TotalSizeInBytes { get; set; }
+    public int LinesAdded { get; set; }
+    public int LinesDeleted { get; set; }
 
     public required DateTime EarliestCommitDateUtc { get; set; }
     public required DateTime LatestCommitDateUtc { get; set; }
