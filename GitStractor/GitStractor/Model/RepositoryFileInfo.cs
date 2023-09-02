@@ -3,7 +3,6 @@
 public class RepositoryFileInfo
 {
     public FileState State { get; set; } = FileState.Unmodified;
-    public required string Name { get; set; }
     public required string Sha { get; init; }
     public required string Path { get; set; }
 
@@ -34,6 +33,7 @@ public class RepositoryFileInfo
     public DateTime CreatedDateUtc { get; init; }
     public required int Lines { get; init; }
     public required int LinesDelta { get; init; }
+    public string OldPath { get; internal set; }
 
     public override string ToString() 
         => $"{Sha[..6]} {Path} @ {Commit[..6]} ({State})";
@@ -46,7 +46,6 @@ public class RepositoryFileInfo
             Lines = this.Lines,
             LinesDelta = this.Lines,
             Commit = this.Commit,
-            Name = this.Name,
             Path = this.Path,
             Sha = this.Sha,
             CreatedDateUtc = this.CreatedDateUtc,
@@ -60,7 +59,6 @@ public class RepositoryFileInfo
             Lines = 0,
             LinesDelta = this.Lines,
             Commit = commit,
-            Name = this.Name,
             Path = this.Path,
             Sha = this.Sha, // May want to use string.empty here, but leaving for comparison of same file over time
             CreatedDateUtc = commitDateUtc,
@@ -74,7 +72,6 @@ public class RepositoryFileInfo
             Lines = this.Lines,
             LinesDelta = 0,
             Commit = this.Commit,
-            Name = this.Name,
             Path = this.Path,
             Sha = this.Sha, // May want to use string.empty here, but leaving for comparison of same file over time
             CreatedDateUtc = this.CreatedDateUtc,

@@ -6,6 +6,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -16,37 +17,58 @@ public class GitTreeWalker {
     public ILogger<GitTreeWalker> Log { get; set; }
     private readonly Dictionary<string, string> _pathShas = new();
     private readonly Dictionary<string, RepositoryFileInfo> _fileInfo = new();
+    private readonly Dictionary<string, Tree> _trees = new();
 
     public GitTreeWalker(ILogger<GitTreeWalker> log) {
         Log = log;
     }
 
-    private readonly Dictionary<string, GitTreeInfo> _trees = new();
 
-    public GitTreeInfo WalkCommitTree(Commit commit, List<IGitObserver> observers) {
+    public GitTreeInfo WalkCommitTree(Commit commit, Repository repo, List<IGitObserver> observers) {
         GitTreeInfo treeInfo = new();
-        _trees[commit.Tree.Sha] = treeInfo;
+        _trees[commit.Sha] = commit.Tree;
 
-        // Walk the commit tree to get file information
-        WalkTree(commit, commit.Tree, treeInfo, observers);
+        TreeChanges changes = repo.Diff.Compare<TreeChanges>(commit.Parents.FirstOrDefault()?.Tree, commit.Tree);
 
-        // Detect any Deleted Files
-        // Get what we know about the parent commit this came from
-        Commit? parentCommit = commit.Parents.FirstOrDefault();
-        GitTreeInfo? parentTree = parentCommit != null ? _trees[parentCommit.Tree.Sha] : null;
+        foreach (TreeEntryChanges change in changes) {
+            ChangeKind kind = change.Status;
+            FileState state = GetFileState(kind);
 
-        if (parentTree != null) {
-            foreach (string path in parentTree.Files) {
-                if (!treeInfo.Contains(path)) {
-                    RepositoryFileInfo file = parentTree.Find(path)!;
-                    Log.LogDebug($"Detected deleted file {file.Path}");
-                    //_options!.FileWriter.WriteFile(file.AsDeletedFile(commit.Sha, commit.Author.When.UtcDateTime));
-                }
-            }
+            RepositoryFileInfo fileInfo = new() {
+                Sha = change.Oid.Sha,
+                Commit = commit.Sha,
+                Path = change.Path,
+                OldPath = change.OldPath,
+                Lines = 0, // TODO
+                LinesDelta = 0, // TODO
+                Bytes = 0,
+                State = state
+            };
+            treeInfo.Register(fileInfo);
+            observers.ForEach(o => o.OnProcessingFile(fileInfo, commit.Sha));
+        }
+
+        if (commit == repo.Head.Tip) {
+            // TODO: Loop over the tree and report the final file structure
         }
 
         return treeInfo;
     }
+
+    private static FileState GetFileState(ChangeKind kind)
+        => kind switch {
+            ChangeKind.Added => FileState.Added,
+            ChangeKind.Unmodified => FileState.Unmodified,
+            ChangeKind.Deleted => FileState.Deleted,
+            ChangeKind.Modified => FileState.Modified,
+            ChangeKind.Renamed => FileState.Renamed,
+            ChangeKind.TypeChanged => FileState.TypeChanged,
+            ChangeKind.Conflicted => FileState.Conflicted,
+            ChangeKind.Unreadable => FileState.Unreadable, // What is this?
+            ChangeKind.Copied => FileState.Copied, // What is this?
+            ChangeKind.Ignored => FileState.Ignored, // What is this?
+            _ => FileState.Untracked,
+        };
 
     private void WalkTree(Commit commit, Tree tree, GitTreeInfo treeInfo, List<IGitObserver> observers) {
         Queue<TreeEntry> entries = new(tree);

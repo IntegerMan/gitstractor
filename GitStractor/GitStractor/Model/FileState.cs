@@ -8,4 +8,11 @@ public enum FileState
     Modified = 4,
     Unmodified = 8,
     Final = 16,
+    Renamed = 32,
+    Copied = 64,
+    Conflicted = 128,
+    Ignored = 256,
+    Untracked = 512,
+    TypeChanged = 1024,
+    Unreadable = 2048,
 }
