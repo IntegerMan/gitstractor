@@ -1,5 +1,4 @@
 using System.Diagnostics.CodeAnalysis;
-using GitStractor.Writers;
 using Shouldly;
 
 namespace GitStractor.Tests;

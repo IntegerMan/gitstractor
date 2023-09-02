@@ -1,73 +1,44 @@
-﻿using CsvHelper;
-using GitStractor.Model;
-using System.Globalization;
+﻿using GitStractor.Model;
 
 namespace GitStractor.GitObservers;
 
-public class GitCommitObserver : IGitObserver, IDisposable
+public class GitCommitObserver : FileWriterObserverBase
 {
-    private CsvWriter? _writer;
+    public override string Filename => "Commits.csv";
 
-    public void OnBeginningIteration(int totalCommits, string outputPath)
+    public override void OnBeginningIteration(int totalCommits, string outputPath)
     {
-        _writer = new CsvWriter(new StreamWriter(Path.Combine(outputPath, "Commits.csv"), append: false), CultureInfo.InvariantCulture);
-        _writer.WriteField("Sha");
-        _writer.WriteField("ParentSha");
-        _writer.WriteField("Parent2Sha");
-        _writer.WriteField("AuthorId");
-        _writer.WriteField("AuthorDateUtc");
-        _writer.WriteField("CommitterId");
-        _writer.WriteField("CommitterDateUtc");
-        _writer.WriteField("Message");
-        _writer.WriteField("Total Files");
-        _writer.WriteField("Added Files");
-        _writer.WriteField("Deleted Files");
-        _writer.NextRecord();
+        base.OnBeginningIteration(totalCommits, outputPath);
+
+        WriteField("Sha");
+        WriteField("ParentSha");
+        WriteField("Parent2Sha");
+        WriteField("AuthorId");
+        WriteField("AuthorDateUtc");
+        WriteField("CommitterId");
+        WriteField("CommitterDateUtc");
+        WriteField("Message");
+        WriteField("Total Files");
+        WriteField("Added Files");
+        WriteField("Deleted Files");
+        NextRecord();
     }
 
-    public void OnNewAuthor(AuthorInfo author)
+    public override void OnProcessedCommit(CommitInfo commit)
     {
-    }
+        base.OnProcessedCommit(commit);
 
-    public void OnCompletedIteration(string outputPath)
-    {
-        _writer!.Flush();
-        _writer.Dispose();
-        _writer = null;
-    }
-
-    public void OnProcessingCommit(string sha, bool isLast)
-    {
-
-    }
-
-    public void OnProcessedCommit(CommitInfo commit)
-    {
-        _writer!.WriteField(commit.Sha);
-        _writer.WriteField(commit.ParentSha);
-        _writer.WriteField(commit.Parent2Sha);
-        _writer.WriteField(commit.Author.Id);
-        _writer.WriteField(commit.AuthorDateUtc);
-        _writer.WriteField(commit.Committer.Id);
-        _writer.WriteField(commit.CommitterDateUtc);
-        _writer.WriteField(commit.Message);
-        _writer.WriteField(commit.TotalFiles);
-        _writer.WriteField(commit.AddedFiles);
-        _writer.WriteField(commit.DeletedFiles);
-        _writer.NextRecord();
-    }
-
-    public void UpdateProgress(double percent, int commitNum, double totalCommits)
-    {
-    }
-
-    public void Dispose()
-    {
-        GC.SuppressFinalize(this);
-        _writer?.Dispose();
-    }
-
-    public void OnProcessingFile(RepositoryFileInfo fileInfo, string commitSha)
-    {
+        WriteField(commit.Sha);
+        WriteField(commit.ParentSha);
+        WriteField(commit.Parent2Sha);
+        WriteField(commit.Author.Id);
+        WriteField(commit.AuthorDateUtc);
+        WriteField(commit.Committer.Id);
+        WriteField(commit.CommitterDateUtc);
+        WriteField(commit.Message);
+        WriteField(commit.TotalFiles);
+        WriteField(commit.AddedFiles);
+        WriteField(commit.DeletedFiles);
+        NextRecord();
     }
 }

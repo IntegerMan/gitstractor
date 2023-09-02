@@ -34,11 +34,8 @@ public class AnalyzeCommand : CommandBase, IProgressListener
         {
             try
             {
-                GitExtractionOptions options = GitExtractionOptions.BuildFileOptions(_vm.RepositoryPath);
-                options.ProgressListener = this;
-
-                GitDataExtractor extractor = new(options);
-                extractor.ExtractInformation();
+                GitDataExtractor extractor = new(log: null, observers: null, new GitTreeWalker(log: null));
+                extractor.ExtractInformation(repoPath: null, outputPath: null);
             }
             catch (Exception ex)
             {

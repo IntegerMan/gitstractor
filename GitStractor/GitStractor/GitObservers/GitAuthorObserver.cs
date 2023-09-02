@@ -1,61 +1,32 @@
-﻿using CsvHelper;
-using GitStractor.Model;
-using System.Globalization;
+﻿using GitStractor.Model;
 
 namespace GitStractor.GitObservers;
 
-public class GitAuthorObserver : IGitObserver, IDisposable
+public class GitAuthorObserver : FileWriterObserverBase
 {
-    private CsvWriter? _writer;
+    public override string Filename => "Authors.csv";
 
-    public void OnBeginningIteration(int totalCommits, string outputPath)
+    public override void OnBeginningIteration(int totalCommits, string outputPath)
     {
-        _writer = new CsvWriter(new StreamWriter(Path.Combine(outputPath, "Authors.csv"), append: false), CultureInfo.InvariantCulture);
+        base.OnBeginningIteration(totalCommits, outputPath);
 
-        _writer.WriteField("Id");
-        _writer.WriteField("Email");
-        _writer.WriteField("Name");
-        _writer.WriteField("Is Bot?");
-        _writer.WriteField("First Commit Date UTC");
-        _writer.NextRecord();
+        WriteField("Id");
+        WriteField("Email");
+        WriteField("Name");
+        WriteField("Is Bot?");
+        WriteField("First Commit Date UTC");
+        NextRecord();
     }
 
-    public void OnNewAuthor(AuthorInfo author)
+    public override void OnNewAuthor(AuthorInfo author)
     {
-        _writer!.WriteField(author.Id);
-        _writer.WriteField(author.Email);
-        _writer.WriteField(author.Name);
-        _writer.WriteField(author.IsBot);
-        _writer.WriteField(author.EarliestCommitDateUtc);
-        _writer.NextRecord();
-    }
+        base.OnNewAuthor(author);
 
-    public void OnCompletedIteration(string outputPath)
-    {
-        _writer!.Flush();
-        _writer.Dispose();
-        _writer = null;
-    }
-
-    public void OnProcessingCommit(string sha, bool isLast)
-    {
-    }
-
-    public void OnProcessedCommit(CommitInfo commit)
-    {
-    }
-
-    public void UpdateProgress(double percent, int commitNum, double totalCommits)
-    {
-    }
-
-    public void Dispose()
-    {
-        GC.SuppressFinalize(this);
-        _writer?.Dispose();
-    }
-
-    public void OnProcessingFile(RepositoryFileInfo fileInfo, string commitSha)
-    {
+        WriteField(author.Id);
+        WriteField(author.Email);
+        WriteField(author.Name);
+        WriteField(author.IsBot);
+        WriteField(author.EarliestCommitDateUtc);
+        NextRecord();
     }
 }

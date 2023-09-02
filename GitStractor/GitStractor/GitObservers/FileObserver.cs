@@ -4,61 +4,35 @@ using System.Globalization;
 
 namespace GitStractor.GitObservers;
 
-public class FileObserver : IGitObserver, IDisposable
+public class FileObserver : FileWriterObserverBase
 {
-    private string _outputPath = Environment.CurrentDirectory;
-    private CsvWriter? _writer;
+    public override string Filename => "Files.csv";
 
-    public void OnBeginningIteration(int totalCommits, string outputPath)
+    public override void OnProcessingCommit(string sha, bool isLast)
     {
-        _outputPath = outputPath;
-    }
+        base.OnProcessingCommit(sha, isLast);
 
-    public void OnNewAuthor(AuthorInfo author)
-    {
-    }
-
-    public void OnCompletedIteration(string outputPath)
-    {
-    }
-
-    public void OnProcessingCommit(string sha, bool isLast)
-    {
         if (!isLast) return;
 
-        _writer = new CsvWriter(new StreamWriter(Path.Combine(_outputPath, "Files.csv"), append: false), CultureInfo.InvariantCulture);
-        _writer.WriteField("Commit Sha");
-        _writer.WriteField("File Sha");
-        _writer.WriteField("Lines");
-        _writer.WriteField("Bytes");
-        _writer.WriteField("Path");
-        _writer.NextRecord();
+        WriteField("Commit Sha");
+        WriteField("File Sha");
+        WriteField("Lines");
+        WriteField("Bytes");
+        WriteField("Path");
+        NextRecord();
     }
 
-    public void OnProcessedCommit(CommitInfo commit)
+    public override void OnProcessingFile(RepositoryFileInfo fileInfo, string commitSha)
     {
-    }
+        base.OnProcessingFile(fileInfo, commitSha);
 
-    public void OnProcessingFile(RepositoryFileInfo fileInfo, string commitSha)
-    {
-        if (_writer == null || fileInfo.State != FileState.Final) return;
+        if (fileInfo.State != FileState.Final) return;
 
-        _writer.WriteField(fileInfo.Commit);
-        _writer.WriteField(fileInfo.Sha);
-        _writer.WriteField(fileInfo.Lines);
-        _writer.WriteField(fileInfo.Bytes);
-        _writer.WriteField(fileInfo.Path);
-        _writer.NextRecord();
-    }
-
-    public void UpdateProgress(double percent, int commitNum, double totalCommits)
-    {
-    }
-
-    public void Dispose()
-    {
-        GC.SuppressFinalize(this);
-        _writer?.Dispose();
-        _writer = null;
+        WriteField(fileInfo.Commit);
+        WriteField(fileInfo.Sha);
+        WriteField(fileInfo.Lines);
+        WriteField(fileInfo.Bytes);
+        WriteField(fileInfo.Path);
+        NextRecord();
     }
 }

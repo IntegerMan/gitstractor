@@ -1,6 +1,4 @@
-﻿using GitStractor.Cloning;
-using GitStractor.Writers;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace GitStractor.Workers;
@@ -16,7 +14,7 @@ public class GitStractorExtractWorker : GitStractorWorkerBase {
 
     public override string Name => "GitStractor-Extract";
 
-    public const int InitialDelayInSeconds = 2;
+    public const int InitialDelayInMilliseconds = 200;
 
     public GitStractorExtractWorker(ILogger<GitStractorExtractWorker> log, IOptions<GitStractorExtractOptions> options, GitDataExtractor extractor) : base(log) {
         _options = options.Value;
@@ -25,7 +23,7 @@ public class GitStractorExtractWorker : GitStractorWorkerBase {
 
     protected override async Task OnStartAsync() {
         // TODO: This belongs in a new base class
-        _timer = new Timer(DoWork, null, TimeSpan.FromSeconds(InitialDelayInSeconds), TimeSpan.FromMilliseconds(-1));
+        _timer = new Timer(DoWork, null, TimeSpan.FromMilliseconds(InitialDelayInMilliseconds), TimeSpan.FromMilliseconds(-1));
 
         await base.OnStartAsync();
     }

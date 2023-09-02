@@ -1,9 +1,7 @@
 ﻿using GitStractor.GitObservers;
 using GitStractor.Model;
 using GitStractor.Utilities;
-using LibGit2Sharp;
 using Microsoft.Extensions.Logging;
-using System;
 
 namespace GitStractor;
 
@@ -59,7 +57,7 @@ public class GitDataExtractor {
                 SortBy = CommitSortStrategies.Reverse,
 
                 // Don't include branch details
-                FirstParentOnly = false,
+                FirstParentOnly = true,
 
                 // We only want to look at commits that are reachable from whatever is HEAD at the moment
                 IncludeReachableFrom = repo.Head

@@ -1,65 +1,38 @@
-﻿using CsvHelper;
-using GitStractor.Model;
-using System.Globalization;
+﻿using GitStractor.Model;
 
 namespace GitStractor.GitObservers;
 
-public class FileCommitObserver : IGitObserver, IDisposable
+public class FileCommitObserver : FileWriterObserverBase
 {
-    private CsvWriter? _writer;
+    public override string Filename => "FileCommits.csv";
 
-    public void OnBeginningIteration(int totalCommits, string outputPath)
+    public override void OnBeginningIteration(int totalCommits, string outputPath)
     {
-        _writer = new CsvWriter(new StreamWriter(Path.Combine(outputPath, "FileCommits.csv"), append: false), CultureInfo.InvariantCulture);
-        _writer.WriteField("Commit");
-        _writer.WriteField("Type");
-        _writer.WriteField("Path");
-        _writer.WriteField("Lines Added");
-        _writer.WriteField("Lines Deleted");
-        _writer.NextRecord();
+        base.OnBeginningIteration(totalCommits, outputPath);
+
+        WriteField("Commit");
+        WriteField("Type");
+        WriteField("Path");
+        WriteField("Lines Added");
+        WriteField("Lines Deleted");
+        NextRecord();
     }
 
-    public void OnNewAuthor(AuthorInfo author)
+    public override void OnProcessingFile(RepositoryFileInfo fileInfo, string commitSha)
     {
-    }
+        base.OnProcessingFile(fileInfo, commitSha);
 
-    public void OnCompletedIteration(string outputPath)
-    {
-    }
-
-    public void OnProcessingCommit(string sha, bool isLast)
-    {
-    }
-
-    public void OnProcessedCommit(CommitInfo commit)
-    {
-    }
-
-    public void OnProcessingFile(RepositoryFileInfo fileInfo, string commitSha)
-    {
-        if (_writer == null ||
-            commitSha != fileInfo.Commit ||
+        if (commitSha != fileInfo.Commit ||
             fileInfo.State == FileState.Final ||
             fileInfo.State == FileState.Ignored ||
             fileInfo.State == FileState.Untracked)
             return;
 
-        _writer.WriteField(fileInfo.Commit);
-        _writer.WriteField(fileInfo.State.ToString());
-        _writer.WriteField(fileInfo.Path);
-        _writer.WriteField(fileInfo.LinesAdded);
-        _writer.WriteField(fileInfo.LinesDeleted);
-        _writer.NextRecord();
-    }
-
-    public void UpdateProgress(double percent, int commitNum, double totalCommits)
-    {
-    }
-
-    public void Dispose()
-    {
-        GC.SuppressFinalize(this);
-        _writer?.Dispose();
-        _writer = null;
+        WriteField(fileInfo.Commit);
+        WriteField(fileInfo.State.ToString());
+        WriteField(fileInfo.Path);
+        WriteField(fileInfo.LinesAdded);
+        WriteField(fileInfo.LinesDeleted);
+        NextRecord();
     }
 }
