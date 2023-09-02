@@ -24,7 +24,7 @@ public class LoggingGitObserver : IGitObserver {
         Log.LogInformation($"Found new author: {author.Name} ({author.Email})");
     }
 
-    public void OnProcessingCommit(string sha) {
+    public void OnProcessingCommit(string sha, bool isLast) {
         Log.LogDebug($"Analyzing commit {sha.Substring(0, 5)}");
     }
 

@@ -19,7 +19,7 @@ public class FileCommitObserver : IGitObserver, IDisposable {
     public void OnCompletedIteration(string outputPath) {
     }
 
-    public void OnProcessingCommit(string sha) {
+    public void OnProcessingCommit(string sha, bool isLast) {
         _writer = new CsvWriter(new StreamWriter(Path.Combine(_outputPath, $"Files_{sha}.csv"), append: false), CultureInfo.InvariantCulture);
         _writer.WriteField("CommitSha");
         _writer.WriteField("FileSha");

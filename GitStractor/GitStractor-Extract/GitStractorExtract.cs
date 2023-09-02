@@ -16,7 +16,8 @@ public class GitStractorExtract : GitStractorProgram {
                 services.AddTransient<IGitObserver, LoggingGitObserver>();
                 services.AddTransient<IGitObserver, GitAuthorObserver>();
                 services.AddTransient<IGitObserver, GitCommitObserver>();
-                services.AddTransient<IGitObserver, FileCommitObserver>();
+                services.AddTransient<IGitObserver, FileObserver>();
+                //services.AddTransient<IGitObserver, FileCommitObserver>();
                 services.AddTransient(provider => provider.GetServices<IGitObserver>().ToList());
 
                 services.AddTransient<GitDataExtractor>();

@@ -32,7 +32,7 @@ public class GitCommitObserver : IGitObserver, IDisposable {
         _writer = null;
     }
 
-    public void OnProcessingCommit(string sha) {
+    public void OnProcessingCommit(string sha, bool isLast) {
 
     }
 
