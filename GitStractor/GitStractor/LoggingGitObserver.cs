@@ -24,9 +24,16 @@ public class LoggingGitObserver : IGitObserver {
         Log.LogInformation($"Found new author: {author.Name} ({author.Email})");
     }
 
-    public void OnProcessingCommit(CommitInfo commit, bool isLast) {
+    public void OnProcessingCommit(string sha) {
+        Log.LogDebug($"Analyzing commit {sha.Substring(0, 5)}");
+    }
+
+    public void OnProcessedCommit(CommitInfo commit) {
         string displayMessage = commit.Message.Substring(0, Math.Min(commit.Message.Length, 140));
-        Log.LogDebug($"Analyzing commit {commit.Sha.Substring(0, 5)} by {commit.Author.Name}: {displayMessage}");
+        Log.LogDebug($"Analyzed commit {commit.Sha.Substring(0, 5)} by {commit.Author.Name}: {displayMessage}");
+    }
+
+    public void OnProcessingFile(RepositoryFileInfo fileInfo) {
     }
 
     public void UpdateProgress(double percent, int commitNum, double totalCommits) {

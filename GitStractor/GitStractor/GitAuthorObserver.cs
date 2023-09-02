@@ -33,7 +33,10 @@ public class GitAuthorObserver : IGitObserver, IDisposable {
         _writer = null;
     }
 
-    public void OnProcessingCommit(CommitInfo commit, bool isLast) {
+    public void OnProcessingCommit(string sha) {
+    }
+
+    public void OnProcessedCommit(CommitInfo commit) {
     }
 
     public void UpdateProgress(double percent, int commitNum, double totalCommits) {
@@ -42,5 +45,8 @@ public class GitAuthorObserver : IGitObserver, IDisposable {
     public void Dispose() {
         GC.SuppressFinalize(this);
         _writer?.Dispose();
+    }
+
+    public void OnProcessingFile(RepositoryFileInfo fileInfo) {
     }
 }

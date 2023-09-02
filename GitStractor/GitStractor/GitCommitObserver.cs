@@ -32,7 +32,11 @@ public class GitCommitObserver : IGitObserver, IDisposable {
         _writer = null;
     }
 
-    public void OnProcessingCommit(CommitInfo commit, bool isLast) {
+    public void OnProcessingCommit(string sha) {
+
+    }
+
+    public void OnProcessedCommit(CommitInfo commit) {
         _writer!.WriteField(commit.Sha);
         _writer.WriteField(commit.ParentSha);
         _writer.WriteField(commit.Parent2Sha);
@@ -53,5 +57,8 @@ public class GitCommitObserver : IGitObserver, IDisposable {
     public void Dispose() {
         GC.SuppressFinalize(this);
         _writer?.Dispose();
+    }
+
+    public void OnProcessingFile(RepositoryFileInfo fileInfo) {
     }
 }

@@ -23,12 +23,12 @@ public class GitTreeWalker {
 
     private readonly Dictionary<string, GitTreeInfo> _trees = new();
 
-    public GitTreeInfo WalkCommitTree(Commit commit) {
+    public GitTreeInfo WalkCommitTree(Commit commit, List<IGitObserver> observers) {
         GitTreeInfo treeInfo = new();
         _trees[commit.Tree.Sha] = treeInfo;
 
         // Walk the commit tree to get file information
-        WalkTree(commit, commit.Tree, treeInfo);
+        WalkTree(commit, commit.Tree, treeInfo, observers);
 
         // Detect any Deleted Files
         // Get what we know about the parent commit this came from
@@ -48,7 +48,7 @@ public class GitTreeWalker {
         return treeInfo;
     }
 
-    private void WalkTree(Commit commit, Tree tree, GitTreeInfo treeInfo) {
+    private void WalkTree(Commit commit, Tree tree, GitTreeInfo treeInfo, List<IGitObserver> observers) {
         Queue<TreeEntry> entries = new(tree);
 
         while (entries.Count > 0) {
@@ -79,7 +79,7 @@ public class GitTreeWalker {
                     // Add or update our entry for the file's path
                     _pathShas[fileLower] = treeEntry.Target.Sha;
 
-                    //_options.FileWriter.WriteFile(fileInfo);
+                    observers.ForEach(o => o.OnProcessingFile(fileInfo));
                     break;
 
                 case Mode.Directory:

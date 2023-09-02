@@ -74,7 +74,7 @@ public class GitDataExtractor {
             foreach (Commit commit in SearchCommits(repo, filter)) {
                 commitNum++;
                 bool isLast = commit == repo.Head.Tip;
-                ProcessCommit(commit, isLast);
+                ProcessCommit(commit);
 
                 UpdateProgress(totalCommits, commitNum);
             }
@@ -106,9 +106,10 @@ public class GitDataExtractor {
 
     private ICommitLog SearchCommits(Repository repo, CommitFilter filter) => repo.Commits.QueryBy(filter);
 
-    private void ProcessCommit(Commit commit, bool isLast) {
+    private void ProcessCommit(Commit commit) {
 
-        GitTreeInfo treeInfo = _treeWalker.WalkCommitTree(commit);
+        Observers.ForEach(o => o.OnProcessingCommit(commit.Sha));
+        GitTreeInfo treeInfo = _treeWalker.WalkCommitTree(commit, Observers);
 
         // Identify author
         AuthorInfo author = GetOrCreateAuthor(commit.Author, true);
@@ -118,7 +119,7 @@ public class GitDataExtractor {
         CommitInfo info = CreateCommitFromLibGitCommit(commit, author, committer, treeInfo);
 
         // Write the commit to the appropriate writers
-        Observers.ForEach(o => o.OnProcessingCommit(info, isLast));
+        Observers.ForEach(o => o.OnProcessedCommit(info));
     }
 
     private AuthorInfo GetOrCreateAuthor(Signature signature, bool isAuthor) {
