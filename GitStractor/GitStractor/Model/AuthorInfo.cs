@@ -9,6 +9,9 @@ public class AuthorInfo
     public int NumCommits { get; set; }
     public int LinesAdded { get; set; }
     public int LinesDeleted { get; set; }
+    public int FilesAdded { get; set; }
+    public int FilesDeleted { get; set; }
+    public int FilesModified { get; set; }
 
     public required DateTime EarliestCommitDateUtc { get; set; }
     public required DateTime LatestCommitDateUtc { get; set; }

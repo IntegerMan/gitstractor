@@ -4,16 +4,14 @@ namespace GitStractor.Model;
 /// This class is an abstraction representing another commit.
 /// It exists so that changes to LibGit2Sharp do not propagate throughout the application.
 /// </summary>
-public class CommitInfo
-{
+public class CommitInfo {
     private readonly List<RepositoryFileInfo> _files;
 
     /// <summary>
     /// Creates a new instance of <see cref="CommitInfo"/>.
     /// </summary>
     /// <param name="files">The files associated with the commit</param>
-    public CommitInfo(IEnumerable<RepositoryFileInfo> files)
-    {
+    public CommitInfo(IEnumerable<RepositoryFileInfo> files) {
         _files = new List<RepositoryFileInfo>(files);
     }
 
@@ -21,7 +19,7 @@ public class CommitInfo
     /// The commit message
     /// </summary>
     public required string Message { get; init; }
-    
+
     /// <summary>
     /// Gets the total number of files in the working tree as of this commit. This is typically not the amount of files
     /// modified by the commit.
@@ -72,18 +70,20 @@ public class CommitInfo
     /// <summary>
     /// The number of files in the commit's tree
     /// </summary>
-    public uint NumFiles => (uint)(_files.Count + DeletedFiles);
-    
+    public uint NumFiles => (uint)(_files.Count + FilesDeleted);
+
     /// <summary>
     /// The number of files in this commit's tree that didn't appear with the same path previously
     /// </summary>
-    public int AddedFiles { get; set; }
-    
+    public int FilesAdded { get; set; }
+
     /// <summary>
     /// The number of files in the prior commit's tree that didn't appear in this tree's
     /// </summary>
-    public int DeletedFiles { get; set; }
-    
+    public int FilesDeleted { get; set; }
+
+    public int FilesModified {get; set;}
+
     /// <summary>
     /// The names of the files modified by the commit
     /// </summary>
@@ -100,6 +100,6 @@ public class CommitInfo
     /// <inheritdoc />
     public override string ToString()
     {
-        return $"{Sha[..6]} {Author.Name} @ {AuthorDateLocal.ToShortDateString()} {AuthorDateLocal.ToShortTimeString()}: {Message} ({NumFiles} file(s), +{AddedFiles}/-{DeletedFiles})";
+        return $"{Sha[..6]} {Author.Name} @ {AuthorDateLocal.ToShortDateString()} {AuthorDateLocal.ToShortTimeString()}: {Message} ({NumFiles} file(s), +{FilesAdded}/-{FilesDeleted})";
     }
 }

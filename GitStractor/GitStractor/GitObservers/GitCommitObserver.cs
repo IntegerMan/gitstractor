@@ -37,8 +37,8 @@ public class GitCommitObserver : FileWriterObserverBase
         WriteField(commit.CommitterDateUtc);
         WriteField(commit.Message);
         WriteField(commit.TotalFiles);
-        WriteField(commit.AddedFiles);
-        WriteField(commit.DeletedFiles);
+        WriteField(commit.FilesAdded);
+        WriteField(commit.FilesDeleted);
         NextRecord();
     }
 }

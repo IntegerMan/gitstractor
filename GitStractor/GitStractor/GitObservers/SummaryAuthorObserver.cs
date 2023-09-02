@@ -18,6 +18,9 @@ public class SummaryAuthorObserver : FileWriterObserverBase
         WriteField("Num Commits");
         WriteField("Lines Added");
         WriteField("Lines Deleted");
+        WriteField("Files Added");
+        WriteField("Files Deleted");
+        WriteField("Files Modified");
         WriteField("First Commit Date UTC");
         WriteField("Last Commit Date UTC");
         NextRecord();
@@ -40,6 +43,9 @@ public class SummaryAuthorObserver : FileWriterObserverBase
             WriteField(author.NumCommits);
             WriteField(author.LinesAdded);
             WriteField(author.LinesDeleted);
+            WriteField(author.FilesAdded);
+            WriteField(author.FilesDeleted);
+            WriteField(author.FilesModified);
             WriteField(author.EarliestCommitDateUtc);
             WriteField(author.LatestCommitDateUtc);
             NextRecord();

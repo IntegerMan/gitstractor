@@ -114,10 +114,16 @@ public class GitDataExtractor {
         AuthorInfo committer = GetOrCreateAuthor(commit.Author, false);
 
         // Create the commit summary info.
+        if (author.Name.Contains("Eland")) {
+            int i = 42;
+        }
         CommitInfo info = CreateCommitFromLibGitCommit(commit, author, committer, treeInfo);
 
         author.LinesDeleted += info.LinesDeleted;
         author.LinesAdded += info.LinesAdded;
+        author.FilesAdded += info.FilesAdded;
+        author.FilesDeleted += info.FilesDeleted;
+        author.FilesModified += info.FilesModified;
 
         // Write the commit to the appropriate writers
         Observers.ForEach(o => o.OnProcessedCommit(info));
@@ -166,8 +172,9 @@ public class GitDataExtractor {
             Message = commit.MessageShort, // This is just the first line of the commit message. Usually all that's needed
 
             TotalFiles = treeInfo.TotalFileCount,
-            AddedFiles = treeInfo.AddedFileCount,
-            DeletedFiles = treeInfo.DeletedFileCount,
+            FilesAdded = treeInfo.AddedFileCount,
+            FilesDeleted = treeInfo.DeletedFileCount,
+            FilesModified = treeInfo.ChangedFileCount,
             LinesAdded = treeInfo.LinesAdded,
             LinesDeleted = treeInfo.LinesDeleted,
 
