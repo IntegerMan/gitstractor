@@ -10,12 +10,13 @@ public class GitCommitObserver : IGitObserver, IDisposable {
     public void OnBeginningIteration(int totalCommits, string outputPath) {
         _writer = new CsvWriter(new StreamWriter(Path.Combine(outputPath, "Commits.csv"), append: false), CultureInfo.InvariantCulture);
         _writer.WriteField("Sha");
+        _writer.WriteField("ParentSha");
+        _writer.WriteField("Parent2Sha");
         _writer.WriteField("AuthorId");
         _writer.WriteField("AuthorDateUtc");
         _writer.WriteField("CommitterId");
         _writer.WriteField("CommitterDateUtc");
         _writer.WriteField("Message");
-        _writer.WriteField("ParentSha");
         _writer.WriteField("Total Files");
         _writer.WriteField("Added Files");
         _writer.WriteField("Deleted Files");
@@ -32,14 +33,14 @@ public class GitCommitObserver : IGitObserver, IDisposable {
     }
 
     public void OnProcessingCommit(CommitInfo commit, bool isLast) {
-        //_writer!.WriteRecord(commit);
         _writer!.WriteField(commit.Sha);
+        _writer.WriteField(commit.ParentSha);
+        _writer.WriteField(commit.Parent2Sha);
         _writer.WriteField(commit.Author.Id);
         _writer.WriteField(commit.AuthorDateUtc);
         _writer.WriteField(commit.Committer.Id);
         _writer.WriteField(commit.CommitterDateUtc);
         _writer.WriteField(commit.Message);
-        _writer.WriteField(commit.ParentSha);
         _writer.WriteField(commit.TotalFiles);
         _writer.WriteField(commit.AddedFiles);
         _writer.WriteField(commit.DeletedFiles);

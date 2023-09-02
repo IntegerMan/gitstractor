@@ -1,4 +1,4 @@
-﻿namespace GitStractor.Model;
+namespace GitStractor.Model;
 
 /// <summary>
 /// This class is an abstraction representing another commit.
@@ -100,6 +100,7 @@ public class CommitInfo
     public string FileNames => string.Join(", ", Files);
 
     public string? ParentSha { get; init; }
+    public string? Parent2Sha { get; init; }
 
     /// <inheritdoc />
     public override string ToString()

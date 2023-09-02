@@ -59,7 +59,7 @@ public class GitDataExtractor {
                 SortBy = CommitSortStrategies.Reverse,
 
                 // Don't include branch details
-                FirstParentOnly = true,
+                FirstParentOnly = false,
 
                 // We only want to look at commits that are reachable from whatever is HEAD at the moment
                 IncludeReachableFrom = repo.Head
@@ -158,7 +158,9 @@ public class GitDataExtractor {
         => new(treeInfo.ModifiedFiles) {
             Sha = commit.Sha,
             ParentSha = commit.Parents.FirstOrDefault()?.Sha,
+            Parent2Sha = commit.Parents.Count() > 1 ? commit.Parents.Last().Sha : null,
             Message = commit.MessageShort, // This is just the first line of the commit message. Usually all that's needed
+
             SizeInBytes = treeInfo.Bytes,
             TotalFiles = treeInfo.TotalFileCount,
             AddedFiles = treeInfo.AddedFileCount,
