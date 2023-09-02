@@ -14,6 +14,8 @@ public class FileCommitObserver : IGitObserver, IDisposable
         _writer.WriteField("Commit");
         _writer.WriteField("Type");
         _writer.WriteField("Path");
+        _writer.WriteField("Lines Added");
+        _writer.WriteField("Lines Deleted");
         _writer.NextRecord();
     }
 
@@ -45,6 +47,8 @@ public class FileCommitObserver : IGitObserver, IDisposable
         _writer.WriteField(fileInfo.Commit);
         _writer.WriteField(fileInfo.State.ToString());
         _writer.WriteField(fileInfo.Path);
+        _writer.WriteField(fileInfo.LinesAdded);
+        _writer.WriteField(fileInfo.LinesDeleted);
         _writer.NextRecord();
     }
 

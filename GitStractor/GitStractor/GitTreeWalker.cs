@@ -1,52 +1,25 @@
 ﻿using GitStractor.GitObservers;
 using GitStractor.Model;
-using LibGit2Sharp;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace GitStractor;
 
 public class GitTreeWalker {
 
     public ILogger<GitTreeWalker> Log { get; set; }
-    private readonly Dictionary<string, string> _pathShas = new();
-    private readonly Dictionary<string, RepositoryFileInfo> _fileInfo = new();
-    private readonly Dictionary<string, Tree> _trees = new();
 
     public GitTreeWalker(ILogger<GitTreeWalker> log) {
         Log = log;
     }
 
-
     public GitTreeInfo WalkCommitTree(Commit commit, Repository repo, List<IGitObserver> observers) {
         GitTreeInfo treeInfo = new();
-        _trees[commit.Sha] = commit.Tree;
 
         TreeChanges changes = repo.Diff.Compare<TreeChanges>(commit.Parents.FirstOrDefault()?.Tree, commit.Tree);
+        PatchStats patchStats = repo.Diff.Compare<PatchStats>(commit.Parents.FirstOrDefault()?.Tree, commit.Tree);
 
         foreach (TreeEntryChanges change in changes) {
-            ChangeKind kind = change.Status;
-            FileState state = GetFileState(kind);
-
-            RepositoryFileInfo fileInfo = new() {
-                Sha = change.Oid.Sha,
-                Commit = commit.Sha,
-                Path = change.Path,
-                OldPath = change.Path == change.OldPath ? null : change.OldPath,
-                Lines = 0, // TODO
-                LinesDelta = 0, // TODO
-                Bytes = 0,
-                State = state
-            };
-            treeInfo.Register(fileInfo);
-            observers.ForEach(o => o.OnProcessingFile(fileInfo, commit.Sha));
+            ProcessTreeChange(commit, observers, treeInfo, change, patchStats[change.Path]);
         }
 
         if (commit == repo.Head.Tip) {
@@ -54,6 +27,26 @@ public class GitTreeWalker {
         }
 
         return treeInfo;
+    }
+
+    private static void ProcessTreeChange(Commit commit, List<IGitObserver> observers, GitTreeInfo treeInfo, TreeEntryChanges change, ContentChangeStats stats) {
+        ChangeKind kind = change.Status;
+        FileState state = GetFileState(kind);
+
+        RepositoryFileInfo fileInfo = new() {
+            Sha = change.Oid.Sha,
+            Commit = commit.Sha,
+            Path = change.Path,
+            OldPath = change.Path == change.OldPath ? null : change.OldPath,
+            LinesDeleted = stats.LinesDeleted,
+            LinesAdded = stats.LinesAdded,
+            LinesDelta = stats.LinesAdded - stats.LinesDeleted,
+            Lines = 0,
+            Bytes = 0,
+            State = state
+        };
+        treeInfo.Register(fileInfo);
+        observers.ForEach(o => o.OnProcessingFile(fileInfo, commit.Sha));
     }
 
     private static FileState GetFileState(ChangeKind kind)
@@ -72,6 +65,7 @@ public class GitTreeWalker {
         };
 
     private void WalkTree(Commit commit, GitTreeInfo treeInfo, List<IGitObserver> observers) {
+        // Using a Queue here is more efficient with the call stack for deep hierarchies than using recursion
         Queue<TreeEntry> entries = new(commit.Tree);
 
         while (entries.Count > 0) {
@@ -80,24 +74,9 @@ public class GitTreeWalker {
             switch (treeEntry.Mode) {
                 case Mode.NonExecutableFile:
                 case Mode.NonExecutableGroupWritableFile:
+                case Mode.ExecutableFile:
                     Blob blob = (Blob)treeEntry.Target;
-
-                    (int lines, ulong bytes) = CountLinesAndBytes(blob);
-
-                    RepositoryFileInfo fileInfo = new() {
-                        Sha = blob.Id.Sha,
-                        Commit = commit.Sha,
-                        Path = treeEntry.Path,
-                        OldPath = null,
-                        Lines = lines,
-                        LinesDelta = 0,
-                        Bytes = bytes,
-                        State = FileState.Final
-                    };
-
-                    treeInfo.Register(fileInfo);
-
-                    observers.ForEach(o => o.OnProcessingFile(fileInfo, commit.Sha));
+                    ProcessFile(commit, treeInfo, blob, treeEntry.Path, observers);
                     break;
 
                 case Mode.Directory:
@@ -110,21 +89,31 @@ public class GitTreeWalker {
                 case Mode.SymbolicLink:
                     Log.LogWarning("Repository contained a Symbolic Link which is not currently supported by GitStractor. Some entries may be missing");
                     break;
+
                 case Mode.GitLink:
                     Log.LogWarning("Repository contained a GitLink which is not currently supported by GitStractor. Some entries may be missing");
-                    break;
-                case Mode.ExecutableFile:
-                    // Maybe this is supportable as a standard file?
-                    Log.LogWarning("Repository contained an executable file which is not currently supported by GitStractor. Some entries may be missing");
                     break;
             }
         }
     }
 
-    public void Clear() {
-        _trees.Clear();
-        _pathShas.Clear();
-        _fileInfo.Clear();
+    private static void ProcessFile(Commit commit, GitTreeInfo treeInfo, Blob blob, string path, List<IGitObserver> observers) {
+        (int lines, ulong bytes) = CountLinesAndBytes(blob);
+
+        RepositoryFileInfo fileInfo = new() {
+            Sha = blob.Id.Sha,
+            Commit = commit.Sha,
+            Path = path,
+            OldPath = null,
+            Lines = lines,
+            LinesDelta = 0,
+            Bytes = bytes,
+            State = FileState.Final
+        };
+
+        treeInfo.Register(fileInfo);
+
+        observers.ForEach(o => o.OnProcessingFile(fileInfo, commit.Sha));
     }
 
     public static (int lines, ulong bytes) CountLinesAndBytes(Blob blob) {

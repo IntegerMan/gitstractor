@@ -34,6 +34,8 @@ public class RepositoryFileInfo
     public required int Lines { get; init; }
     public required int LinesDelta { get; init; }
     public string? OldPath { get; init; }
+    public int LinesDeleted { get; internal set; }
+    public int LinesAdded { get; internal set; }
 
     public override string ToString() 
         => $"{Sha[..6]} {Path} @ {Commit[..6]} ({State})";

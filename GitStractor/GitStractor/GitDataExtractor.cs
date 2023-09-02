@@ -31,7 +31,6 @@ public class GitDataExtractor {
 
         // Clear old state
         _authors.Clear();
-        _treeWalker.Clear();
 
         // If we got a git directory that isn't actually a git directory, look for a .git file in its parents
         string? gitPath = FileUtilities.GetParentGitDirectory(repoPath);
