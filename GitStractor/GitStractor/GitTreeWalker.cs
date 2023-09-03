@@ -73,9 +73,12 @@ public class GitTreeWalker {
         Queue<TreeEntry> entries = new(tree);
         while (entries.Count > 0) {
             TreeEntry entry = entries.Dequeue();
+            
             if (entry.TargetType == TreeEntryTargetType.Blob && entry.Path == path) {
                 return (Blob)entry.Target;
-            } else if (entry.TargetType == TreeEntryTargetType.Tree) {
+            } 
+            
+            if (entry.TargetType == TreeEntryTargetType.Tree) {
                 foreach (TreeEntry nestedEntry in (Tree)entry.Target) {
                     entries.Enqueue(nestedEntry);
                 }
