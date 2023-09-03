@@ -13,6 +13,7 @@ public class GitCommitObserver : FileWriterObserverBase
         WriteField("Sha");
         WriteField("ParentSha");
         WriteField("Parent2Sha");
+        WriteField("IsMerge");
         WriteField("AuthorId");
         WriteField("AuthorDateUtc");
         WriteField("CommitterId");
@@ -31,6 +32,7 @@ public class GitCommitObserver : FileWriterObserverBase
         WriteField(commit.Sha);
         WriteField(commit.ParentSha);
         WriteField(commit.Parent2Sha);
+        WriteField(commit.IsMerge);
         WriteField(commit.Author.Id);
         WriteField(commit.AuthorDateUtc);
         WriteField(commit.Committer.Id);

@@ -2,7 +2,7 @@
 
 namespace GitStractor.GitObservers;
 
-public class FileCommitObserver : FileWriterObserverBase
+public class DenormalizedFileCommitObserver : FileWriterObserverBase
 {
     public override string Filename => "FileCommits.csv";
 
@@ -15,14 +15,17 @@ public class FileCommitObserver : FileWriterObserverBase
         WriteField("Path");
         WriteField("Lines Added");
         WriteField("Lines Deleted");
+        WriteField("Commit Author");
+        WriteField("Commit Date UTC");
+        WriteField("Commit Message");
         NextRecord();
     }
 
-    public override void OnProcessingFile(RepositoryFileInfo fileInfo, CommitInfo commit)
+    public override void OnProcessingFile(RepositoryFileInfo fileInfo, CommitInfo commitInfo)
     {
-        base.OnProcessingFile(fileInfo, commit);
+        base.OnProcessingFile(fileInfo, commitInfo);
 
-        if (commit.Sha != fileInfo.Commit ||
+        if (commitInfo.Sha != fileInfo.Commit ||
             fileInfo.State == FileState.Final ||
             fileInfo.State == FileState.Ignored ||
             fileInfo.State == FileState.Untracked)
@@ -33,6 +36,9 @@ public class FileCommitObserver : FileWriterObserverBase
         WriteField(fileInfo.Path);
         WriteField(fileInfo.LinesAdded);
         WriteField(fileInfo.LinesDeleted);
+        WriteField(commitInfo.Author.Id);
+        WriteField(commitInfo.AuthorDateUtc);
+        WriteField(commitInfo.Message);
         NextRecord();
     }
 }

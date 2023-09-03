@@ -35,7 +35,7 @@ public abstract class FileWriterObserverBase : IGitObserver, IDisposable {
     public virtual void OnProcessingCommit(string sha, bool isLast) {
     }
 
-    public virtual void OnProcessingFile(RepositoryFileInfo fileInfo, string commitSha) {
+    public virtual void OnProcessingFile(RepositoryFileInfo fileInfo, CommitInfo commitInfo) {
     }
 
     public virtual void UpdateProgress(double percent, int commitNum, double totalCommits) {

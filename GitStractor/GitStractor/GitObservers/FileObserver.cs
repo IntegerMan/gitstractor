@@ -17,21 +17,19 @@ public class FileObserver : FileWriterObserverBase
         WriteField("Commit Sha");
         WriteField("File Sha");
         WriteField("Lines");
-        WriteField("Bytes");
         WriteField("Path");
         NextRecord();
     }
 
-    public override void OnProcessingFile(RepositoryFileInfo fileInfo, string commitSha)
+    public override void OnProcessingFile(RepositoryFileInfo fileInfo, CommitInfo commit)
     {
-        base.OnProcessingFile(fileInfo, commitSha);
+        base.OnProcessingFile(fileInfo, commit);
 
         if (fileInfo.State != FileState.Final) return;
 
         WriteField(fileInfo.Commit);
         WriteField(fileInfo.Sha);
         WriteField(fileInfo.Lines);
-        WriteField(fileInfo.Bytes);
         WriteField(fileInfo.Path);
         NextRecord();
     }

@@ -105,19 +105,24 @@ public class GitDataExtractor {
 
     private void ProcessCommit(Commit commit, Repository repo) {
         bool isLast = commit == repo.Head.Tip;
-
         Observers.ForEach(o => o.OnProcessingCommit(commit.Sha, isLast));
-        GitTreeInfo treeInfo = _treeWalker.WalkCommitTree(commit, repo, Observers);
 
         // Identify author
         AuthorInfo author = GetOrCreateAuthor(commit.Author, true);
-        AuthorInfo committer = GetOrCreateAuthor(commit.Author, false);
+        AuthorInfo committer = GetOrCreateAuthor(commit.Committer, false);
 
         // Create the commit summary info.
-        if (author.Name.Contains("Eland")) {
-            int i = 42;
-        }
-        CommitInfo info = CreateCommitFromLibGitCommit(commit, author, committer, treeInfo);
+        CommitInfo info = CreateCommitFromLibGitCommit(commit, author, committer);
+
+        // Parse Commit
+        GitTreeInfo treeInfo = _treeWalker.WalkCommitTree(commit, info, repo, Observers);
+
+        info.TotalFiles = treeInfo.TotalFileCount;
+        info.FilesAdded = treeInfo.AddedFileCount;
+        info.FilesDeleted = treeInfo.DeletedFileCount;
+        info.FilesModified = treeInfo.ChangedFileCount;
+        info.LinesAdded = treeInfo.LinesAdded;
+        info.LinesDeleted = treeInfo.LinesDeleted;
 
         author.LinesDeleted += info.LinesDeleted;
         author.LinesAdded += info.LinesAdded;
@@ -163,20 +168,12 @@ public class GitDataExtractor {
     private static CommitInfo CreateCommitFromLibGitCommit(
         Commit commit,
         AuthorInfo author,
-        AuthorInfo committer,
-        GitTreeInfo treeInfo)
-        => new(treeInfo.ModifiedFiles) {
+        AuthorInfo committer)
+        => new() {
             Sha = commit.Sha,
             ParentSha = commit.Parents.FirstOrDefault()?.Sha,
             Parent2Sha = commit.Parents.Count() > 1 ? commit.Parents.Last().Sha : null,
             Message = commit.MessageShort, // This is just the first line of the commit message. Usually all that's needed
-
-            TotalFiles = treeInfo.TotalFileCount,
-            FilesAdded = treeInfo.AddedFileCount,
-            FilesDeleted = treeInfo.DeletedFileCount,
-            FilesModified = treeInfo.ChangedFileCount,
-            LinesAdded = treeInfo.LinesAdded,
-            LinesDeleted = treeInfo.LinesDeleted,
 
             // Author information. Author is the person who wrote the contents of the commit
             Author = author,

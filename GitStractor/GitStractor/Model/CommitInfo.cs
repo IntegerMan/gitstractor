@@ -5,15 +5,7 @@ namespace GitStractor.Model;
 /// It exists so that changes to LibGit2Sharp do not propagate throughout the application.
 /// </summary>
 public class CommitInfo {
-    private readonly List<RepositoryFileInfo> _files;
-
-    /// <summary>
-    /// Creates a new instance of <see cref="CommitInfo"/>.
-    /// </summary>
-    /// <param name="files">The files associated with the commit</param>
-    public CommitInfo(IEnumerable<RepositoryFileInfo> files) {
-        _files = new List<RepositoryFileInfo>(files);
-    }
+    private readonly List<RepositoryFileInfo> _files = new();
 
     /// <summary>
     /// The commit message
@@ -24,10 +16,10 @@ public class CommitInfo {
     /// Gets the total number of files in the working tree as of this commit. This is typically not the amount of files
     /// modified by the commit.
     /// </summary>
-    public int TotalFiles { get; init; }
+    public int TotalFiles { get; set; }
 
-    public int LinesDeleted { get; init; }
-    public int LinesAdded { get; init; }
+    public int LinesDeleted { get; set; }
+    public int LinesAdded { get; set; }
 
     /// <summary>
     /// The SHA of the commit
@@ -96,6 +88,7 @@ public class CommitInfo {
 
     public string? ParentSha { get; init; }
     public string? Parent2Sha { get; init; }
+    public bool IsMerge => !string.IsNullOrWhiteSpace(ParentSha) && !string.IsNullOrWhiteSpace(Parent2Sha);
 
     /// <inheritdoc />
     public override string ToString()

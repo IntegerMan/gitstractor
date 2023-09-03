@@ -31,7 +31,6 @@ public class LoggingGitObserver : IGitObserver
 
     public void OnProcessingCommit(string sha, bool isLast)
     {
-        Log.LogDebug($"Analyzing commit {sha.Substring(0, 5)}");
     }
 
     public void OnProcessedCommit(CommitInfo commit)
@@ -40,7 +39,7 @@ public class LoggingGitObserver : IGitObserver
         Log.LogDebug($"Analyzed commit {commit.Sha.Substring(0, 5)} by {commit.Author.Name}: {displayMessage}");
     }
 
-    public void OnProcessingFile(RepositoryFileInfo fileInfo, string commitSha)
+    public void OnProcessingFile(RepositoryFileInfo fileInfo, CommitInfo commitInfo)
     {
     }
 

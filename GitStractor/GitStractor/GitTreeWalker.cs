@@ -1,6 +1,7 @@
 ﻿using GitStractor.GitObservers;
 using GitStractor.Model;
 using Microsoft.Extensions.Logging;
+using System.IO;
 
 namespace GitStractor;
 
@@ -12,24 +13,25 @@ public class GitTreeWalker {
         Log = log;
     }
 
-    public GitTreeInfo WalkCommitTree(Commit commit, Repository repo, List<IGitObserver> observers) {
+    public GitTreeInfo WalkCommitTree(Commit commit, CommitInfo commitInfo, Repository repo, List<IGitObserver> observers) {
         GitTreeInfo treeInfo = new();
 
         TreeChanges changes = repo.Diff.Compare<TreeChanges>(commit.Parents.FirstOrDefault()?.Tree, commit.Tree);
         PatchStats patchStats = repo.Diff.Compare<PatchStats>(commit.Parents.FirstOrDefault()?.Tree, commit.Tree);
 
         foreach (TreeEntryChanges change in changes) {
-            ProcessTreeChange(commit, observers, treeInfo, change, patchStats[change.Path]);
+            RepositoryFileInfo fileInfo = ProcessTreeChange(commit, treeInfo, change, patchStats[change.Path]);
+            observers.ForEach(o => o.OnProcessingFile(fileInfo, commitInfo));
         }
 
         if (commit == repo.Head.Tip) {
-            WalkTree(commit, treeInfo, observers);
+            WalkTree(commit, commitInfo, treeInfo, observers);
         }
 
         return treeInfo;
     }
 
-    private static void ProcessTreeChange(Commit commit, List<IGitObserver> observers, GitTreeInfo treeInfo, TreeEntryChanges change, ContentChangeStats stats) {
+    private static RepositoryFileInfo ProcessTreeChange(Commit commit, GitTreeInfo treeInfo, TreeEntryChanges change, ContentChangeStats stats) {
         ChangeKind kind = change.Status;
         FileState state = GetFileState(kind);
 
@@ -41,12 +43,11 @@ public class GitTreeWalker {
             LinesDeleted = stats.LinesDeleted,
             LinesAdded = stats.LinesAdded,
             LinesDelta = stats.LinesAdded - stats.LinesDeleted,
-            Lines = 0,
-            Bytes = 0,
+            Lines = 0, // TODO
             State = state
         };
         treeInfo.Register(fileInfo);
-        observers.ForEach(o => o.OnProcessingFile(fileInfo, commit.Sha));
+        return fileInfo;
     }
 
     private static FileState GetFileState(ChangeKind kind)
@@ -64,7 +65,7 @@ public class GitTreeWalker {
             _ => FileState.Untracked,
         };
 
-    private void WalkTree(Commit commit, GitTreeInfo treeInfo, List<IGitObserver> observers) {
+    private void WalkTree(Commit commit, CommitInfo commitInfo, GitTreeInfo treeInfo, List<IGitObserver> observers) {
         // Using a Queue here is more efficient with the call stack for deep hierarchies than using recursion
         Queue<TreeEntry> entries = new(commit.Tree);
 
@@ -76,7 +77,8 @@ public class GitTreeWalker {
                 case Mode.NonExecutableGroupWritableFile:
                 case Mode.ExecutableFile:
                     Blob blob = (Blob)treeEntry.Target;
-                    ProcessFile(commit, treeInfo, blob, treeEntry.Path, observers);
+                    RepositoryFileInfo fileInfo = ProcessFile(commit, treeInfo, blob, treeEntry.Path);
+                    observers.ForEach(o => o.OnProcessingFile(fileInfo, commitInfo));
                     break;
 
                 case Mode.Directory:
@@ -97,8 +99,8 @@ public class GitTreeWalker {
         }
     }
 
-    private static void ProcessFile(Commit commit, GitTreeInfo treeInfo, Blob blob, string path, List<IGitObserver> observers) {
-        (int lines, ulong bytes) = CountLinesAndBytes(blob);
+    private static RepositoryFileInfo ProcessFile(Commit commit, GitTreeInfo treeInfo, Blob blob, string path) {
+        int lines = CountLines(blob);
 
         RepositoryFileInfo fileInfo = new() {
             Sha = blob.Id.Sha,
@@ -107,28 +109,22 @@ public class GitTreeWalker {
             OldPath = null,
             Lines = lines,
             LinesDelta = 0,
-            Bytes = bytes,
             State = FileState.Final
         };
 
         treeInfo.Register(fileInfo);
-
-        observers.ForEach(o => o.OnProcessingFile(fileInfo, commit.Sha));
+        return fileInfo;
     }
 
-    public static (int lines, ulong bytes) CountLinesAndBytes(Blob blob) {
+    public static int CountLines(Blob blob) {
         int lines = 0;
-        ulong bytes = 0;
         using var stream = blob.GetContentStream();
         using var reader = new StreamReader(stream, Encoding.UTF8, true, 1024, true);
         while (!reader.EndOfStream) {
             string? line = reader.ReadLine();
             lines++;
-            if (line != null) {
-                bytes += (ulong)(Encoding.UTF8.GetByteCount(line) + Encoding.UTF8.GetByteCount(Environment.NewLine));
-            }
         }
-        return (lines, bytes);
+        return lines;
     }
 
 }

@@ -9,6 +9,6 @@ public interface IGitObserver
     void OnNewAuthor(AuthorInfo author);
     void OnProcessingCommit(string sha, bool isLast);
     void OnProcessedCommit(CommitInfo commit);
-    void OnProcessingFile(RepositoryFileInfo fileInfo, string commitSha);
+    void OnProcessingFile(RepositoryFileInfo fileInfo, CommitInfo commitInfo);
     void UpdateProgress(double percent, int commitNum, double totalCommits);
 }
