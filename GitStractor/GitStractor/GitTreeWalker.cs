@@ -1,7 +1,6 @@
 ﻿using GitStractor.GitObservers;
 using GitStractor.Model;
 using Microsoft.Extensions.Logging;
-using System.IO;
 
 namespace GitStractor;
 
@@ -13,41 +12,76 @@ public class GitTreeWalker {
         Log = log;
     }
 
-    public GitTreeInfo WalkCommitTree(Commit commit, CommitInfo commitInfo, Repository repo, List<IGitObserver> observers) {
-        GitTreeInfo treeInfo = new();
-
+    public CommitInfo WalkCommitTree(Commit commit, CommitInfo commitInfo, Repository repo, List<IGitObserver> observers) {
         TreeChanges changes = repo.Diff.Compare<TreeChanges>(commit.Parents.FirstOrDefault()?.Tree, commit.Tree);
         PatchStats patchStats = repo.Diff.Compare<PatchStats>(commit.Parents.FirstOrDefault()?.Tree, commit.Tree);
 
         foreach (TreeEntryChanges change in changes) {
-            RepositoryFileInfo fileInfo = ProcessTreeChange(commit, treeInfo, change, patchStats[change.Path]);
+            RepositoryFileInfo fileInfo = ProcessTreeChange(commit, change, patchStats[change.Path]);
+
+            commitInfo.TotalFiles++;
+
+            switch (fileInfo.State) {
+                case FileState.Added:
+                    commitInfo.FilesAdded++;
+                    break;
+
+                case FileState.Deleted:
+                    commitInfo.FilesDeleted++;
+                    break;
+
+                case FileState.Modified:
+                case FileState.Renamed:
+                case FileState.Conflicted:
+                    commitInfo.FilesModified++;
+                    break;
+            }
+
+            commitInfo.LinesAdded += fileInfo.LinesAdded;
+            commitInfo.LinesDeleted += fileInfo.LinesDeleted;
+
             observers.ForEach(o => o.OnProcessingFile(fileInfo, commitInfo));
         }
 
         if (commit == repo.Head.Tip) {
-            WalkTree(commit, commitInfo, treeInfo, observers);
+            WalkTree(commit, commitInfo, observers);
         }
 
-        return treeInfo;
+        return commitInfo;
     }
 
-    private static RepositoryFileInfo ProcessTreeChange(Commit commit, GitTreeInfo treeInfo, TreeEntryChanges change, ContentChangeStats stats) {
+    private static RepositoryFileInfo ProcessTreeChange(Commit commit, TreeEntryChanges change, ContentChangeStats stats) {
         ChangeKind kind = change.Status;
         FileState state = GetFileState(kind);
 
-        RepositoryFileInfo fileInfo = new() {
+        string path = change.Path;
+        Blob? blob = FindBlobInTree(commit.Tree, path);
+
+        return new RepositoryFileInfo() {
             Sha = change.Oid.Sha,
             Commit = commit.Sha,
             Path = change.Path,
             OldPath = change.Path == change.OldPath ? null : change.OldPath,
             LinesDeleted = stats.LinesDeleted,
             LinesAdded = stats.LinesAdded,
-            LinesDelta = stats.LinesAdded - stats.LinesDeleted,
-            Lines = 0, // TODO
+            Lines = blob == null ? 0 : CountLines(blob),
             State = state
         };
-        treeInfo.Register(fileInfo);
-        return fileInfo;
+    }
+
+    private static Blob? FindBlobInTree(Tree tree, string path) {
+        Queue<TreeEntry> entries = new(tree);
+        while (entries.Count > 0) {
+            TreeEntry entry = entries.Dequeue();
+            if (entry.TargetType == TreeEntryTargetType.Blob && entry.Path == path) {
+                return (Blob)entry.Target;
+            } else if (entry.TargetType == TreeEntryTargetType.Tree) {
+                foreach (TreeEntry nestedEntry in (Tree)entry.Target) {
+                    entries.Enqueue(nestedEntry);
+                }
+            }
+        }
+        return null;
     }
 
     private static FileState GetFileState(ChangeKind kind)
@@ -65,7 +99,7 @@ public class GitTreeWalker {
             _ => FileState.Untracked,
         };
 
-    private void WalkTree(Commit commit, CommitInfo commitInfo, GitTreeInfo treeInfo, List<IGitObserver> observers) {
+    private void WalkTree(Commit commit, CommitInfo commitInfo, List<IGitObserver> observers) {
         // Using a Queue here is more efficient with the call stack for deep hierarchies than using recursion
         Queue<TreeEntry> entries = new(commit.Tree);
 
@@ -77,7 +111,7 @@ public class GitTreeWalker {
                 case Mode.NonExecutableGroupWritableFile:
                 case Mode.ExecutableFile:
                     Blob blob = (Blob)treeEntry.Target;
-                    RepositoryFileInfo fileInfo = ProcessFile(commit, treeInfo, blob, treeEntry.Path);
+                    RepositoryFileInfo fileInfo = ProcessFile(commit, blob, treeEntry.Path);
                     observers.ForEach(o => o.OnProcessingFile(fileInfo, commitInfo));
                     break;
 
@@ -99,32 +133,23 @@ public class GitTreeWalker {
         }
     }
 
-    private static RepositoryFileInfo ProcessFile(Commit commit, GitTreeInfo treeInfo, Blob blob, string path) {
-        int lines = CountLines(blob);
-
-        RepositoryFileInfo fileInfo = new() {
+    private static RepositoryFileInfo ProcessFile(Commit commit, Blob blob, string path) 
+        => new RepositoryFileInfo() {
             Sha = blob.Id.Sha,
             Commit = commit.Sha,
             Path = path,
             OldPath = null,
-            Lines = lines,
-            LinesDelta = 0,
+            Lines = CountLines(blob),
             State = FileState.Final
         };
 
-        treeInfo.Register(fileInfo);
-        return fileInfo;
-    }
-
     public static int CountLines(Blob blob) {
-        int lines = 0;
-        using var stream = blob.GetContentStream();
-        using var reader = new StreamReader(stream, Encoding.UTF8, true, 1024, true);
-        while (!reader.EndOfStream) {
-            string? line = reader.ReadLine();
-            lines++;
+        using StreamReader reader = new(blob.GetContentStream(), Encoding.UTF8, false);
+        int count = 0;
+        while (reader.ReadLine() != null) {
+            count++;
         }
-        return lines;
+        return count;
     }
 
 }

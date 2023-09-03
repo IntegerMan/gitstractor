@@ -115,14 +115,7 @@ public class GitDataExtractor {
         CommitInfo info = CreateCommitFromLibGitCommit(commit, author, committer);
 
         // Parse Commit
-        GitTreeInfo treeInfo = _treeWalker.WalkCommitTree(commit, info, repo, Observers);
-
-        info.TotalFiles = treeInfo.TotalFileCount;
-        info.FilesAdded = treeInfo.AddedFileCount;
-        info.FilesDeleted = treeInfo.DeletedFileCount;
-        info.FilesModified = treeInfo.ChangedFileCount;
-        info.LinesAdded = treeInfo.LinesAdded;
-        info.LinesDeleted = treeInfo.LinesDeleted;
+        _treeWalker.WalkCommitTree(commit, info, repo, Observers);
 
         author.LinesDeleted += info.LinesDeleted;
         author.LinesAdded += info.LinesAdded;

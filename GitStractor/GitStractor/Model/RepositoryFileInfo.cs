@@ -18,10 +18,9 @@ public class RepositoryFileInfo
     public required string Commit { get; init; }
     public DateTime CreatedDateUtc { get; init; }
     public required int Lines { get; init; }
-    public required int LinesDelta { get; init; }
     public string? OldPath { get; init; }
-    public int LinesDeleted { get; internal set; }
-    public int LinesAdded { get; internal set; }
+    public int LinesDeleted { get; init; }
+    public int LinesAdded { get; init; }
 
     public override string ToString() 
         => $"{Sha[..6]} {Path} @ {Commit[..6]} ({State})";

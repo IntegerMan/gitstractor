@@ -15,6 +15,7 @@ public class DenormalizedFileCommitObserver : FileWriterObserverBase
         WriteField("Path");
         WriteField("Lines Added");
         WriteField("Lines Deleted");
+        WriteField("Current Lines");
         WriteField("Commit Author");
         WriteField("Commit Date UTC");
         WriteField("Commit Message");
@@ -36,6 +37,7 @@ public class DenormalizedFileCommitObserver : FileWriterObserverBase
         WriteField(fileInfo.Path);
         WriteField(fileInfo.LinesAdded);
         WriteField(fileInfo.LinesDeleted);
+        WriteField(fileInfo.Lines);
         WriteField(commitInfo.Author.Id);
         WriteField(commitInfo.AuthorDateUtc);
         WriteField(commitInfo.Message);

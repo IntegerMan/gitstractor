@@ -15,6 +15,7 @@ public class FileCommitObserver : FileWriterObserverBase
         WriteField("Path");
         WriteField("Lines Added");
         WriteField("Lines Deleted");
+        WriteField("Current Lines");
         NextRecord();
     }
 
@@ -33,6 +34,7 @@ public class FileCommitObserver : FileWriterObserverBase
         WriteField(fileInfo.Path);
         WriteField(fileInfo.LinesAdded);
         WriteField(fileInfo.LinesDeleted);
+        WriteField(fileInfo.Lines);
         NextRecord();
     }
 }
