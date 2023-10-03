@@ -16,6 +16,11 @@ public class GitStractorExtract : GitStractorProgram {
                 services.AddTransient<GitTreeWalker>();
                 services.AddTransient<IGitObserver, LoggingGitObserver>();
                 services.AddTransient<IGitObserver, SummaryAuthorObserver>();
+                services.AddTransient<IGitObserver, AuthorYearlyCommitObserver>();
+                services.AddTransient<IGitObserver, AuthorQuarterlyCommitObserver>();
+                services.AddTransient<IGitObserver, AuthorMonthlyCommitObserver>();
+                services.AddTransient<IGitObserver, AuthorWeeklyCommitObserver>();
+                services.AddTransient<IGitObserver, AuthorDailyCommitObserver>();
                 services.AddTransient<IGitObserver, GitCommitObserver>();
                 services.AddTransient<IGitObserver, FileObserver>();
                 services.AddTransient<IGitObserver, DenormalizedFileCommitObserver>();

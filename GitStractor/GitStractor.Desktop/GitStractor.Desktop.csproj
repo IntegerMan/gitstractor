@@ -11,6 +11,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<PackageReference Include="MattEland.Analyzers" Version="1.1.2" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="7.0.1" />
 		<PackageReference Include="Telerik.UI.for.Wpf.70.Xaml" Version="2023.2.718" />
 	</ItemGroup>
