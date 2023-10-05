@@ -55,7 +55,7 @@ public class GitStractorExtractWorker : GitStractorWorkerBase {
                 FileWriter = new FileCsvDataWriter(Path.Combine(_options.OutputPath, "Files.csv")),
             };
             */
-            _extractor.ExtractInformation(_options.SourcePath, _options.OutputPath);
+            _extractor.ExtractInformation(_options.SourcePath, _options.OutputPath, _options.AuthorMapPath);
 
             logExtracted(Log, _options.OutputPath, null);
 

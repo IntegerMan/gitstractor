@@ -2,6 +2,9 @@
 using GitStractor.Model;
 using GitStractor.Utilities;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+using System.Net.Http.Json;
+using System.Text.Json.Serialization;
 
 namespace GitStractor;
 
@@ -25,7 +28,7 @@ public class GitDataExtractor {
     /// <exception cref="RepositoryNotFoundException">
     /// Thrown when the repository does not exist
     /// </exception>
-    public void ExtractInformation(string repoPath, string outputPath) {
+    public void ExtractInformation(string repoPath, string outputPath, string? authorMapPath) {
 
         // Clear old state
         _authors.Clear();
@@ -38,6 +41,24 @@ public class GitDataExtractor {
             string message = $"Could not find a git repository at {repoPath}";
             Log.LogWarning(message);
             throw new RepositoryNotFoundException(message);
+        }
+
+        // If we got an author map, let's instantiate it
+        List<AuthorMap> authorMaps;
+        if (!string.IsNullOrEmpty(authorMapPath)) {
+            if (!File.Exists(authorMapPath)) { 
+                throw new FileNotFoundException("Author map file does not exist", authorMapPath);
+            }
+
+            // Deserialize an AuthorMap array from the JSON in the file in the filesystem at authorMapPath
+            string json = File.ReadAllText(authorMapPath);
+
+            // Deserialize the JSON into a list of AuthorMap
+            authorMaps = JsonConvert.DeserializeObject<List<AuthorMap>>(json)!;
+
+            Log.LogInformation("Using author map from {AuthorMapPath} with {Count} author entries", authorMapPath, authorMaps.Count);
+        } else {
+            authorMaps = new List<AuthorMap>();
         }
 
         Log.LogInformation($"Analyzing git repository at {gitPath}");
@@ -71,7 +92,7 @@ public class GitDataExtractor {
             int commitNum = 0;
             foreach (Commit commit in SearchCommits(repo, filter)) {
                 commitNum++;
-                ProcessCommit(commit, repo);
+                ProcessCommit(commit, repo, authorMaps);
 
                 UpdateProgress(totalCommits, commitNum);
             }
@@ -103,13 +124,13 @@ public class GitDataExtractor {
 
     private ICommitLog SearchCommits(Repository repo, CommitFilter filter) => repo.Commits.QueryBy(filter);
 
-    private void ProcessCommit(Commit commit, Repository repo) {
+    private void ProcessCommit(Commit commit, Repository repo, IEnumerable<AuthorMap> authorMap) {
         bool isLast = commit == repo.Head.Tip;
         Observers.ForEach(o => o.OnProcessingCommit(commit.Sha, isLast));
 
         // Identify author
-        AuthorInfo author = GetOrCreateAuthor(commit.Author, true);
-        AuthorInfo committer = GetOrCreateAuthor(commit.Committer, false);
+        AuthorInfo author = GetOrCreateAuthor(commit.Author, true, authorMap);
+        AuthorInfo committer = GetOrCreateAuthor(commit.Committer, false, authorMap);
 
         // Create the commit summary info.
         CommitInfo info = CreateCommitFromLibGitCommit(commit, author, committer);
@@ -127,20 +148,32 @@ public class GitDataExtractor {
         Observers.ForEach(o => o.OnProcessedCommit(info));
     }
 
-    private AuthorInfo GetOrCreateAuthor(Signature signature, bool isAuthor) {
-        string key = signature.Email.ToLowerInvariant();
-        if (!_authors.TryGetValue(key, out AuthorInfo? author)) {
+    private AuthorInfo GetOrCreateAuthor(Signature signature, bool isAuthor, IEnumerable<AuthorMap> authorMap) {
+
+        string name = signature.Name;
+        string email = signature.Email.ToLowerInvariant();
+        bool isBot = signature.Name.Contains("[bot]", StringComparison.OrdinalIgnoreCase);
+
+        AuthorMap? matched = authorMap.FirstOrDefault(m => m.Emails.Any(e => e.Equals(email, StringComparison.OrdinalIgnoreCase)));
+
+        if (matched != null) {
+            email = matched.Emails[0];
+            name = matched.Name;
+            isBot = matched.Bot;
+        }
+
+        if (!_authors.TryGetValue(email, out AuthorInfo? author)) {
             author = new AuthorInfo() {
                 Id = _authors.Count + 1,
-                Email = signature.Email,
-                Name = signature.Name,
-                IsBot = signature.Name.Contains("[bot]", StringComparison.OrdinalIgnoreCase),
+                Email = email,
+                Name = name,
+                IsBot = isBot,
                 EarliestCommitDateUtc = signature.When.UtcDateTime,
                 LatestCommitDateUtc = signature.When.UtcDateTime,
                 NumCommits = isAuthor ? 1 : 0,
             };
             Observers.ForEach(o => o.OnNewAuthor(author));
-            _authors.Add(key, author);
+            _authors.Add(email, author);
         } else {
             if (isAuthor) {
                 author.NumCommits++;

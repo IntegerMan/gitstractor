@@ -3,7 +3,7 @@
   "profiles": {
     "GitStractor-Extract": {
       "commandName": "Project",
-      "commandLineArgs": "-s C:\\Dev\\Repos\\Interactive -d C:\\GitStractor\\Extract\\PacktBook",
+      "commandLineArgs": "-s C:\\Dev\\Repos\\Interactive -d C:\\GitStractor\\Extract\\PacktBook -a C:\\Dev\\authormap.json",
       "dotnetRunMessages": true,
       "environmentVariables": {
         "DOTNET_ENVIRONMENT": "Development"
