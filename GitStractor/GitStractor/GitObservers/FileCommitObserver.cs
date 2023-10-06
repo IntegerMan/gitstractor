@@ -11,6 +11,7 @@ public class FileCommitObserver : FileWriterObserverBase
         base.OnBeginningIteration(totalCommits, outputPath);
 
         WriteField("Commit");
+        WriteField("File Sha");
         WriteField("Type");
         WriteField("Path");
         WriteField("Lines Added");
@@ -30,6 +31,7 @@ public class FileCommitObserver : FileWriterObserverBase
             return;
 
         WriteField(fileInfo.Commit);
+        WriteField(fileInfo.Sha);
         WriteField(fileInfo.State.ToString());
         WriteField(fileInfo.Path);
         WriteField(fileInfo.LinesAdded);

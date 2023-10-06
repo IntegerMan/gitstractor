@@ -18,6 +18,7 @@ public class FileObserver : FileWriterObserverBase
         WriteField("File Sha");
         WriteField("Lines");
         WriteField("Path");
+        WriteField("Extension");
         NextRecord();
     }
 
@@ -31,6 +32,7 @@ public class FileObserver : FileWriterObserverBase
         WriteField(fileInfo.Sha);
         WriteField(fileInfo.Lines);
         WriteField(fileInfo.Path);
+        WriteField(fileInfo.Extension);
         NextRecord();
     }
 }
