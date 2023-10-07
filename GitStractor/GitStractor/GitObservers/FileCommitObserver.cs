@@ -6,9 +6,9 @@ public class FileCommitObserver : FileWriterObserverBase
 {
     public override string Filename => "FileCommits.csv";
 
-    public override void OnBeginningIteration(int totalCommits, string outputPath)
+    public override void OnBeginningIteration(int totalCommits, string outputPath, bool includeBranchDetails)
     {
-        base.OnBeginningIteration(totalCommits, outputPath);
+        base.OnBeginningIteration(totalCommits, outputPath, includeBranchDetails);
 
         WriteField("Commit");
         WriteField("File Sha");
@@ -27,7 +27,8 @@ public class FileCommitObserver : FileWriterObserverBase
         if (commit.Sha != fileInfo.Commit ||
             fileInfo.State == FileState.Final ||
             fileInfo.State == FileState.Ignored ||
-            fileInfo.State == FileState.Untracked)
+            fileInfo.State == FileState.Untracked ||
+            (commit.IsMerge && IncludeBranchDetails))
             return;
 
         WriteField(fileInfo.Commit);

@@ -28,7 +28,7 @@ public class GitDataExtractor {
     /// <exception cref="RepositoryNotFoundException">
     /// Thrown when the repository does not exist
     /// </exception>
-    public void ExtractInformation(string repoPath, string outputPath, string? authorMapPath) {
+    public void ExtractInformation(string repoPath, string outputPath, string? authorMapPath, bool includeBranchDetails) {
 
         // Clear old state
         _authors.Clear();
@@ -78,7 +78,7 @@ public class GitDataExtractor {
                 SortBy = CommitSortStrategies.Reverse,
 
                 // Don't include branch details
-                FirstParentOnly = true,
+                FirstParentOnly = !includeBranchDetails,
 
                 // We only want to look at commits that are reachable from whatever is HEAD at the moment
                 IncludeReachableFrom = repo.Head
@@ -86,7 +86,7 @@ public class GitDataExtractor {
 
             int totalCommits = SearchCommits(repo, filter).Count();
 
-            Observers.ForEach(o => o.OnBeginningIteration(totalCommits, outputPath));
+            Observers.ForEach(o => o.OnBeginningIteration(totalCommits, outputPath, includeBranchDetails));
 
             // Loop over each commit
             int commitNum = 0;

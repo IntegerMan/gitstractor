@@ -7,8 +7,8 @@ public class AuthorQuarterlyCommitObserver : FileWriterObserverBase {
     public override string Filename => "AuthorQuarterlyCommits.csv";
     private readonly Dictionary<int, Dictionary<string, List<CommitInfo>>> _authorCommits = new();
 
-    public override void OnBeginningIteration(int totalCommits, string outputPath) {
-        base.OnBeginningIteration(totalCommits, outputPath);
+    public override void OnBeginningIteration(int totalCommits, string outputPath, bool includeBranchDetails) {
+        base.OnBeginningIteration(totalCommits, outputPath, includeBranchDetails);
 
         WriteField("Author");
         WriteField("Year");
@@ -27,6 +27,8 @@ public class AuthorQuarterlyCommitObserver : FileWriterObserverBase {
     public override void OnProcessedCommit(CommitInfo commit) {
         base.OnProcessedCommit(commit);
 
+        if (commit.IsMerge && IncludeBranchDetails) return;
+        
         int year = commit.AuthorDateUtc.Year;
         int quarter = ((commit.AuthorDateUtc.Month - 1) / 3) + 1;
         string year_quarter = year + "_" + quarter;

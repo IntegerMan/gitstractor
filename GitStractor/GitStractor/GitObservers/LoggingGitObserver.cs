@@ -14,7 +14,7 @@ public class LoggingGitObserver : IGitObserver
 
     public ILogger<LoggingGitObserver> Log { get; }
 
-    public void OnBeginningIteration(int totalCommits, string outputPath)
+    public void OnBeginningIteration(int totalCommits, string outputPath, bool includeBranchDetails)
     {
         Log.LogDebug($"Analyzing {totalCommits} commits and writing to files in {outputPath}");
     }

@@ -17,6 +17,11 @@ public class CommitInfo {
     /// modified by the commit.
     /// </summary>
     public int TotalFiles { get; set; }
+    /// <summary>
+    /// Gets the total number of lines in the working tree as of this commit. This is typically not the amount of lines
+    /// modified by the commit.
+    /// </summary>
+    public int TotalLines { get; set; }
 
     public int LinesDeleted { get; set; }
     public int LinesAdded { get; set; }

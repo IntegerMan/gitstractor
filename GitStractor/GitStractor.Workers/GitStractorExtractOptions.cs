@@ -2,17 +2,16 @@
 
 namespace GitStractor.Workers;
 
-#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+[Serializable]
 public class GitStractorExtractOptions
 {
     [Required(ErrorMessage = "Source path is required. Specify via -s or --source")]
-    public string SourcePath { get; set; }
+    public required string SourcePath { get; init; }
 
     [Required(ErrorMessage="Output path is required. Specify via -d or --destination")]
-    public string OutputPath { get; set; }
+    public required string OutputPath { get; init; }
 
-    public bool OverwriteIfExists { get; set; }
+    public bool IncludeBranchDetails { get; init; }
 
-    public string AuthorMapPath { get; set; }
+    public string? AuthorMapPath { get; init; }
 }
-#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.

@@ -38,7 +38,7 @@ public class GitStractorExtract : GitStractorProgram {
                 services.AddHostedService<GitStractorExtractWorker>();
             })
             .ConfigureAppConfiguration(services => {
-                services.AddCommandLine(args, new Dictionary<string, string>() {
+                services.AddCommandLine(args, new Dictionary<string, string> {
                     { "-s", "Extract:SourcePath" },
                     { "--source", "Extract:SourcePath" },
                     { "-d", "Extract:OutputPath" },
@@ -47,6 +47,8 @@ public class GitStractorExtract : GitStractorProgram {
                     { "--overwrite", "Extract:OverwriteIfExists" },
                     { "-a", "Extract:AuthorMapPath" },
                     { "--authormap", "Extract:AuthorMapPath" },
+                    { "-i", "Extract:IncludeBranchDetails" },
+                    { "--includebranches", "Extract:IncludeBranchDetails" },
                 });
             });
 }

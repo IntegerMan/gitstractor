@@ -6,9 +6,9 @@ public class DenormalizedFileCommitObserver : FileWriterObserverBase
 {
     public override string Filename => "FileCommits.csv";
 
-    public override void OnBeginningIteration(int totalCommits, string outputPath)
+    public override void OnBeginningIteration(int totalCommits, string outputPath, bool includeBranchDetails)
     {
-        base.OnBeginningIteration(totalCommits, outputPath);
+        base.OnBeginningIteration(totalCommits, outputPath, includeBranchDetails);
 
         WriteField("Commit");
         WriteField("File Sha");
@@ -18,7 +18,7 @@ public class DenormalizedFileCommitObserver : FileWriterObserverBase
         WriteField("Lines Deleted");
         WriteField("Current Lines");
         WriteField("Commit Author");
-        WriteField("Commit Date UTC");
+        WriteField("Commit Date Utc");
         WriteField("Commit Message");
         NextRecord();
     }
@@ -30,7 +30,8 @@ public class DenormalizedFileCommitObserver : FileWriterObserverBase
         if (commitInfo.Sha != fileInfo.Commit ||
             fileInfo.State == FileState.Final ||
             fileInfo.State == FileState.Ignored ||
-            fileInfo.State == FileState.Untracked)
+            fileInfo.State == FileState.Untracked ||
+            (commitInfo.IsMerge && IncludeBranchDetails))
             return;
 
         WriteField(fileInfo.Commit);

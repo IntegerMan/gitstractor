@@ -6,9 +6,9 @@ public class GitCommitObserver : FileWriterObserverBase
 {
     public override string Filename => "Commits.csv";
 
-    public override void OnBeginningIteration(int totalCommits, string outputPath)
+    public override void OnBeginningIteration(int totalCommits, string outputPath, bool includeBranchDetails)
     {
-        base.OnBeginningIteration(totalCommits, outputPath);
+        base.OnBeginningIteration(totalCommits, outputPath, includeBranchDetails);
 
         WriteField("Sha");
         WriteField("ParentSha");
@@ -20,8 +20,13 @@ public class GitCommitObserver : FileWriterObserverBase
         WriteField("CommitterDateUtc");
         WriteField("Message");
         WriteField("Total Files");
+        WriteField("Modified Files");
         WriteField("Added Files");
         WriteField("Deleted Files");
+        WriteField("Total Lines");
+        WriteField("Net Lines");
+        WriteField("Added Lines");
+        WriteField("Deleted Lines");
         NextRecord();
     }
 
@@ -39,8 +44,13 @@ public class GitCommitObserver : FileWriterObserverBase
         WriteField(commit.CommitterDateUtc);
         WriteField(commit.Message);
         WriteField(commit.TotalFiles);
+        WriteField(commit.Files.Count);
         WriteField(commit.FilesAdded);
         WriteField(commit.FilesDeleted);
+        WriteField(commit.TotalLines);
+        WriteField(commit.Files.Sum(f => f.LinesAdded - f.LinesDeleted));
+        WriteField(commit.Files.Sum(f => f.LinesAdded));
+        WriteField(commit.Files.Sum(f => f.LinesDeleted));
         NextRecord();
     }
 }

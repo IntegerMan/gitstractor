@@ -13,9 +13,11 @@ public abstract class FileWriterObserverBase : IGitObserver, IDisposable {
         _writer = null;
     }
 
+    public bool IncludeBranchDetails { get; set; }
+    
     public abstract string Filename { get; }
 
-    public virtual void OnBeginningIteration(int totalCommits, string outputPath) {
+    public virtual void OnBeginningIteration(int totalCommits, string outputPath, bool includeBranchDetails) {
         _writer = new CsvWriter(new StreamWriter(Path.Combine(outputPath, Filename), append: false), CultureInfo.InvariantCulture);
     }
 

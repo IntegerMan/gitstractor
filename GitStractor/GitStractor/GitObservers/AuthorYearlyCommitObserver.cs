@@ -6,8 +6,8 @@ public class AuthorYearlyCommitObserver : FileWriterObserverBase {
     public override string Filename => "AuthorYearlyCommits.csv";
     private readonly Dictionary<int, Dictionary<int, List<CommitInfo>>> _authorCommits = new();
 
-    public override void OnBeginningIteration(int totalCommits, string outputPath) {
-        base.OnBeginningIteration(totalCommits, outputPath);
+    public override void OnBeginningIteration(int totalCommits, string outputPath, bool includeBranchDetails) {
+        base.OnBeginningIteration(totalCommits, outputPath, includeBranchDetails);
 
         WriteField("Author");
         WriteField("Year");
@@ -25,6 +25,8 @@ public class AuthorYearlyCommitObserver : FileWriterObserverBase {
     public override void OnProcessedCommit(CommitInfo commit) {
         base.OnProcessedCommit(commit);
 
+        if (commit.IsMerge && IncludeBranchDetails) return;
+        
         int year = commit.AuthorDateUtc.Year;
 
         if (!_authorCommits.TryGetValue(commit.Author.Id, out Dictionary<int, List<CommitInfo>>? aggregatedCommits)) {

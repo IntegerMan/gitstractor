@@ -24,6 +24,7 @@ public class GitTreeWalker {
             switch (fileInfo.State) {
                 case FileState.Added:
                     commitInfo.FilesAdded++;
+                    commitInfo.TotalLines += fileInfo.Lines;
                     break;
 
                 case FileState.Deleted:
@@ -34,6 +35,7 @@ public class GitTreeWalker {
                 case FileState.Renamed:
                 case FileState.Conflicted:
                     commitInfo.FilesModified++;
+                    commitInfo.TotalLines += fileInfo.Lines;
                     break;
             }
 
@@ -137,7 +139,7 @@ public class GitTreeWalker {
     }
 
     private static RepositoryFileInfo ProcessFile(Commit commit, Blob blob, string path) 
-        => new RepositoryFileInfo() {
+        => new() {
             Sha = blob.Id.Sha,
             Commit = commit.Sha,
             Path = path,

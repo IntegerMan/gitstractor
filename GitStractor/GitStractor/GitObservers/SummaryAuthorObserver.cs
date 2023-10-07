@@ -7,9 +7,9 @@ public class SummaryAuthorObserver : FileWriterObserverBase
     public override string Filename => "Authors.csv";
     private readonly List<AuthorInfo> _authors = new();
 
-    public override void OnBeginningIteration(int totalCommits, string outputPath)
+    public override void OnBeginningIteration(int totalCommits, string outputPath, bool includeBranchDetails)
     {
-        base.OnBeginningIteration(totalCommits, outputPath);
+        base.OnBeginningIteration(totalCommits, outputPath, includeBranchDetails);
 
         WriteField("Id");
         WriteField("Email");
