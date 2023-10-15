@@ -12,7 +12,7 @@ public class GitTreeWalker {
         Log = log;
     }
 
-    public CommitInfo WalkCommitTree(Commit commit, CommitInfo commitInfo, Repository repo, List<IGitObserver> observers) {
+    public CommitInfo WalkCommitTree(Commit commit, CommitInfo commitInfo, Repository repo, List<IGitObserver> observers, IEnumerable<string> ignorePatterns) {
         TreeChanges changes = repo.Diff.Compare<TreeChanges>(commit.Parents.FirstOrDefault()?.Tree, commit.Tree);
         PatchStats patchStats = repo.Diff.Compare<PatchStats>(commit.Parents.FirstOrDefault()?.Tree, commit.Tree);
 
@@ -20,6 +20,10 @@ public class GitTreeWalker {
             RepositoryFileInfo fileInfo = ProcessTreeChange(commit, change, patchStats[change.Path]);
 
             commitInfo.TotalFiles++;
+
+            // If it is a file we want to ignore, don't do anything with the file. We DO want it to count towards the total file number for the commit, though, so that remains accurate
+            if (FileMatchesPattern(fileInfo, ignorePatterns))
+                continue;
 
             switch (fileInfo.State) {
                 case FileState.Added:
@@ -52,6 +56,9 @@ public class GitTreeWalker {
         return commitInfo;
     }
 
+    private static bool FileMatchesPattern(RepositoryFileInfo fileInfo, IEnumerable<string> ignorePatterns)
+        => ignorePatterns.Any(p => fileInfo.Extension.Equals(p, StringComparison.OrdinalIgnoreCase) || fileInfo.Path.EndsWith(p, StringComparison.OrdinalIgnoreCase));
+
     private static RepositoryFileInfo ProcessTreeChange(Commit commit, TreeEntryChanges change, ContentChangeStats stats) {
         ChangeKind kind = change.Status;
         FileState state = GetFileState(kind);
@@ -75,11 +82,11 @@ public class GitTreeWalker {
         Queue<TreeEntry> entries = new(tree);
         while (entries.Count > 0) {
             TreeEntry entry = entries.Dequeue();
-            
+
             if (entry.TargetType == TreeEntryTargetType.Blob && entry.Path == path) {
                 return (Blob)entry.Target;
-            } 
-            
+            }
+
             if (entry.TargetType == TreeEntryTargetType.Tree) {
                 foreach (TreeEntry nestedEntry in (Tree)entry.Target) {
                     entries.Enqueue(nestedEntry);
@@ -138,7 +145,7 @@ public class GitTreeWalker {
         }
     }
 
-    private static RepositoryFileInfo ProcessFile(Commit commit, Blob blob, string path) 
+    private static RepositoryFileInfo ProcessFile(Commit commit, Blob blob, string path)
         => new() {
             Sha = blob.Id.Sha,
             Commit = commit.Sha,

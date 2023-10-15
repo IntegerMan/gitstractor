@@ -14,4 +14,6 @@ public class GitStractorExtractOptions
     public bool IncludeBranchDetails { get; init; }
 
     public string? AuthorMapPath { get; init; }
+
+    public string IgnorePatterns { get; init; } = string.Empty;
 }

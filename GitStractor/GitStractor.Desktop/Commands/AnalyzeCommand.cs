@@ -35,7 +35,7 @@ public class AnalyzeCommand : CommandBase, IProgressListener
             try
             {
                 GitDataExtractor extractor = new(log: null, observers: null, new GitTreeWalker(log: null));
-                extractor.ExtractInformation(repoPath: null, outputPath: null);
+                extractor.ExtractInformation(repoPath: null, outputPath: null, ignorePatterns: Enumerable.Empty<string>());
             }
             catch (Exception ex)
             {

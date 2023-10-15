@@ -28,7 +28,7 @@ public class GitDataExtractor {
     /// <exception cref="RepositoryNotFoundException">
     /// Thrown when the repository does not exist
     /// </exception>
-    public void ExtractInformation(string repoPath, string outputPath, string? authorMapPath, bool includeBranchDetails) {
+    public void ExtractInformation(string repoPath, string outputPath, string? authorMapPath, bool includeBranchDetails, string[] ignorePatterns) {
 
         // Clear old state
         _authors.Clear();
@@ -61,11 +61,11 @@ public class GitDataExtractor {
             authorMaps = new List<AuthorMap>();
         }
 
-        Log.LogInformation($"Analyzing git repository at {gitPath}");
+        Log.LogInformation("Analyzing git repository at {Path}", gitPath);
 
         // Connect to the git repository
         RepositoryOptions repoOptions = new() {
-            Identity = new Identity("Test", "Testerson@gmail.com"),            
+            Identity = new Identity("Test", "Testerson@gmail.com"), // TODO: This could come from the options
         };
 
         try {
@@ -92,17 +92,17 @@ public class GitDataExtractor {
             int commitNum = 0;
             foreach (Commit commit in SearchCommits(repo, filter)) {
                 commitNum++;
-                ProcessCommit(commit, repo, authorMaps);
+                ProcessCommit(commit, repo, authorMaps, ignorePatterns);
 
                 UpdateProgress(totalCommits, commitNum);
             }
-            Log.LogInformation($"Enumerated {commitNum} commits");
+            Log.LogInformation("Enumerated {Commits} commits", commitNum);
 
             // Write all authors at the end, now that we know aggregate-level information
             Observers.ForEach(o => o.OnCompletedIteration(outputPath));
 
             //_options.ProgressListener?.Completed();
-            Log.LogInformation($"Successfully analyzed repository at {repoPath}");
+            Log.LogInformation("Successfully analyzed repository at {Path}", repoPath);
         }
         catch (LibGit2SharpException ex) {
 
@@ -122,9 +122,10 @@ public class GitDataExtractor {
         Observers.ForEach(o => o.UpdateProgress(percent, commitNum, totalCommits));
     }
 
-    private ICommitLog SearchCommits(Repository repo, CommitFilter filter) => repo.Commits.QueryBy(filter);
+    private ICommitLog SearchCommits(Repository repo, CommitFilter filter) 
+        => repo.Commits.QueryBy(filter);
 
-    private void ProcessCommit(Commit commit, Repository repo, IEnumerable<AuthorMap> authorMap) {
+    private void ProcessCommit(Commit commit, Repository repo, IEnumerable<AuthorMap> authorMap, IEnumerable<string> ignorePatterns) {
         bool isLast = commit == repo.Head.Tip;
         Observers.ForEach(o => o.OnProcessingCommit(commit.Sha, isLast));
 
@@ -136,7 +137,7 @@ public class GitDataExtractor {
         CommitInfo info = CreateCommitFromLibGitCommit(commit, author, committer);
 
         // Parse Commit
-        _treeWalker.WalkCommitTree(commit, info, repo, Observers);
+        _treeWalker.WalkCommitTree(commit, info, repo, Observers, ignorePatterns);
 
         author.LinesDeleted += info.LinesDeleted;
         author.LinesAdded += info.LinesAdded;

@@ -24,7 +24,6 @@ public class GitStractorExtract : GitStractorProgram {
                 services.AddTransient<IGitObserver, GitCommitObserver>();
                 services.AddTransient<IGitObserver, FileObserver>();
                 services.AddTransient<IGitObserver, DenormalizedFileCommitObserver>();
-                //services.AddTransient<IGitObserver, FileCommitObserver>();
                 services.AddTransient(provider => provider.GetServices<IGitObserver>().ToList());
 
                 services.AddTransient<GitDataExtractor>();
@@ -47,8 +46,10 @@ public class GitStractorExtract : GitStractorProgram {
                     { "--overwrite", "Extract:OverwriteIfExists" },
                     { "-a", "Extract:AuthorMapPath" },
                     { "--authormap", "Extract:AuthorMapPath" },
-                    { "-i", "Extract:IncludeBranchDetails" },
+                    { "-b", "Extract:IncludeBranchDetails" },
                     { "--includebranches", "Extract:IncludeBranchDetails" },
+                    { "-i", "Extract:IgnorePatterns" },
+                    { "--ignore", "Extract:IgnorePatterns" },
                 });
             });
 }
