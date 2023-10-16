@@ -25,6 +25,8 @@ public class GitTreeWalker {
             if (FileMatchesPattern(fileInfo, ignorePatterns))
                 continue;
 
+            commitInfo.Add(fileInfo);
+
             switch (fileInfo.State) {
                 case FileState.Added:
                     commitInfo.FilesAdded++;

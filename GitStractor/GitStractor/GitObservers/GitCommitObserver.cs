@@ -44,7 +44,7 @@ public class GitCommitObserver : FileWriterObserverBase
         WriteField(commit.CommitterDateUtc);
         WriteField(commit.Message);
         WriteField(commit.TotalFiles);
-        WriteField(commit.Files.Count);
+        WriteField(commit.FilesModified);
         WriteField(commit.FilesAdded);
         WriteField(commit.FilesDeleted);
         WriteField(commit.TotalLines);

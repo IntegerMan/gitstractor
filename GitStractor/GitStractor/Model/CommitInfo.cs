@@ -86,6 +86,10 @@ public class CommitInfo {
     /// </summary>
     public IReadOnlyList<RepositoryFileInfo> Files => _files;
 
+    public void Add(RepositoryFileInfo file) {
+        _files.Add(file);
+    }
+
     /// <summary>
     /// A comma-separated list of files modified by the commit
     /// </summary>
