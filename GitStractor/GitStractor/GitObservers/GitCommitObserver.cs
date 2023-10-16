@@ -19,6 +19,7 @@ public class GitCommitObserver : FileWriterObserverBase
         WriteField("CommitterId");
         WriteField("CommitterDateUtc");
         WriteField("Message");
+        WriteField("Work Items");
         WriteField("Total Files");
         WriteField("Modified Files");
         WriteField("Added Files");
@@ -43,6 +44,7 @@ public class GitCommitObserver : FileWriterObserverBase
         WriteField(commit.Committer.Id);
         WriteField(commit.CommitterDateUtc);
         WriteField(commit.Message);
+        WriteField(commit.WorkItemIdentifiers.Count());
         WriteField(commit.TotalFiles);
         WriteField(commit.FilesModified);
         WriteField(commit.FilesAdded);

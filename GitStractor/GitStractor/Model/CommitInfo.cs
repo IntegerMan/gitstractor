@@ -1,3 +1,6 @@
+using LibGit2Sharp;
+using System.Text.RegularExpressions;
+
 namespace GitStractor.Model;
 
 /// <summary>
@@ -98,6 +101,18 @@ public class CommitInfo {
     public string? ParentSha { get; init; }
     public string? Parent2Sha { get; init; }
     public bool IsMerge => !string.IsNullOrWhiteSpace(ParentSha) && !string.IsNullOrWhiteSpace(Parent2Sha);
+
+    public IEnumerable<string> WorkItemIdentifiers {
+        get {
+            var regexPattern = @"(Bug \d+|Issue #\d+|Ticket \d+|FEAT-\d+|#\d+)";
+
+            MatchCollection matches = Regex.Matches(Message, regexPattern);
+
+            foreach (Match match in matches) {
+                yield return match.Value.Replace("#","").Trim();
+            }
+        }
+    }
 
     /// <inheritdoc />
     public override string ToString()

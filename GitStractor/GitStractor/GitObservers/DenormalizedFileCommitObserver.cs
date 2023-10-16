@@ -20,6 +20,7 @@ public class DenormalizedFileCommitObserver : FileWriterObserverBase
         WriteField("Commit Author");
         WriteField("Commit Date Utc");
         WriteField("Commit Message");
+        WriteField("Work Items");
         NextRecord();
     }
 
@@ -44,6 +45,7 @@ public class DenormalizedFileCommitObserver : FileWriterObserverBase
         WriteField(commitInfo.Author.Id);
         WriteField(commitInfo.AuthorDateUtc);
         WriteField(commitInfo.Message);
+        WriteField(commitInfo.WorkItemIdentifiers.Count());
         NextRecord();
     }
 }

@@ -6,6 +6,29 @@ public class RepositoryFileInfo
     public required string Sha { get; init; }
     public required string Path { get; set; }
 
+    public string Path1 
+        => Path.Split('/', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).FirstOrDefault() ?? string.Empty;
+
+    public string Path2 {
+        get {
+            string[] parts = Path.Split('/', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            return parts.Length switch {
+                > 1 => parts[1],
+                _ => string.Empty
+            };
+        }
+    }
+
+    public string Path3 {
+        get {
+            string[] parts = Path.Split('/', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            return parts.Length switch {
+                > 2 => parts[2],
+                _ => string.Empty
+            };
+        }
+    }
+
     public string Extension
     {
         get
