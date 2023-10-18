@@ -11,7 +11,8 @@ public class GitStractorExtractOptions
     [Required(ErrorMessage="Output path is required. Specify via -d or --destination")]
     public required string OutputPath { get; init; }
 
-    public bool IncludeBranchDetails { get; init; }
+    public bool IncludeBranchDetails { get; init; } = true;
+
 
     public string? AuthorMapPath { get; init; }
 

@@ -14,8 +14,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GitStractor.Tests", "GitStractor.Tests\GitStractor.Tests.csproj", "{52163168-5AFC-4437-93D2-51B58EEEA682}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GitStractor.Desktop", "GitStractor.Desktop\GitStractor.Desktop.csproj", "{A0F0CF20-83D6-4A22-8C62-9BBE1580FC6F}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GitStractor-Acquire", "GitStractor-Acquisition\GitStractor-Acquire.csproj", "{42C9F8F2-8BAF-4F23-82FC-91922E6DB536}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GitStractor.Workers", "GitStractor.Workers\GitStractor.Workers.csproj", "{4752D027-E881-4E72-AA7A-0F0034552EE7}"
@@ -36,10 +34,6 @@ Global
 		{52163168-5AFC-4437-93D2-51B58EEEA682}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{52163168-5AFC-4437-93D2-51B58EEEA682}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{52163168-5AFC-4437-93D2-51B58EEEA682}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A0F0CF20-83D6-4A22-8C62-9BBE1580FC6F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A0F0CF20-83D6-4A22-8C62-9BBE1580FC6F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A0F0CF20-83D6-4A22-8C62-9BBE1580FC6F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A0F0CF20-83D6-4A22-8C62-9BBE1580FC6F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{42C9F8F2-8BAF-4F23-82FC-91922E6DB536}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{42C9F8F2-8BAF-4F23-82FC-91922E6DB536}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{42C9F8F2-8BAF-4F23-82FC-91922E6DB536}.Release|Any CPU.ActiveCfg = Release|Any CPU

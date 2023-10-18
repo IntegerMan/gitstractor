@@ -40,8 +40,6 @@ public class GitStractorExtract : GitStractorProgram {
                     { "--source", "Extract:SourcePath" },
                     { "-d", "Extract:OutputPath" },
                     { "--destination", "Extract:OutputPath" },
-                    { "-o", "Extract:OverwriteIfExists" },
-                    { "--overwrite", "Extract:OverwriteIfExists" },
                     { "-a", "Extract:AuthorMapPath" },
                     { "--authormap", "Extract:AuthorMapPath" },
                     { "-b", "Extract:IncludeBranchDetails" },

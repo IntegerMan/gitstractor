@@ -84,13 +84,14 @@ public class GitDataExtractor {
                 IncludeReachableFrom = repo.Head
             };
 
-            int totalCommits = SearchCommits(repo, filter).Count();
+            ICommitLog commits = repo.Commits.QueryBy(filter);
+            int totalCommits = commits.Count();
 
             Observers.ForEach(o => o.OnBeginningIteration(totalCommits, outputPath, includeBranchDetails));
 
             // Loop over each commit
             int commitNum = 0;
-            foreach (Commit commit in SearchCommits(repo, filter)) {
+            foreach (Commit commit in commits) {
                 commitNum++;
                 ProcessCommit(commit, repo, authorMaps, ignorePatterns);
 
@@ -121,9 +122,6 @@ public class GitDataExtractor {
         double percent = commitNum / totalCommits;
         Observers.ForEach(o => o.UpdateProgress(percent, commitNum, totalCommits));
     }
-
-    private ICommitLog SearchCommits(Repository repo, CommitFilter filter) 
-        => repo.Commits.QueryBy(filter);
 
     private void ProcessCommit(Commit commit, Repository repo, IEnumerable<AuthorMap> authorMap, IEnumerable<string> ignorePatterns) {
         bool isLast = commit == repo.Head.Tip;
