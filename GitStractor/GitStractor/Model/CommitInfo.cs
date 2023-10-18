@@ -1,41 +1,34 @@
-﻿namespace GitStractor.Model;
+using LibGit2Sharp;
+using System.Text.RegularExpressions;
+
+namespace GitStractor.Model;
 
 /// <summary>
 /// This class is an abstraction representing another commit.
 /// It exists so that changes to LibGit2Sharp do not propagate throughout the application.
 /// </summary>
-public class CommitInfo
-{
-    private readonly List<RepositoryFileInfo> _files;
-
-    /// <summary>
-    /// Creates a new instance of <see cref="CommitInfo"/>.
-    /// </summary>
-    /// <param name="files">The files associated with the commit</param>
-    public CommitInfo(IEnumerable<RepositoryFileInfo> files)
-    {
-        _files = new List<RepositoryFileInfo>(files);
-    }
+public class CommitInfo {
+    private readonly List<RepositoryFileInfo> _files = new();
 
     /// <summary>
     /// The commit message
     /// </summary>
     public required string Message { get; init; }
-    
-    /// <summary>
-    /// The total blob size of the commit in terms of bytes
-    /// </summary>
-    public ulong SizeInBytes { get; init; }
-    
+
     /// <summary>
     /// Gets the total number of files in the working tree as of this commit. This is typically not the amount of files
     /// modified by the commit.
     /// </summary>
-    public int TotalFiles { get; init; }
+    public int TotalFiles { get; set; }
+    /// <summary>
+    /// Gets the total number of lines in the working tree as of this commit. This is typically not the amount of lines
+    /// modified by the commit.
+    /// </summary>
+    public int TotalLines { get; set; }
 
-    public int TotalLines => _files.Sum(f => f.Lines);
-    public int NetLines => _files.Sum(f => f.LinesDelta);
-    
+    public int LinesDeleted { get; set; }
+    public int LinesAdded { get; set; }
+
     /// <summary>
     /// The SHA of the commit
     /// </summary>
@@ -77,31 +70,53 @@ public class CommitInfo
     /// <summary>
     /// The number of files in the commit's tree
     /// </summary>
-    public uint NumFiles => (uint)(_files.Count + DeletedFiles);
-    
+    public uint NumFiles => (uint)(_files.Count + FilesDeleted);
+
     /// <summary>
     /// The number of files in this commit's tree that didn't appear with the same path previously
     /// </summary>
-    public int AddedFiles { get; set; }
-    
+    public int FilesAdded { get; set; }
+
     /// <summary>
     /// The number of files in the prior commit's tree that didn't appear in this tree's
     /// </summary>
-    public int DeletedFiles { get; set; }
-    
+    public int FilesDeleted { get; set; }
+
+    public int FilesModified {get; set;}
+
     /// <summary>
     /// The names of the files modified by the commit
     /// </summary>
     public IReadOnlyList<RepositoryFileInfo> Files => _files;
+
+    public void Add(RepositoryFileInfo file) {
+        _files.Add(file);
+    }
 
     /// <summary>
     /// A comma-separated list of files modified by the commit
     /// </summary>
     public string FileNames => string.Join(", ", Files);
 
+    public string? ParentSha { get; init; }
+    public string? Parent2Sha { get; init; }
+    public bool IsMerge => !string.IsNullOrWhiteSpace(ParentSha) && !string.IsNullOrWhiteSpace(Parent2Sha);
+
+    public IEnumerable<string> WorkItemIdentifiers {
+        get {
+            var regexPattern = @"(Bug \d+|Issue #\d+|Ticket \d+|FEAT-\d+|#\d+)";
+
+            MatchCollection matches = Regex.Matches(Message, regexPattern);
+
+            foreach (Match match in matches) {
+                yield return match.Value.Replace("#","").Trim();
+            }
+        }
+    }
+
     /// <inheritdoc />
     public override string ToString()
     {
-        return $"{Sha[..6]} {Author.Name} @ {AuthorDateLocal.ToShortDateString()} {AuthorDateLocal.ToShortTimeString()}: {Message} ({NumFiles} file(s), +{AddedFiles}/-{DeletedFiles})";
+        return $"{Sha[..6]} {Author.Name} @ {AuthorDateLocal.ToShortDateString()} {AuthorDateLocal.ToShortTimeString()}: {Message} ({NumFiles} file(s), +{FilesAdded}/-{FilesDeleted})";
     }
 }

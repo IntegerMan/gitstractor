@@ -1,0 +1,51 @@
+﻿<telerik:RadWindow x:Class="GitStractor.Desktop.MainWindow" 
+                         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+                         xmlns:navigation="clr-namespace:Telerik.Windows.Controls.Navigation;assembly=Telerik.Windows.Controls.Navigation"
+                         navigation:RadWindowInteropHelper.Icon="favicon.ico"
+                         navigation:RadWindowInteropHelper.ShowInTaskbar="True"
+                         Header="{Binding Path=Title}"
+                         WindowStartupLocation="CenterScreen"
+                         Width="1080"
+                         Height="800"
+                         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+                         xmlns:pages="clr-namespace:GitStractor.Desktop.Pages"
+                         xmlns:telerik="http://schemas.telerik.com/2008/xaml/presentation" 
+                         xmlns:vm="clr-namespace:GitStractor.Desktop.ViewModels" 
+                         xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+                         >
+    <telerik:RadWindow.IconTemplate>
+        <DataTemplate>
+            <Image Source="favicon.ico" Stretch="None" />
+        </DataTemplate>
+    </telerik:RadWindow.IconTemplate>
+    <telerik:RadBusyIndicator IsBusy="{Binding Path=IsBusy}" 
+                              BusyContent="{Binding Path=BusyText}" 
+                              ProgressValue="{Binding Path=BusyProgress}"
+                              IsIndeterminate="{Binding Path=IsBusyIndeterminent}">
+        <DockPanel>
+            <telerik:RadMenu DockPanel.Dock="Top">
+                <telerik:RadMenuItem Header="_File">
+                    <telerik:RadMenuItem Header="_Analyze Local Git Repository" Command="{Binding Path=ShowAnalyzeCommand}" />
+                    <telerik:RadMenuItem Header="_Open GitStractor File" Command="{Binding Path=OpenAnalysisCommand}" />
+                    <telerik:RadMenuItem Header="_Exit" Command="{Binding Path=ExitCommand}" />
+                </telerik:RadMenuItem>
+                <telerik:RadMenuItem Header="_Help">
+                    <telerik:RadMenuItem Header="_About this Application" Command="{Binding Path=ShowAboutInfoCommand}" />
+                    <telerik:RadMenuItem Header="_View the Repository on GitHub" Command="{Binding Path=NotImplementedCommand}"/>
+                </telerik:RadMenuItem>
+            </telerik:RadMenu>
+            <telerik:RadToolBar DockPanel.Dock="Bottom" IsManipulationEnabled="False" AutoHideOverflowButton="True">
+                <TextBlock VerticalAlignment="Center" FontSize="11" Text="{Binding Path=Version}" />
+            </telerik:RadToolBar>
+            <Grid>
+                <pages:WelcomePage Visibility="{Binding Path=ShowWelcome, Converter={StaticResource ShowIfTrue}}" />
+                <Grid Visibility="{Binding Path=ShowAnalyze, Converter={StaticResource ShowIfTrue}}">
+                    <pages:AnalyzeRepositoryPage DataContext="{Binding Path=AnalysisVM}"/>
+                </Grid>
+                <Grid Visibility="{Binding Path=ShowResults, Converter={StaticResource ShowIfTrue}}">
+                    <pages:AnalysisResultsPage DataContext="{Binding Path=ReportVM}"/>
+                </Grid>
+            </Grid>
+        </DockPanel>
+    </telerik:RadBusyIndicator>
+</telerik:RadWindow> 

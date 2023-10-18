@@ -1,0 +1,37 @@
+﻿<Project Sdk="Microsoft.NET.Sdk;Microsoft.NET.Sdk.Publish">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net7.0</TargetFramework>
+    <RootNamespace>GitStractor.Acquire</RootNamespace>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <Title>GitStractor Acquire Worker</Title>
+    <Authors>Matt Eland</Authors>
+    <Copyright>Matt Eland</Copyright>
+    <PackageProjectUrl>https://gitstractor.com</PackageProjectUrl>
+    <Description>This is a worker application that clones git repositories to disk so they can be analyzed</Description>
+    <RepositoryUrl>https://github.com/integerman/gitstractor</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackAsTool>True</PackAsTool>
+    <AnalysisLevel>latest-recommended</AnalysisLevel>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    <StartupObject>GitStractor.Acquire.Program</StartupObject>
+    <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="LibGit2Sharp" Version="0.27.2" />
+    <PackageReference Include="MattEland.Analyzers" Version="1.1.2" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="7.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="7.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="7.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Options.DataAnnotations" Version="7.0.0" />
+    <PackageReference Include="Microsoft.NET.Build.Containers" Version="7.0.400" />
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.19.5" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\GitStractor.Workers\GitStractor.Workers.csproj" />
+    <ProjectReference Include="..\GitStractor\GitStractor.csproj" />
+  </ItemGroup>
+</Project>

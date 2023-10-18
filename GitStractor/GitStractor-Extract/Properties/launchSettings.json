@@ -1,0 +1,13 @@
+﻿{
+  "$schema": "http://json.schemastore.org/launchsettings.json",
+  "profiles": {
+    "GitStractor-Extract": {
+      "commandName": "Project",
+      "commandLineArgs": "-s C:\\Dev\\Interactive -d C:\\GitStractor\\Interactive -a C:\\Dev\\authormap.json --includebranches true --ignore .gif,.txt,.json,.d.ts",
+      "dotnetRunMessages": true,
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development"
+      }
+    }
+  }
+}

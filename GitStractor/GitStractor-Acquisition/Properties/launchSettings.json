@@ -1,0 +1,29 @@
+{
+  "profiles": {
+    "GitStractor-Acquire": {
+      "commandName": "Project",
+      "commandLineArgs": "-r https://github.com/PacktPublishing/Refactoring-with-CSharp -p C:\\GitStractor\\Acquire\\PacktBook",
+      "dotnetRunMessages": true,
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development"
+      }
+    },
+    "GitStractor-Acquire-NoParams": {
+      "commandName": "Project",
+      "commandLineArgs": "",
+      "dotnetRunMessages": true,
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development"
+      }
+    },
+    "Docker": {
+      "commandName": "Docker",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development",
+        "GITSTRACTOR_Acquire:Repository": "https://github.com/PacktPublishing/Refactoring-with-CSharp",
+        "GITSTRACTOR_Acquire:ExtractPath": "/dev/GitStractor/PacktBook",
+        "GITSTRACTOR_Acquire:OverwriteIfExists": "true"
+      }
+    }
+  }
+}
