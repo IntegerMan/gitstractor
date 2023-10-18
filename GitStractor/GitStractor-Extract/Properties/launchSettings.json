@@ -3,7 +3,7 @@
   "profiles": {
     "GitStractor-Extract": {
       "commandName": "Project",
-      "commandLineArgs": "-s C:\\Dev\\Interactive -d C:\\GitStractor\\Interactive -a C:\\Dev\\authormap.json --includebranches true --ignore .gif,.txt,.json,.d.ts",
+      "commandLineArgs": "-s C:\\Dev\\Repos\\OpenRA -d C:\\GitStractor\\OpenRA -a C:\\Dev\\authormap.json --includebranches true --ignore .gif,.txt,.json,.d.ts,.xml,.mix,.ttf,.bin,.png,.AUD",
       "dotnetRunMessages": true,
       "environmentVariables": {
         "DOTNET_ENVIRONMENT": "Development"
