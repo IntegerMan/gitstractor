@@ -2,7 +2,7 @@
 
 	<PropertyGroup>
 		<OutputType>Exe</OutputType>
-		<TargetFramework>net7.0</TargetFramework>
+		<TargetFramework>net8.0</TargetFramework>
 		<RootNamespace>GitStractor.Extract</RootNamespace>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
@@ -21,6 +21,7 @@
 		<StartupObject>GitStractor.Extract.Program</StartupObject>
 		<EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
 		<UserSecretsId>dotnet-GitStractor_Extract-910bbec2-4a84-4310-9590-0d5f16829aa7</UserSecretsId>
+		<LangVersion>12</LangVersion>
 	</PropertyGroup>
 	
 	<ItemGroup>
