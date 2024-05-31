@@ -1,6 +1,7 @@
 ﻿using System.Text;
 using GitStractor;
 using GitStractor.GitObservers;
+using GitstractorConsole;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Spectre.Console;
@@ -36,31 +37,35 @@ try
     string outputPath = "extracted-output";
     AnsiConsole.MarkupLine($"Extracting data to [yellow]{outputPath}[/]");
 
-    List<IGitObserver> observers = new()
+    AnsiConsole.Progress().Start(context =>
     {
-        new LoggingGitObserver(new NullLogger<LoggingGitObserver>()),
-        new SummaryAuthorObserver(),
-        new AuthorYearlyCommitObserver(),
-        new AuthorQuarterlyCommitObserver(),
-        new AuthorMonthlyCommitObserver(),
-        new AuthorWeeklyCommitObserver(),
-        new AuthorDailyCommitObserver(),
-        new GitCommitObserver(),
-        new CommitWorkItemObserver(),
-        new FileObserver(),
-        new DenormalizedFileCommitObserver()
-    };
+        List<IGitObserver> observers = new()
+        {
+            new AnsiConsoleProgressLogger(context),
+            new SummaryAuthorObserver(),
+            new AuthorYearlyCommitObserver(),
+            new AuthorQuarterlyCommitObserver(),
+            new AuthorMonthlyCommitObserver(),
+            new AuthorWeeklyCommitObserver(),
+            new AuthorDailyCommitObserver(),
+            new GitCommitObserver(),
+            new CommitWorkItemObserver(),
+            new FileObserver(),
+            new DenormalizedFileCommitObserver()
+        };
 
-    ILogger<GitTreeWalker> treeLogger = new NullLogger<GitTreeWalker>();
-    ILogger<GitDataExtractor> extractLogger = new NullLogger<GitDataExtractor>();
-
-    GitTreeWalker walker = new(treeLogger);
-    GitDataExtractor extractor = new(extractLogger, observers, walker);
-    extractor.ExtractInformation(gitRepo,
-        outputPath: outputPath,
-        authorMapPath: null,
-        includeBranchDetails: false,
-        ignorePatterns: []);
+        ILogger<GitTreeWalker> treeLogger = new NullLogger<GitTreeWalker>();
+        ILogger<GitDataExtractor> extractLogger = new NullLogger<GitDataExtractor>();
+        
+        GitTreeWalker walker = new(treeLogger);
+        GitDataExtractor extractor = new(extractLogger, observers, walker);
+        
+        extractor.ExtractInformation(gitRepo,
+            outputPath: outputPath,
+            authorMapPath: null,
+            includeBranchDetails: false,
+            ignorePatterns: []);
+    });
 
     return 0;
 }
