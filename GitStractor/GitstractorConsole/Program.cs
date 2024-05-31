@@ -1,9 +1,6 @@
 ﻿using System.Text;
-using GitStractor;
-using GitStractor.GitObservers;
-using GitstractorConsole;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
+using GitstractorConsole.Classification;
+using GitstractorConsole.Extraction;
 using Spectre.Console;
 
 try
@@ -13,61 +10,36 @@ try
     Console.InputEncoding = Encoding.UTF8;
 
     AnsiConsole.Write(new FigletText("GitStractor").Color(Color.Aqua));
+    AnsiConsole.MarkupLine($"[bold yellow]GitStractor[/] is a tool to extract data from Git repositories.{Environment.NewLine}");
 
-    AnsiConsole.MarkupLine(
-        $"[bold yellow]GitStractor[/] is a tool to extract data from Git repositories.{Environment.NewLine}");
-
-    string path = AnsiConsole.Prompt(
-        new TextPrompt<string>("Enter the path to the Git repository")
-            .PromptStyle("green")
-            .DefaultValue(".")
-    );
-    AnsiConsole.WriteLine();
-
-    string? gitRepo = GitStractor.Utilities.FileUtilities.GetParentGitDirectory(path);
-
-    if (string.IsNullOrWhiteSpace(gitRepo))
+    Dictionary<string, Func<int>> choices = new()
     {
-        AnsiConsole.MarkupLine("[red]No Git repository found in the specified path.[/]");
-        return 1;
-    }
-
-    AnsiConsole.MarkupLine($"Extracting data from git repo in [yellow]{gitRepo}[/]");
-
-    string outputPath = "extracted-output";
-    AnsiConsole.MarkupLine($"Extracting data to [yellow]{outputPath}[/]");
-
-    AnsiConsole.Progress().Start(context =>
-    {
-        List<IGitObserver> observers = new()
         {
-            new AnsiConsoleProgressLogger(context),
-            new SummaryAuthorObserver(),
-            new AuthorYearlyCommitObserver(),
-            new AuthorQuarterlyCommitObserver(),
-            new AuthorMonthlyCommitObserver(),
-            new AuthorWeeklyCommitObserver(),
-            new AuthorDailyCommitObserver(),
-            new GitCommitObserver(),
-            new CommitWorkItemObserver(),
-            new FileObserver(),
-            new DenormalizedFileCommitObserver()
-        };
+            "Extract data from a Git repository", () =>
+            {
+                ExtractionMenu extraction = new();
+                return extraction.Run();
+            }
+        },
+        {
+            "Classify commits", () =>
+            {
+                CommitClassification classification = new();
+                return classification.Run();
+            }
+        },
+        {
+            "Exit", () =>
+            {
+                AnsiConsole.WriteLine("Thank you for using [Yellow]GitStractor[/]");
+                return 0;
+            }
+        }
+    };
 
-        ILogger<GitTreeWalker> treeLogger = new NullLogger<GitTreeWalker>();
-        ILogger<GitDataExtractor> extractLogger = new NullLogger<GitDataExtractor>();
-        
-        GitTreeWalker walker = new(treeLogger);
-        GitDataExtractor extractor = new(extractLogger, observers, walker);
-        
-        extractor.ExtractInformation(gitRepo,
-            outputPath: outputPath,
-            authorMapPath: null,
-            includeBranchDetails: false,
-            ignorePatterns: []);
-    });
-
-    return 0;
+    return choices[AnsiConsole.Prompt(new SelectionPrompt<string>()
+        .Title("Select a task")
+        .AddChoices(choices.Keys))]();
 }
 catch (Exception ex)
 {

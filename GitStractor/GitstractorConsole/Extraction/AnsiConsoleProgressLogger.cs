@@ -2,7 +2,7 @@ using GitStractor.GitObservers;
 using GitStractor.Model;
 using Spectre.Console;
 
-namespace GitstractorConsole;
+namespace GitstractorConsole.Extraction;
 
 public class AnsiConsoleProgressLogger : IGitObserver
 {
