@@ -12,32 +12,32 @@ try
     AnsiConsole.Write(new FigletText("GitStractor").Color(Color.Aqua));
     AnsiConsole.MarkupLine($"[bold yellow]GitStractor[/] is a tool to extract data from Git repositories.{Environment.NewLine}");
 
-    Dictionary<string, Func<int>> choices = new()
+    Dictionary<string, Func<Task<int>>> choices = new()
     {
         {
             "Extract data from a Git repository", () =>
             {
                 ExtractionMenu extraction = new();
-                return extraction.Run();
+                return Task.FromResult(extraction.Run());
             }
         },
         {
-            "Classify commits", () =>
+            "Classify commits", async () =>
             {
                 CommitClassification classification = new();
-                return classification.Run();
+                return await classification.RunAsync();
             }
         },
         {
             "Exit", () =>
             {
                 AnsiConsole.WriteLine("Thank you for using [Yellow]GitStractor[/]");
-                return 0;
+                return Task.FromResult(0);
             }
         }
     };
 
-    return choices[AnsiConsole.Prompt(new SelectionPrompt<string>()
+    return await choices[AnsiConsole.Prompt(new SelectionPrompt<string>()
         .Title("Select a task")
         .AddChoices(choices.Keys))]();
 }

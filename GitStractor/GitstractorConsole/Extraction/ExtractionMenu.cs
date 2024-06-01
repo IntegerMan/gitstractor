@@ -13,7 +13,7 @@ public class ExtractionMenu
         string path = AnsiConsole.Prompt(
             new TextPrompt<string>("Enter the path to the Git repository")
                 .PromptStyle("green")
-                .DefaultValue("/home/matteland/Documents/dotnetml")
+                .DefaultValue("/home/matteland/Documents/EmergenceWin")
         );
 
         string? gitRepo = GitStractor.Utilities.FileUtilities.GetParentGitDirectory(path);
@@ -30,7 +30,7 @@ public class ExtractionMenu
         string outputPath = AnsiConsole.Prompt(
             new TextPrompt<string>("Enter the output path")
                 .PromptStyle("green")
-                .DefaultValue("/home/matteland/data/gitstractor")
+                .DefaultValue("/home/matteland/data/emergence")
         );
 
         // Combine the output path with the current directory to get the full path.
