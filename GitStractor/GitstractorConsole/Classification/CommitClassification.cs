@@ -8,7 +8,6 @@ using LLama.Common;
 using LLama.Native;
 using Newtonsoft.Json;
 using Spectre.Console;
-using Spectre.Console.Json;
 
 namespace GitstractorConsole.Classification;
 
@@ -17,7 +16,7 @@ public class CommitClassification
     public async Task<int> RunAsync()
     {
         string directory = "/home/matteland/data/";
-        
+
         // Get directories in that directory
         string[] directories = Directory.GetDirectories(directory);
         if (directories.Length == 0)
@@ -25,12 +24,12 @@ public class CommitClassification
             AnsiConsole.MarkupLine("[red]No directories found in the specified path.[/]");
             return 1;
         }
-        
+
         // Prompt the user to select a directory
         directory = AnsiConsole.Prompt(new SelectionPrompt<string>()
             .Title("Select a directory")
             .AddChoices(directories));
-        
+
         string commitFile = Path.Combine(directory, "Commits.csv");
         string filePath = Path.Combine(directory, commitFile);
 
@@ -46,7 +45,7 @@ public class CommitClassification
             //AnsiConsole.WriteLine($"{level}: {message}");
         });
 
-        string modelPath = @"/home/matteland/models/";
+        string modelPath = "/home/matteland/models/";
 
         // Get a list of available models in the model path
         string[] models = Directory.GetFiles(modelPath, "*.gguf");
@@ -56,10 +55,18 @@ public class CommitClassification
             return 1;
         }
 
-        // Prompt the user to select a model
-        string selectedModel = AnsiConsole.Prompt(new SelectionPrompt<string>()
-            .Title("Select a model")
-            .AddChoices(models));
+        // Prompt the user to select a model if we have > 1 model
+        string selectedModel;
+        if (models.Length == 1)
+        {
+            selectedModel = models[0];
+        }
+        else
+        {
+            selectedModel = AnsiConsole.Prompt(new SelectionPrompt<string>()
+                .Title("Select a model")
+                .AddChoices(models));
+        }
 
         modelPath = Path.Combine(modelPath, selectedModel);
 
@@ -67,8 +74,8 @@ public class CommitClassification
 
         var parameters = new ModelParams(modelPath)
         {
-            ContextSize = 1024, // The longest length of chat as memory.
-            GpuLayerCount = 8 // How many layers to offload to GPU. Please adjust it according to your GPU memory.
+            ContextSize = 2048, // The longest length of chat as memory.
+            GpuLayerCount = int.MaxValue
         };
         using LLamaWeights model = LLamaWeights.LoadFromFile(parameters);
         using LLamaContext context = model.CreateContext(parameters);
@@ -77,65 +84,89 @@ public class CommitClassification
         // Add chat histories as prompt to tell AI how to act.
         InferenceParams inferenceParams = new()
         {
-            MaxTokens = 64,
+            MaxTokens = 128,
             AntiPrompts = new List<string> { "User:", "}", "Assistant:", "<|user|>", "<|end|>", "<|assistant|>" }
         };
 
         const string systemPrompt =
-            "Consider the input JSON to determine if it represents a bugfix commit. Respond only with \"{\"IsBugFix\": boolean_value, \"Reason\": \"A few words of explanation\"}\" Some examples:";
+            "You are an AI agent built to classify git commits as being related to fixing bugs or not being related to fixing bugs." +
+            "Consider the input JSON to determine if it represents a bugfix commit. Respond only with \"{\"IsBugFix\": boolean_value, \"Reason\": \"A few words of explanation\"}\" " +
+            "where boolean_value must be either true or false and never null, empty, or undefined. " +
+            "Only indicate if a commit is a bugfix commit if there is a high probability that the commit is intended to fix a known problem in the code. " +
+            "Adding features does not count as a bug fix. " +
+            "When providing a reason, keep the explanation short and to a single sentence." +
+            "Some examples:";
 
-        const string example1 = """
-                                <|user|>
-                                {
-                                   "Message": "Fixed build issues",
-                                   "WorkItems": 0,
-                                   "TotalFiles": 11,
-                                   "ModifiedFiles": 4,
-                                   "AddedFiles": 6,
-                                   "DeletedFiles": 1,
-                                   "TotalLines": 7346,
-                                   "NetLines": 6904,
-                                   "AddedLines": 6928,
-                                   "DeletedLines": 24,
-                                   "IsMerge": false
-                                }
-                                <|end|>
+        string[] examples =
+        [
+            """
+            <|user|>
+            "Fixed build issues"
+            <|end|>
 
-                                <|assistant|>
-                                {"IsBugFix": false, "Reason": "Mentioned fixing things"}
-                                <|end|>
-                                """;
+            <|assistant|>
+            {"IsBugFix": true, "Reason": "Mentioned fixing things"}
+            <|end|>
+            """,            
+            """
+            <|user|>
+            "Rendering user list and starting on internal logic"
+            <|end|>
 
-        const string example2 = """
-                                <|user|>
-                                {
-                                   "Message": "Refactoring code to be more testable",
-                                   "WorkItems": 0,
-                                   "TotalFiles": 13,
-                                   "ModifiedFiles": 5,
-                                   "AddedFiles": 8,
-                                   "DeletedFiles": 0,
-                                   "TotalLines": 454,
-                                   "NetLines": 165,
-                                   "AddedLines": 210,
-                                   "DeletedLines": 45,
-                                   "IsMerge": false
-                                }
-                                <|end|>
+            <|assistant|>
+            {"IsBugFix": false, "Reason": "Looks like progress on new features"}
+            <|end|>
+            """,
+            """
+            <|user|>
+            "Refactoring code to be more testable"
+            <|end|>
 
-                                <|assistant|>
-                                {"IsBugFix": false, "Reason": "Refactoring and testability are not bugfixes"}
-                                <|end|>
-                                """;
+            <|assistant|>
+            {"IsBugFix": false, "Reason": "Refactoring and testability are not bugfixes"}
+            <|end|>
+            """,
 
+            """
+            <|user|>
+            "Adding logging"
+            <|end|>
+
+            <|assistant|>
+            {"IsBugFix": false, "Reason": "Logging can help identify bugs, but does not represent a fix"}
+            <|end|>
+            """,
+
+            """
+            <|user|>
+            "For bob"
+            <|end|>
+
+            <|assistant|>
+            {"IsBugFix": false, "Reason": "The message is ambiguous so defaulting to false"}
+            <|end|>
+            """,
+
+            """
+            <|user|>
+            "Starting dark theme"
+            <|end|>
+
+            <|assistant|>
+            {"IsBugFix": false, "Reason": "This looks like a new feature, not a bugfix."}
+            <|end|>
+            """
+        ];
+        string prompts = systemPrompt + "\n" +
+                         string.Join("\n", examples) + "\r" +
+                         "Actual scenario to evaluate follows: + \n\n";
+        
         string outputPath = Path.Combine(directory, "ClassifiedCommits.csv");
-
         TimeSpan elapsed = TimeSpan.Zero;
         await AnsiConsole.Progress().StartAsync(async prog =>
         {
             ProgressTask task = prog.AddTask($"Classifying {commits.Count} commits...", autoStart: false);
             task.MaxValue = commits.Count;
-            
             await using FileStream file = new(outputPath, FileMode.Create);
             await using CsvWriter writer = new CsvWriter(new StreamWriter(file), CultureInfo.CurrentCulture);
             writer.WriteField("Sha");
@@ -144,23 +175,16 @@ public class CommitClassification
             writer.WriteField("Message");
             writer.WriteField("Response");
             await writer.NextRecordAsync();
-            
             task.StartTask();
             
             foreach (var row in commits)
             {
-                string json = JsonConvert.SerializeObject(row, Formatting.Indented);
-
-                StringBuilder sb = new(systemPrompt);
-                sb.AppendLine(example1);
-                sb.AppendLine(example2);
-                sb.AppendLine("Actual scenario to evaluate follows:");
-                sb.AppendLine();
+                string json = JsonConvert.SerializeObject(row.Message);
+                StringBuilder sb = new(prompts);
                 sb.AppendLine("<|user|>");
                 sb.AppendLine(json);
                 sb.AppendLine("<|end|>");
                 sb.AppendLine("<|assistant|>");
-
                 StringBuilder response = new();
                 await foreach (var text in executor.InferAsync(sb.ToString(), inferenceParams))
                 {
@@ -171,8 +195,16 @@ public class CommitClassification
                     .ReplaceLineEndings(" ")
                     .Trim();
 
-                ClassificationResult? classify = null;
+                // Remove content before the first { and after the last }
+                int start = resp.IndexOf('{');
+                int end = resp.LastIndexOf('}');
+                if (start >= 0 && end >= 0)
+                {
+                    resp = resp[start..(end + 1)];
+                }
 
+                // Parse the JSON
+                ClassificationResult? classify = null;
                 try
                 {
                     classify = JsonConvert.DeserializeObject<ClassificationResult>(resp);
@@ -194,12 +226,13 @@ public class CommitClassification
 
             await writer.FlushAsync();
             task.StopTask();
-            
+
             elapsed = task.ElapsedTime!.Value;
         });
 
         AnsiConsole.MarkupLineInterpolated($"[Green]Wrote classified commits to[/] [yellow]{outputPath}[/]");
-        AnsiConsole.MarkupLineInterpolated($"[cyan]Elapsed time:[/] {elapsed.TotalMilliseconds/1000.0:0.00} seconds ({(elapsed.TotalMilliseconds / (double)commits.Count)/1000.0:0.00} seconds per commit)");
+        AnsiConsole.MarkupLineInterpolated(
+            $"[cyan]Elapsed time:[/] {elapsed.TotalMilliseconds / 1000.0:0.00} seconds ({(elapsed.TotalMilliseconds / (double)commits.Count) / 1000.0:0.00} seconds per commit)");
 
         return 0;
     }
