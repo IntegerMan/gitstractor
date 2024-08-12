@@ -28,7 +28,7 @@ public class AnsiConsoleProgressLogger : IGitObserver
         _task?.StopTask();
         _task = null;
     }
-
+    
     public void OnNewAuthor(AuthorInfo author)
     {
     }
