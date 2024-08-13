@@ -19,7 +19,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\GitStractor.Workers\GitStractor.Workers.csproj" />
       <ProjectReference Include="..\GitStractor\GitStractor.csproj" />
     </ItemGroup>
 
