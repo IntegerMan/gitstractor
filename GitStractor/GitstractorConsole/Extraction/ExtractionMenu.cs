@@ -17,7 +17,7 @@ public class ExtractionMenu
         string path = AnsiConsole.Prompt(
             new TextPrompt<string>("Enter the path to the Git repository")
                 .PromptStyle("green")
-                .DefaultValue("/home/matteland/Documents/EmergenceWin")
+                .DefaultValue("/home/matteland/Documents/machinelearning")
         );
 
         string? gitRepo = GitStractor.Utilities.FileUtilities.GetParentGitDirectory(path);
@@ -34,7 +34,7 @@ public class ExtractionMenu
         string outputPath = AnsiConsole.Prompt(
             new TextPrompt<string>("Enter the output path")
                 .PromptStyle("green")
-                .DefaultValue("/home/matteland/data/emergence")
+                .DefaultValue("/home/matteland/data/GitStractorOutput")
         );
 
         // Combine the output path with the current directory to get the full path.
@@ -67,7 +67,7 @@ public class ExtractionMenu
                 new CommitWorkItemObserver(),
                 new FileObserver(),
                 provider.GetRequiredService<DenormalizedFileCommitWithBugFixClassificationObserver>()
-            ];
+            ]; // /home/matteland/Documents/Wherewolf, /home/matteland/data/wherewolf
 
             ILogger<GitTreeWalker> treeLogger = new NullLogger<GitTreeWalker>();
             ILogger<GitDataExtractor> extractLogger = new NullLogger<GitDataExtractor>();
